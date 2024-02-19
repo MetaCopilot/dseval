@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Heart Attack Risk Prediction Dataset",
+  "description": "### Context\n\nThe Heart Attack Risk Prediction Dataset serves as a valuable resource for delving into the intricate dynamics of heart health and its predictors. Heart attacks, or myocardial infarctions, continue to be a significant global health issue, necessitating a deeper comprehension of their precursors and potential mitigating factors. This dataset encapsulates a diverse range of attributes including age, cholesterol levels, blood pressure, smoking habits, exercise patterns, dietary preferences, and more, aiming to elucidate the complex interplay of these variables in determining the likelihood of a heart attack. By employing predictive analytics and machine learning on this dataset, researchers and healthcare professionals can work towards proactive strategies for heart disease prevention and management. The dataset stands as a testament to collective efforts to enhance our understanding of cardiovascular health and pave the way for a healthier future.\n\n### Content\n\nThis dataset provides a comprehensive array of features relevant to heart health and lifestyle choices, encompassing patient-specific details such as age, gender, cholesterol levels, blood pressure, heart rate, and indicators like diabetes, family history, smoking habits, obesity, and alcohol consumption. Additionally, lifestyle factors like exercise hours, dietary habits, stress levels, and sedentary hours are included. Medical aspects comprising previous heart problems, medication usage, and triglyceride levels are considered. Socioeconomic aspects such as income and geographical attributes like country, continent, and hemisphere are incorporated. The dataset, consisting of 8763 records from patients around the globe, culminates in a crucial binary classification feature denoting the presence or absence of a heart attack risk, providing a comprehensive resource for predictive analysis and research in cardiovascular health.\n\n### Dataset Glossary (Column-wise)\n\n* <b>Patient ID</b> - Unique identifier for each patient\n* <b>Age</b> - Age of the patient\n* <b>Sex</b> - Gender of the patient (Male/Female)\n* <b>Cholesterol</b> - Cholesterol levels of the patient\n* <b>Blood Pressure</b> - Blood pressure of the patient (systolic/diastolic)\n* <b>Heart Rate</b> - Heart rate of the patient\n* <b>Diabetes</b> - Whether the patient has diabetes (Yes/No)\n* <b>Family History</b> - Family history of heart-related problems (1: Yes, 0: No)\n* <b>Smoking</b> - Smoking status of the patient (1: Smoker, 0: Non-smoker)\n* <b>Obesity</b> - Obesity status of the patient (1: Obese, 0: Not obese)\n* <b>Alcohol Consumption</b> - Level of alcohol consumption by the patient (None/Light/Moderate/Heavy)\n* <b>Exercise Hours Per Week</b> - Number of exercise hours per week\n* <b>Diet</b> - Dietary habits of the patient (Healthy/Average/Unhealthy)\n* <b>Previous Heart Problems</b> - Previous heart problems of the patient (1: Yes, 0: No)\n* <b>Medication Use</b> - Medication usage by the patient (1: Yes, 0: No)\n* <b>Stress Level</b> - Stress level reported by the patient (1-10)\n* <b>Sedentary Hours Per Day</b> - Hours of sedentary activity per day\n* <b>Income</b> - Income level of the patient\n* <b>BMI</b> - Body Mass Index (BMI) of the patient\n* <b>Triglycerides</b> - Triglyceride levels of the patient\n* <b>Physical Activity Days Per Week</b> - Days of physical activity per week\n* <b>Sleep Hours Per Day</b> - Hours of sleep per day\n* <b>Country</b> - Country of the patient\n* <b>Continent</b> - Continent where the patient resides\n* <b>Hemisphere</b> - Hemisphere where the patient resides\n* <b>Heart Attack Risk</b> - Presence of heart attack risk (1: Yes, 0: No)\n\n### Structure of the Dataset\n\n![](https://i.imgur.com/5cTusqA.png)\n\n### Acknowledgement\n\nThis dataset is a synthetic creation generated using ChatGPT to simulate a realistic experience. Its purpose is to provide a platform for beginners and data enthusiasts, allowing them to create, enjoy, practice, and learn from a dataset that mirrors real-world scenarios. The aim is to foster learning and experimentation in a simulated environment, encouraging a deeper understanding of data analysis and interpretation.\n\nCover Photo by: <b><a href=\"https://www.freepik.com/free-vector/human-internal-organ-with-heart_27289238.htm#query=heart%20organ&amp;position=14&amp;from_view=keyword&amp;track=ais\">brgfx</a> on Freepik</b>\n\nThumbnail by: <b><a href=\"https://www.freepik.com/free-vector/cardiology-clinic-hospital-department-healthy-heart-cardiovascular-prevention-healthcare-industry-idea-design-element-electrocardiogram-ekg-vector-isolated-concept-metaphor-illustration_12468752.htm#query=human%20heart&amp;position=17&amp;from_view=keyword&amp;track=ais\">vectorjuice</a> on Freepik</b>",
+  "url": "https://www.kaggle.com/iamsouravbanerjee/heart-attack-prediction-dataset",
+  "version": 1,
+  "keywords": [
+    "subject, health and fitness, health",
+    "subject, health and fitness, health, health conditions",
+    "subject, health and fitness, health, health conditions, heart conditions",
+    "subject, health and fitness, health, public health",
+    "subject, health and fitness, health, healthcare"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3786485"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Sourav Banerjee",
+    "url": "https://www.kaggle.com/iamsouravbanerjee",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/7024923-kg.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/iamsouravbanerjee/heart-attack-prediction-dataset/download?datasetVersionNumber=1",
+      "contentSize": "531767 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-09-27T07:07:50.563Z",
+  "discussionUrl": "https://www.kaggle.com/iamsouravbanerjee/heart-attack-prediction-dataset/discussion",
+  "alternateName": "Unlocking Predictive Insights with Multifaceted Synthetic Heart Attack Dataset",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3786485/6552418/10e8bf7549a7662bfeaee9a112cca9fb/dataset-card.png?t=2023-09-27-09-29-19",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 8541
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 35780
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 140
+    }
+  ]
+}

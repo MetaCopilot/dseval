@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Billionaires Statistics Dataset (2023)",
+  "description": "# Description\n\n&gt;This dataset contains statistics on the world's billionaires, including information about their businesses, industries, and personal details. It provides insights into the wealth distribution, business sectors, and demographics of billionaires worldwide.\n\n<div>\n    \n</div>\n\n\n\n# Key Features\n\n&gt;- **rank**: The ranking of the billionaire in terms of wealth.\n- **finalWorth**: The final net worth of the billionaire in U.S. dollars.\n- **category**: The category or industry in which the billionaire's business operates.\n- **personName**: The full name of the billionaire.\n- **age**: The age of the billionaire.\n- **country**: The country in which the billionaire resides.\n- **city**: The city in which the billionaire resides.\n- **source**: The source of the billionaire's wealth.\n- **industries**: The industries associated with the billionaire's business interests.\n- **countryOfCitizenship**: The country of citizenship of the billionaire.\n- **organization**: The name of the organization or company associated with the billionaire.\n- **selfMade**: Indicates whether the billionaire is self-made (True/False).\n- **status**: \"D\" represents self-made billionaires (Founders/Entrepreneurs) and \"U\" indicates inherited or unearned wealth.\n- **gender**: The gender of the billionaire.\n- **birthDate**: The birthdate of the billionaire.\n- **lastName**: The last name of the billionaire.\n- **firstName**: The first name of the billionaire.\n- **title**: The title or honorific of the billionaire.\n- **date**: The date of data collection.\n- **state**: The state in which the billionaire resides.\n- **residenceStateRegion**: The region or state of residence of the billionaire.\n- **birthYear**: The birth year of the billionaire.\n- **birthMonth**: The birth month of the billionaire.\n- **birthDay**: The birth day of the billionaire.\n- **cpi_country**: Consumer Price Index (CPI) for the billionaire's country.\n- **cpi_change_country**: CPI change for the billionaire's country.\n- **gdp_country**: Gross Domestic Product (GDP) for the billionaire's country.\n- **gross_tertiary_education_enrollment**: Enrollment in tertiary education in the billionaire's country.\n- **gross_primary_education_enrollment_country**: Enrollment in primary education in the billionaire's country.\n- **life_expectancy_country**: Life expectancy in the billionaire's country.\n- **tax_revenue_country_country**: Tax revenue in the billionaire's country.\n- **total_tax_rate_country**: Total tax rate in the billionaire's country.\n- **population_country**: Population of the billionaire's country.\n- **latitude_country**: Latitude coordinate of the billionaire's country.\n- **longitude_country**: Longitude coordinate of the billionaire's country.\n\n# Potential Use Cases\n\n&gt;- **Wealth distribution analysis:** Explore the distribution of billionaires' wealth across different industries, countries, and regions.\n- **Demographic analysis:** Investigate the age, gender, and birthplace demographics of billionaires.\n- **Self-made vs. inherited wealth:** Analyze the proportion of self-made billionaires and those who inherited their wealth.\n- **Economic indicators:** Study correlations between billionaire wealth and economic indicators such as GDP, CPI, and tax rates.\n- **Geospatial analysis:** Visualize the geographical distribution of billionaires and their wealth on a map.\n- **Trends over time:** Track changes in billionaire demographics and wealth over the years.\n\n\nIf this was helpful, a vote is appreciated \ud83d\ude42\u2764\ufe0f\n",
+  "url": "https://www.kaggle.com/nelgiriyewithana/billionaires-statistics-dataset",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "subject, people and society, news",
+    "technique, data visualization",
+    "task, classification",
+    "technique, exploratory data analysis"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3795419"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Nidula Elgiriyewithana \u26a1",
+    "url": "https://www.kaggle.com/nelgiriyewithana",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9918221-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/nelgiriyewithana/billionaires-statistics-dataset/download?datasetVersionNumber=1",
+      "contentSize": "142700 bytes"
+    }
+  ],
+  "commentCount": 8,
+  "dateModified": "2023-09-29T13:39:28.27Z",
+  "discussionUrl": "https://www.kaggle.com/nelgiriyewithana/billionaires-statistics-dataset/discussion",
+  "alternateName": "Exploring the Global Landscape of Success",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3795419/6570253/137fc6366680afbe054e29cf72a5b054/dataset-card.png?t=2023-09-29-13-43-46",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 8
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 14022
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 59258
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 329
+    }
+  ]
+}

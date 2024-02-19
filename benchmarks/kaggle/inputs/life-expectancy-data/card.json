@@ -1,0 +1,68 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Health &amp; Development Indicators: Global Insights",
+  "description": "\nLabels: \"Status\" (Development Status: Developing or Developed)\n\nFeatures:\n1. Country: The name of the country.\n2. Year: The year of data recording.\n3. Life Expectancy: The average number of years a newborn, person at different age ranges, or the entire population is expected to live\n4. Adult Mortality: Probability of dying between 15 and 60 years per 1000 population.\n5. Infant Deaths: Number of infant deaths per 1000 live births.\n6. Alcohol: Alcohol consumption per capita (in liters of pure alcohol).\n7. Percentage Expenditure: Expenditure on health as a percentage of total government spending or GDP.\n8. Hepatitis B: Hepatitis B immunization coverage among 1-year-olds (percentage).\n9. Measles: Measles immunization coverage among 1-year-olds (percentage).\n\n",
+  "url": "https://www.kaggle.com/arunjangir245/life-expectancy-data",
+  "version": 2,
+  "keywords": [
+    "subject, people and society, business"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Database: Open Database, Contents: Database Contents",
+    "url": "http://opendatacommons.org/licenses/dbcl/1.0/"
+  },
+  "identifier": [
+    "3579291"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Arun Jangir",
+    "url": "https://www.kaggle.com/arunjangir245",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/13192197-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/arunjangir245/life-expectancy-data/download?datasetVersionNumber=2",
+      "contentSize": "76589 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-10-15T07:04:21.423Z",
+  "discussionUrl": "https://www.kaggle.com/arunjangir245/life-expectancy-data/discussion",
+  "alternateName": "Analyzing the Intersection of Health and Development Indicators Across Nations",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3579291/6231052/d1e67a67bd1a522f81fac2d89a13510a/dataset-card.png?t=2023-08-02-11-14-31",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 234
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 1394
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 101
+    }
+  ]
+}

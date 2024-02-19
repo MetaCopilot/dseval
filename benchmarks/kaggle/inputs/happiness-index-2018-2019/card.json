@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Happiness Index 2018-2019",
+  "description": "**About data:** This study analyzes the association between the Happiness Index Score in 2018 and 2019, and a set of independent variables such as 'Overall rank', 'GDP per capita', 'Social support', 'Healthy life expectancy', 'Freedom to make life choices', 'Generosity' and 'Perceptions of corruption'. The objective of this study is to investigate the impact of these independent variables on the level of happiness of individuals during these two years. In addition, a country-wise analysis was conducted to examine variations in variables between the top-ranking happiest country and India. Multiple visualizations were employed to identify and illustrate these differences in a clear and concise manner.\n\n**Dependent &amp; Independent variables:** The first independent variable is GDP per capita, which represents the economic well-being of a country's residents. The second variable, freedom to make life choices, represents the level of autonomy and control individuals have over their lives. The third variable, health life expectancy, indicates the length of time individuals can expect to live in good health. The fourth variable, perception of corruption, reflects the extent to which corruption is perceived to be prevalent in a society. Finally, the fifth variable, social support, measures the extent to which individuals have access to support from family, friends, and other social networks.\n\nBy examining the relationship between these independent variables and the Happiness Index Score, the study aims to contribute to the understanding of the factors that impact individuals' happiness levels. The results of this study could be useful for policymakers and other stakeholders in identifying areas for intervention and improvement to enhance the overall well-being of the population.\n\n**Overview of the Data (2018 &amp; 2019)**\n- Overall rank: List of ranks of different countries from 1 to 156\n- Country or region: List of the names of different countries.\n- Score: List of happiness scores of different countries.\n- GDP per capita: The GDP per capita score of different countries.\n- Social support: The social support of different countries.\n- Healthy life expectancy: The healthy life expectancy of different countries.\n- Freedom to make life choices: The score of perception of freedom of different countries.\n- Generosity: Generosity (the quality of being kind and generous) score of different countries.\n- Perceptions of corruption: The score of the perception of corruption in different countries.\n\n**Abstract**\n\nThis study aims to investigate the relationship between the Happiness Index Score and several independent variables, namely GDP per capita, social support, healthy life expectancy, freedom to make life choices, and perceptions of corruption, in the years 2018 and 2019. By analyzing these variables, we sought to identify the factors that significantly influence individuals' happiness levels and contribute to a better understanding of the factors that impact overall well-being. The study used regression analysis to examine the statistical significance of these variables and their impact on the dependent variable, the Happiness Index Score. The results indicate that all independent variables significantly influence the Happiness Index Score and can explain up to 98.6% and 98.1% of the variance in the dependent variable in 2018 and 2019, respectively. Moreover, the analysis suggests that social support and GDP per capita are the main parameters that differentiate Finland from India in terms of happiness levels. The findings of this study could be useful for policymakers and stakeholders in identifying areas for intervention and improvement to enhance the overall well-being of the population.\n\n**Keywords:** Happiness Index Score, GDP per capita, social support, healthy life expectancy, freedom to make life choices, perceptions of corruption, regression analysis, Finland, India.\n\n**Introduction:**\n\nThe pursuit of happiness has been a central theme in human societies throughout history. The Happiness Index Score is a measure of well-being that has gained considerable attention in recent years as an indicator of a country's overall prosperity and quality of life. The Happiness Index Score is calculated based on several variables, including GDP per capita, social support, healthy life expectancy, freedom to make life choices, perceptions of corruption, and generosity.\n\nThe purpose of this study is to investigate the impact of these variables on the Happiness Index Score in 2018 and 2019 and to identify the factors that significantly influence individuals' happiness levels. The study aims to contribute to the understanding of the factors that impact overall well-being and to provide insights for policymakers and stakeholders in identifying areas for intervention and improvement.\n\n**Methodology:**\n\nThe study used regression analysis to examine the relationship between the Happiness Index Score and independent variables, namely GDP per capita, social support, healthy life expectancy, freedom to make life choices, and perceptions of corruption. The data for this study was obtained from the World Happiness Report for the years 2018 and 2019. The analysis was conducted using Python programming and all the visualizations were created using the same.\n\n**Results:**\n\nThe regression analysis revealed that all independent variables significantly influence the Happiness Index Score in both 2018 and 2019. The adjusted R squared values of 0.986 and 0.981 in 2018 and 2019, respectively, indicate a robust model capable of explaining a large proportion of the variance in the dependent variable. Moreover, the p-values associated with the F statistics were less than 0.05, indicating that the model is statistically significant and reliable.\n\nFirstly, a regression analysis was conducted for dataset \"Happiness Index 2018\". Here, The regression model indicates that the independent variables, namely GDP per capita, social support, freedom to make life choices, generosity, and perceptions of corruption, significantly influence the dependent variable, which is the Happiness Index Score. This finding suggests that variations in the aforementioned independent variables can considerably affect positively the level of happiness in a given population. It is worth noting that all the independent variables have p-values less than 0.05, indicating that they are statistically significant in the model. Additionally, the adjusted R squared value of 0.986 is indicative of a robust model, which can explain 98.6% of the variance in the dependent variable. Moreover, the p-value associated with the F statistics is also less than 0.05, further strengthening the evidence that the model is significant and capable of producing reliable results. Overall, these findings suggest that the regression model is valid and can be used to make accurate predictions about the Happiness Index Score based on the selected independent variables.\n\nThereafter, another regression analysis was conducted for dataset \"Happiness Index 2019\" to investigate the influence of social support, freedom to make life choices, generosity, and perceptions of corruption on the happiness index score. The analysis revealed that all independent variables significantly influenced the dependent variable, indicating that the happiness index score varied greatly based on these factors. The statistical significance of these variables was confirmed by a p-value of less than 0.05. The robustness of the model was also demonstrated by an adjusted R squared value of 0.981. Moreover, the p-value associated with F statistics was less than 0.05, suggesting that the model was good. These findings suggest that policymakers and organizations could target these independent variables to enhance overall happiness levels.\n\nFurthermore, the country-wise analysis showed that Finland had significantly higher levels of GDP per capita and social support compared to India, which were the two main factors contributing to the difference in happiness levels between the two countries.\n\n**Conclusion:**\nThe study concludes that the independent variables, namely GDP per capita, social support, healthy life expectancy, freedom to make life choices, and perceptions of corruption, significantly influence the Happiness Index Score in both 2018 and 2019. The findings suggest that policymakers and stakeholders could target these variables to enhance overall well-being and happiness levels. The analysis also highlights the importance of GDP per capita and social support in determining the Happiness Index Score and differentiating countries' happiness levels, as demonstrated by the comparison of Finland and India.\n\nThe study contributes to the understanding of the factors that impact individuals' happiness levels and provides insights for policymakers and stakeholders in identifying areas for intervention and improvement.\n\n\n**Code link:** https://www.kaggle.com/code/sougatapramanick/soug009",
+  "url": "https://www.kaggle.com/sougatapramanick/happiness-index-2018-2019",
+  "version": 1,
+  "keywords": [
+    "subject, people and society, social science",
+    "technique, data analytics",
+    "technique, data visualization",
+    "audience, intermediate",
+    "subject, science and technology, computer science, programming, python",
+    "task, linear regression"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3131024"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Sougata Pramanick",
+    "url": "https://www.kaggle.com/sougatapramanick",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/sougatapramanick/happiness-index-2018-2019/download?datasetVersionNumber=1",
+      "contentSize": "15768 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-04-14T12:01:03.437Z",
+  "discussionUrl": "https://www.kaggle.com/sougatapramanick/happiness-index-2018-2019/discussion",
+  "alternateName": "An analysis of the happiness index for the years 2018 and 2019",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3131024/5404203/983d7bf76b6d05db611be4652c937279/dataset-card.jpg?t=2023-04-14-12-13-17",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 8099
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 40372
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 106
+    }
+  ]
+}

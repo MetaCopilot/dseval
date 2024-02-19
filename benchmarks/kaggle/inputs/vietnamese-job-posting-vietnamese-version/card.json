@@ -1,0 +1,68 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Vietnamese Job Posting - Vietnamese Version",
+  "description": "The dataset contains approximately 2,000 job postings from the CareerBuilder job posting platform. The Scrapy library was used to extract the data from this website. This was the Vietnamese Job Posting data in early 2023.\n\nA job posting typically has some structure, though some fields of the posting may not. The data was unprocessed.\n\n## **Content**\n\njob_title - The original job title.\njob_id - The unique ID of the corresponding job.\njob_url - The link of the job.\ncompany_title - Name of the company.\ncompany_url - The official website of the company.\ncompany_video_url - The official video link of the company.\nsalary - The salary of the job.\nlocation - Location of the working place.\noutstanding_welfare - Outstanding welfare of the corresponding position.\nannoucement_date - Job posting announcement date.\ncategory - The specific type of the job.\nposition - Position in the company.\nexp - Required experience years for the position.\norder - Rank of the position.\nexpiration_date - Job posting expiration date.\ndetailed_welfare - Full welfare.\njob_description - Job description.\njob_requirements - Job requirements.\nother_info - Other information of the job.\njob_tags - Highlight tags of the job.\n\n\n",
+  "url": "https://www.kaggle.com/lucaznguyenofficial/vietnamese-job-posting-vietnamese-version",
+  "version": 2,
+  "keywords": [
+    "subject, people and society, business"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3240285"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Nguyen Tran Huu Thinh",
+    "url": "https://www.kaggle.com/lucaznguyenofficial",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/10078227-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/lucaznguyenofficial/vietnamese-job-posting-vietnamese-version/download?datasetVersionNumber=2",
+      "contentSize": "1761528 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-05-08T18:49:30.463Z",
+  "discussionUrl": "https://www.kaggle.com/lucaznguyenofficial/vietnamese-job-posting-vietnamese-version/discussion",
+  "alternateName": "Detail Vietnamese job posting information",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3240285/5635927/f66bb376360d4697839e7db822f3fa6a/dataset-card.jpg?t=2023-05-08-19-05-57",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 263
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 1882
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 109
+    }
+  ]
+}

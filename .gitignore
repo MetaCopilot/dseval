@@ -1,0 +1,13 @@
+.ipynb_checkpoints
+.Rproj
+.Rproj.user
+.DS_Store
+
+__pycache__
+*.egg-info
+.vscode
+.cache
+.env/
+
+# Temporary results
+/runs

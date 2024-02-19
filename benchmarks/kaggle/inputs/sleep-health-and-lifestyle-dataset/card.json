@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Sleep Health and Lifestyle Dataset",
+  "description": "Note: Don't forget to upvote when you find this useful.\n\n**Dataset Overview:**\nThe Sleep Health and Lifestyle Dataset comprises 400 rows and 13 columns, covering a wide range of variables related to sleep and daily habits. It includes details such as gender, age, occupation, sleep duration, quality of sleep, physical activity level, stress levels, BMI category, blood pressure, heart rate, daily steps, and the presence or absence of sleep disorders.\n\n**Key Features of the Dataset:**\nComprehensive Sleep Metrics: Explore sleep duration, quality, and factors influencing sleep patterns.\nLifestyle Factors: Analyze physical activity levels, stress levels, and BMI categories.\nCardiovascular Health: Examine blood pressure and heart rate measurements.\nSleep Disorder Analysis: Identify the occurrence of sleep disorders such as Insomnia and Sleep Apnea.\n\n**Dataset Columns:**<br>\nPerson ID: An identifier for each individual.<br>\nGender: The gender of the person (Male/Female).<br>\nAge: The age of the person in years.<br>\nOccupation: The occupation or profession of the person.<br>\nSleep Duration (hours): The number of hours the person sleeps per day.<br>\nQuality of Sleep (scale: 1-10): A subjective rating of the quality of sleep, ranging from 1 to 10.<br>\nPhysical Activity Level (minutes/day): The number of minutes the person engages in physical activity daily.<br>\nStress Level (scale: 1-10): A subjective rating of the stress level experienced by the person, ranging from 1 to 10.<br>\nBMI Category: The BMI category of the person (e.g., Underweight, Normal, Overweight).<br>\nBlood Pressure (systolic/diastolic): The blood pressure measurement of the person, indicated as systolic pressure over diastolic pressure.<br>\nHeart Rate (bpm): The resting heart rate of the person in beats per minute.<br>\nDaily Steps: The number of steps the person takes per day.<br>\nSleep Disorder: The presence or absence of a sleep disorder in the person (None, Insomnia, Sleep Apnea).<br>\n\n**Details about Sleep Disorder Column:**\n- None: The individual does not exhibit any specific sleep disorder.\n- Insomnia: The individual experiences difficulty falling asleep or staying asleep, leading to inadequate or poor-quality sleep.\n- Sleep Apnea: The individual suffers from pauses in breathing during sleep, resulting in disrupted sleep patterns and potential health risks.\n\n\n**Acknowledgement:**\n- I would like to clarify that the data I am presenting is synthetic and created by me for illustrative purposes. ",
+  "url": "https://www.kaggle.com/uom190346a/sleep-health-and-lifestyle-dataset",
+  "version": 2,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "subject, health and fitness, health",
+    "technique, data visualization",
+    "subject, health and fitness, health, health conditions, diseases"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3321433"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Laksika Tharmalingam",
+    "url": "https://www.kaggle.com/uom190346a",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9844680-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/uom190346a/sleep-health-and-lifestyle-dataset/download?datasetVersionNumber=2",
+      "contentSize": "2604 bytes"
+    }
+  ],
+  "commentCount": 9,
+  "dateModified": "2023-09-18T07:27:03.117Z",
+  "discussionUrl": "https://www.kaggle.com/uom190346a/sleep-health-and-lifestyle-dataset/discussion",
+  "alternateName": "Unlock sleep insights with the Sleep Health Dataset",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3321433/5781088/8b33c1cdf0ebc9a27b95fe0a3903df62/dataset-card.jpg?t=2023-05-26-10-30-12",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 9
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 22780
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 127207
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 417
+    }
+  ]
+}

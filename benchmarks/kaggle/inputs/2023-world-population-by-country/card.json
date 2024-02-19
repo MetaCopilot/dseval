@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": " World Population by Country ",
+  "description": "**CONTENT**\n\nThe US Census Bureau's world population clock estimated that the global population as of September 2022 was 7,922,312,800 people and was expected to reach 8 billion by mid-November of 2022. This total far exceeds the 2015 world population of 7.2 billion. The world's population continues to increase by roughly 140 people per minute, with births outweighing deaths in most countries.\n\nOverall, however, the rate of population growth has been slowing for several decades. This slowdown is expected to continue until the rate of population growth reaches zero (an equal number of births and deaths) around 2080-2100, at a population of approximately 10.4 billion people. After this time, the population growth rate is expected to turn negative, resulting in global population decline.\n\n**Countries with more than 1 billion people**\nChina is currently the most populous country in the world, with a population estimated at more than 1.42 billion as of September 2022. Only one other country in the world boasts a population of more than 1 billion people: India, whose population is estimated to be 1.41 billion people\u2014and rising.",
+  "url": "https://www.kaggle.com/rajkumarpandey02/2023-world-population-by-country",
+  "version": 1,
+  "keywords": [
+    "subject, people and society, social science",
+    "technique, data analytics",
+    "technique, data visualization",
+    "subject, people and society, social science, demographics",
+    "subject, people and society, people"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3346108"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Raj Kumar Pandey",
+    "url": "https://www.kaggle.com/rajkumarpandey02",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/11417257-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/rajkumarpandey02/2023-world-population-by-country/download?datasetVersionNumber=1",
+      "contentSize": "39357 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-06-01T06:10:41.413Z",
+  "discussionUrl": "https://www.kaggle.com/rajkumarpandey02/2023-world-population-by-country/discussion",
+  "alternateName": "2023 World Population 8,005,176,000",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3346108/5822810/773efb36fa92b7cc801b6b62f4b19a68/dataset-card.jpg?t=2023-06-01-06-33-34",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 6017
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 22336
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 110
+    }
+  ]
+}

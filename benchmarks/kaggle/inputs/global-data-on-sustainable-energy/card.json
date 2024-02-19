@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Global Data on Sustainable Energy (2000-2020)",
+  "description": "# Description\n\n&gt; Uncover this comprehensive dataset showcasing sustainable energy indicators and other useful factors across all countries from 2000 to 2020. Dive into vital aspects such as electricity access, renewable energy, carbon emissions, energy intensity, Financial flows, and economic growth. Compare nations, track progress towards Sustainable Development Goal 7, and gain profound insights into **global energy consumption patterns** over time. \n\n# Datasets tailored to your requirements\n\n## Leave a request at [https://trainingdata.pro/data-market](https://trainingdata.pro/data-market?utm_source=kaggle-partner-anshtanwar&amp;utm_medium=cpc&amp;utm_campaign=global-data-on-sustainable-energy) to discuss your requirements, learn about the pricing, and order a similar dataset.\n\n\n# Key Features:\n\n&gt;- **Entity**: The name of the country or region for which the data is reported.\n- **Year**: The year for which the data is reported, ranging from 2000 to 2020.\n- **Access to electricity (% of population)**: The percentage of population with access to electricity.\n- **Access to clean fuels for cooking (% of population)**: The percentage of the population with primary reliance on clean fuels.\n- **Renewable-electricity-generating-capacity-per-capita**: Installed Renewable energy capacity per person\n- **Financial flows to developing countries (US $)**: Aid and assistance from developed countries for clean energy projects.\n- **Renewable energy share in total final energy consumption (%)**: Percentage of renewable energy in final energy consumption.\n- **Electricity from fossil fuels (TWh)**: Electricity generated from fossil fuels (coal, oil, gas) in terawatt-hours.\n- **Electricity from nuclear (TWh)**: Electricity generated from nuclear power in terawatt-hours.\n- **Electricity from renewables (TWh)**: Electricity generated from renewable sources (hydro, solar, wind, etc.) in terawatt-hours.\n- **Low-carbon electricity (% electricity)**: Percentage of electricity from low-carbon sources (nuclear and renewables).\n- **Primary energy consumption per capita (kWh/person)**: Energy consumption per person in kilowatt-hours.\n- **Energy intensity level of primary energy (MJ/$2011 PPP GDP)**: Energy use per unit of GDP at purchasing power parity.\n- **Value_co2_emissions (metric tons per capita)**: Carbon dioxide emissions per person in metric tons.\n- **Renewables (% equivalent primary energy)**: Equivalent primary energy that is derived from renewable sources.\n- **GDP growth (annual %)**: Annual GDP growth rate based on constant local currency.\n- **GDP per capita**: Gross domestic product per person.\n- **Density (P/Km2)**: Population density in persons per square kilometer.\n- **Land Area (Km2)**: Total land area in square kilometers.\n- **Latitude**: Latitude of the country's centroid in decimal degrees.\n- **Longitude**: Longitude of the country's centroid in decimal degrees.\n\n# Potential Use cases\n\n&gt; - **Energy Consumption Prediction:** Predict future energy usage, aid planning, and track SDG 7 progress.\n- **Carbon Emission Forecasting:** Forecast CO2 emissions, support climate strategies.\n- **Energy Access Classification:** Categorize regions for infrastructure development, understand sustainable energy's role.\n- **Sustainable Development Goal Tracking:** Monitor progress towards Goal 7, evaluate policy impact.\n- **Energy Equity Analysis:** Analyze access, density, and growth for equitable distribution.\n- **Energy Efficiency Optimization:** Identify intensive areas for environmental impact reduction.\n- **Renewable Energy Potential Assessment:** Identify regions for green investments based on capacity.\n- **Renewable Energy Investment Strategies:** Guide investors towards sustainable opportunities.\n\n# Order Data Collection and Annotation tailored to your specifications.\n\n# [https://trainingdata.pro/data-market](https://trainingdata.pro/data-market?utm_source=kaggle-partner-anshtanwar&amp;utm_medium=cpc&amp;utm_campaign=global-data-on-sustainable-energy) offers high-quality data annotation tailored to your needs.\n\n",
+  "url": "https://www.kaggle.com/anshtanwar/global-data-on-sustainable-energy",
+  "version": 7,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "technique, data visualization",
+    "task, classification",
+    "subject, science and technology, energy"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "identifier": [
+    "3597085"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Ansh Tanwar",
+    "url": "https://www.kaggle.com/anshtanwar",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/10994896-kg.png?t=2023-09-08-03-19-07"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/anshtanwar/global-data-on-sustainable-energy/download?datasetVersionNumber=7",
+      "contentSize": "178251 bytes"
+    }
+  ],
+  "commentCount": 3,
+  "dateModified": "2023-08-19T05:22:23.343Z",
+  "discussionUrl": "https://www.kaggle.com/anshtanwar/global-data-on-sustainable-energy/discussion",
+  "alternateName": "\ud83c\udf0f\u26a1Explore 20-year Insights on Sustainable Energy\u26a1\ud83c\udf0f",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3597085/6263343/470bf50ac5ca0cc02087c7379a1b31f9/dataset-card.jpeg?t=2023-08-11-11-36-59",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 3
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 9580
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 44057
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 164
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Latest Data Science Salaries",
+  "description": "### Context\n\nThe \"<b>Data Science Salaries</b>\" dataset provides valuable insights into the compensation trends and variations in the field of data science from 2020 to 2023. This dataset encompasses a comprehensive collection of salary information from various industries, organizations, and geographic regions, enabling data professionals, researchers, and organizations to analyze and understand the prevailing salary landscape in the data science domain during this four-year period. By examining this dataset, one can gain a deeper understanding of the factors influencing data science salaries, such as job roles, experience levels, educational backgrounds, and geographical locations. The dataset serves as a valuable resource for individuals seeking career guidance, companies aiming to benchmark their compensation strategies, and researchers investigating the evolving dynamics of the data science job market.\n\n### Content\n\nThe dataset includes information about Job Title, Employment Type, Experience Level, Expertise Level, Salary, Salary Currency, Company Location, Salary in USD, Employee Residence, Company Size, and Year. This information provides a comprehensive view of job-related details, compensation levels, company characteristics, and temporal aspects, offering valuable insights for analyzing and understanding the dataset.\n\n\n### Structure of the Dataset\n\n![](https://i.imgur.com/k9MN9B0.png)\n\n\n### Acknowledgement\n\nThis Dataset is created from <b>[ai-jobs.net](https://ai-jobs.net/)</b>. If you want to learn more, you can visit the above-mentioned Website.\n\n\nCover Photo by: <b><a href=\"https://www.freepik.com/free-photo/business-financial-concept-stack-money-background-flat-lay_8859422.htm#query=currency&amp;position=4&amp;from_view=search&amp;track=sph\">Image by 8photo</a></b> on <b>Freepik</b>",
+  "url": "https://www.kaggle.com/iamsouravbanerjee/data-science-salaries-2023",
+  "version": 5,
+  "keywords": [
+    "subject, people and society, business",
+    "data type, tabular",
+    "audience, beginner",
+    "technique, exploratory data analysis",
+    "technique, time series analysis"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3490861"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Sourav Banerjee",
+    "url": "https://www.kaggle.com/iamsouravbanerjee",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/7024923-kg.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/iamsouravbanerjee/data-science-salaries-2023/download?datasetVersionNumber=5",
+      "contentSize": "180778 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-09-09T15:20:30.537Z",
+  "discussionUrl": "https://www.kaggle.com/iamsouravbanerjee/data-science-salaries-2023/discussion",
+  "alternateName": "Charting Data Science's Wage Journey: Salaries 2020-2023",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3490861/6095014/fa59e0b336df72a17406b4ff39d59bfb/dataset-card.jpg?t=2023-07-07-12-59-24",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 4500
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 27637
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 124
+    }
+  ]
+}

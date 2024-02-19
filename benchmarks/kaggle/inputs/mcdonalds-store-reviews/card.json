@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "McDonald's Store Reviews",
+  "description": "# Description: \n\n&gt;This dataset contains over 33,000 anonymized reviews of McDonald's stores in the United States, scraped from Google reviews. It provides valuable insights into customer experiences and opinions about various McDonald's locations across the country. The dataset includes information such as store names, categories, addresses, geographic coordinates, review ratings, review texts, and timestamps.\n\n# Key Features:\n\n&gt;- **reviewer_id**: *Unique identifier for each reviewer (anonymized)*\n- **store_name**: *Name of the McDonald's store*\n- **category**: *Category or type of the store*\n- **store_address**: *Address of the store*\n- **latitude**: *Latitude coordinate of the store's location*\n- **longitude**: *Longitude coordinate of the store's location*\n- **rating_count**: *Number of ratings/reviews for the store*\n- **review_time**: *Timestamp of the review*\n- **review**: *Textual content of the review*\n- **rating**: *Rating provided by the reviewer*\n\n\n# Potential Use Cases:\n\n\n&gt;- **Sentiment analysis:** Analyze the sentiment of reviews to understand overall customer satisfaction and identify areas for improvement.\n- **Location-based analysis:** Explore geographical patterns in reviews and ratings to identify high-performing or underperforming regions.\n- **Category analysis:** Investigate how different categories of McDonald's stores (e.g., drive-thru, McCaf\u00e9) are perceived by customers.\n- **Time-based analysis:** Examine temporal trends in reviews to identify any shifts in customer opinions or preferences over time.\n\n\nData Source: *The dataset was obtained by scraping Google reviews of McDonald's stores in the United States. The data does not contain any personally identifiable information (PII) to ensure privacy and comply with ethical guidelines.*<br>\nIf this was helpful, a vote is appreciated \u2764\ufe0f",
+  "url": "https://www.kaggle.com/nelgiriyewithana/mcdonalds-store-reviews",
+  "version": 1,
+  "keywords": [
+    "subject, health and fitness, food",
+    "analysis, nlp",
+    "geography and places, north america, united states",
+    "analysis, text mining",
+    "task, text-classification"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3422393"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Nidula Elgiriyewithana \u26a1",
+    "url": "https://www.kaggle.com/nelgiriyewithana",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9918221-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/nelgiriyewithana/mcdonalds-store-reviews/download?datasetVersionNumber=1",
+      "contentSize": "1868387 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-06-19T08:46:00.263Z",
+  "discussionUrl": "https://www.kaggle.com/nelgiriyewithana/mcdonalds-store-reviews/discussion",
+  "alternateName": "Exploring Customer Sentiments in McDonald's US Store Reviews",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3422393/5968827/59c8d8e9bbf07e7960866a9ab55287f4/dataset-card.jpg?t=2023-06-30-07-04-32",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 4376
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 23884
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 137
+    }
+  ]
+}

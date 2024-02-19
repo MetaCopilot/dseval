@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Students Exam Scores: Extended Dataset",
+  "description": "This dataset includes scores from three test scores of students at a (fictional) public school and a variety of personal and socio-economic factors that may have interaction effects upon them. \n\n**Remark/warning/disclaimer:** \n- This datasets are **fictional** and should be used for **educational purposes only**. \n- The original dataset generator creator is Mr. [Royce Kimmons](http://roycekimmons.com/tools/generated_data/exams)\n- There are *similar datasets* on kaggle already but this one is **different** and **arguably better** in two ways. \n    -&gt; 1) has **more data** (**&gt;30k** instead of just the 1k the other datasets have),\n    -&gt; 2) has extended datasets with **more features** (15 instead of 9) and has **missing values** which makes it ideal for data cleaning and data preprocessing.\n\n### Data Dictionary (column description)\n\n1. **Gender**: Gender of the student (male/female)\n2. **EthnicGroup**: Ethnic group of the student (group A to E)\n3. **ParentEduc**: Parent(s) education background (from some_highschool to master's degree)\n4. **LunchType**: School lunch type (standard or free/reduced)\n5. **TestPrep**: Test preparation course followed (completed or none)\n6. **ParentMaritalStatus**: Parent(s) marital status (married/single/widowed/divorced)\n7. **PracticeSport**: How often the student parctice sport (never/sometimes/regularly))\n8. **IsFirstChild**: If the child is first child in the family or not (yes/no)\n9. **NrSiblings**: Number of siblings the student has (0 to 7)\n10. **TransportMeans**: Means of transport to school (schoolbus/private)\n11. **WklyStudyHours**: Weekly self-study hours(less that 5hrs; between 5 and 10hrs; more than 10hrs)\n12. **MathScore**: math test score(0-100)\n13. **ReadingScore**: reading test score(0-100)\n14. **WritingScore**: writing test score(0-100)\n\n### Analytics questions:\n\n1. What factors (features) affect test scores most?\n2. Are there interacting features which affect test scores?\n",
+  "url": "https://www.kaggle.com/desalegngeb/students-exam-scores",
+  "version": 2,
+  "keywords": [
+    "subject, people and society, education",
+    "data type, tabular",
+    "subject, people and society, education, standardized testing",
+    "audience, beginner",
+    "subject, people and society, education, primary and secondary schools"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3128523"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "des.",
+    "url": "https://www.kaggle.com/desalegngeb",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/5430373-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/desalegngeb/students-exam-scores/download?datasetVersionNumber=2",
+      "contentSize": "711436 bytes"
+    }
+  ],
+  "commentCount": 3,
+  "dateModified": "2023-04-14T00:15:38.83Z",
+  "discussionUrl": "https://www.kaggle.com/desalegngeb/students-exam-scores/discussion",
+  "alternateName": "Exam scores for students at a public school",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3128523/5398553/591b417d10ab96252158b1c639d4ca07/dataset-card.jpg?t=2023-04-13-22-31-37",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 3
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 19371
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 90033
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 316
+    }
+  ]
+}

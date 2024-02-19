@@ -1,0 +1,33 @@
+### Dataset name ###
+
+Fatalities in the Israeli-Palestinian
+
+### Dataset description ###
+
+### **Some Task Ideas:**
+**Analyze Fatality Trends:** Explore the dataset and track the trends in fatalities over time. Identify any significant changes, spikes, or declines in the number of fatalities.
+**Demographic Analysis:**Conduct a demographic analysis by examining the age, gender, and citizenship of the individuals killed. Determine if there are any notable patterns or disparities in the data.
+**Geospatial Analysis:** Utilize the event location, district, and region information to perform geospatial analysis. Visualize the distribution of fatalities on a map and identify areas that have experienced higher levels of violence.
+**Hostilities Participation Analysis:**Investigate the extent of individuals' participation in hostilities before their deaths. Analyze the relationship between participation and the circumstances surrounding each fatality.
+Injury Analysis: Examine the types of injuries inflicted on individuals. Identify the most common types of injuries and assess their severity.
+**Weapons Used:** Analyze the ammunition and means by which the individuals were killed. Determine the most frequently used weapons or methods and evaluate their impact.
+**Victim Profiles:** Create profiles of the victims based on the available data such as age, gender, citizenship, and place of residence. Identify common characteristics among the victims.
+
+### Dataset files ###
+
+- fatalities_isr_pse_conflict_2000_to_2023.csv
+
+    pandas.DataFrame(shape=(11124, 16), columns=["name", "date_of_event", "age", "citizenship", "event_location", "event_location_district", "event_location_region", "date_of_death", "gender", "took_part_in_the_hostilities", "place_of_residence", "place_of_residence_district", "type_of_injury", "ammunition", "killed_by", "notes"])
+                              name date_of_event   age  citizenship     event_location event_location_district event_location_region  ... took_part_in_the_hostilities place_of_residence place_of_residence_district type_of_injury       ammunition            killed_by                notes
+        0      'Abd a-Rahman Su...    2023-09-24  32.0  Palestinian     Nur Shams R.C.              Tulkarm               West Bank   ...                  NaN             Nur Shams R.C.              Tulkarm               gunfire  live ammunition  Israeli security...  Fatally shot by ...
+        1      Usayed Farhan Mu...    2023-09-24  21.0  Palestinian     Nur Shams R.C.              Tulkarm               West Bank   ...                  NaN             Nur Shams R.C.              Tulkarm               gunfire  live ammunition  Israeli security...  Fatally shot by ...
+        2      'Abdallah 'Imad ...    2023-09-22  16.0  Palestinian           Kfar Dan                Jenin               West Bank   ...                  NaN                   al-Yamun                Jenin               gunfire  live ammunition  Israeli security...  Fatally shot by ...
+        3      Durgham Muhammad...    2023-09-20  19.0  Palestinian  'Aqbat Jaber R.C.              Jericho               West Bank   ...                  NaN          'Aqbat Jaber R.C.              Jericho               gunfire  live ammunition  Israeli security...  Shot in the head...
+        4      Raafat 'Omar Ahm...    2023-09-19  15.0  Palestinian         Jenin R.C.                Jenin               West Bank   ...                  NaN                      Jenin                Jenin               gunfire  live ammunition  Israeli security...  Wounded by soldi...
+        ...                    ...           ...   ...          ...                ...                  ...                     ...   ...                  ...                        ...                  ...                   ...              ...                  ...                  ...
+        11119     Binyamin Herling    2000-10-19  64.0      Israeli             Nablus               Nablus               West Bank   ...             Israelis                    Kedumim              Tulkarm               gunfire  live ammunition  Palestinian civi...  Killed while hik...
+        11120  Farid Musa 'Issa...    2000-10-17  28.0  Palestinian         Beit Furik               Nablus               West Bank   ...              Unknown                 Beit Furik               Nablus               gunfire              NaN    Israeli civilians  Killed by a sett...
+        11121     Hillel Lieberman    2000-10-07  36.0      Israeli             Nablus               Nablus               West Bank   ...             Israelis                 Elon Moreh               Nablus               gunfire  live ammunition  Palestinian civi...  His body was fou...
+        11122  Fahed Mustafa 'O...    2000-10-07  21.0  Palestinian              Bidya               Salfit               West Bank   ...                   No                      Bidya               Salfit               gunfire              NaN    Israeli civilians  Killed by settle...
+        11123    Wichlav Zalsevsky    2000-10-02  24.0      Israeli              Masha               Salfit               West Bank   ...             Israelis                     Ashdod               Israel               gunfire  live ammunition  Palestinian civi...                  NaN
+

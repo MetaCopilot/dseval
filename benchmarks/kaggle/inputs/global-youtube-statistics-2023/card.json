@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Global YouTube Statistics 2023",
+  "description": "# Description\n\n&gt; Welcome to the captivating realm of YouTube stardom, where this meticulously curated dataset unveils the statistics of the most subscribed YouTube channels. A collection of YouTube giants, this dataset offers a perfect avenue to analyze and gain valuable insights from the luminaries of the platform. With **comprehensive details on top creators'** subscriber counts, video views, upload frequency, country of origin, earnings, and more, this treasure trove of information is a must-explore for aspiring content creators, data enthusiasts, and anyone intrigued by the ever-evolving online content landscape. Immerse yourself in the world of YouTube success and unlock a wealth of knowledge with this extraordinary dataset.\n\n**For more related datasets:** <br> [Global Missing Migrants Dataset( New )](https://www.kaggle.com/datasets/nelgiriyewithana/global-missing-migrants-dataset) \ud83d\uded1<br>\n [Global Weather Repository ( Daily snapshot )\n( New )](https://www.kaggle.com/datasets/nelgiriyewithana/global-weather-repository)\ud83d\uded1\n<br> [Indian Weather Repository ( Daily snapshot ( New ) )\n](https://www.kaggle.com/datasets/nelgiriyewithana/indian-weather-repository-daily-snapshot) \ud83d\uded1\n\n# Key Features\n\n&gt;- **rank**: *Position of the YouTube channel based on the number of subscribers*\n- **Youtuber**: *Name of the YouTube channel*\n- **subscribers**: *Number of subscribers to the channel*\n- **video views**: *Total views across all videos on the channel*\n- **category**: *Category or niche of the channel*\n- **Title**: *Title of the YouTube channel*\n- **uploads**: *Total number of videos uploaded on the channel*\n- **Country**: *Country where the YouTube channel originates*\n- **Abbreviation**: *Abbreviation of the country*\n- **channel_type**: *Type of the YouTube channel (e.g., individual, brand)*\n- **video_views_rank**: *Ranking of the channel based on total video views*\n- **country_rank**: *Ranking of the channel based on the number of subscribers within its country*\n- **channel_type_rank**: *Ranking of the channel based on its type (individual or brand)*\n- **video_views_for_the_last_30_days**: *Total video views in the last 30 days*\n- **lowest_monthly_earnings**: *Lowest estimated monthly earnings from the channel*\n- **highest_monthly_earnings**: *Highest estimated monthly earnings from the channel*\n- **lowest_yearly_earnings**: *Lowest estimated yearly earnings from the channel*\n- **highest_yearly_earnings**: *Highest estimated yearly earnings from the channel*\n- **subscribers_for_last_30_days**: *Number of new subscribers gained in the last 30 days*\n- **created_year**: *Year when the YouTube channel was created*\n- **created_month**: *Month when the YouTube channel was created*\n- **created_date**: *Exact date of the YouTube channel's creation*\n- **Gross tertiary education enrollment (%)**: *Percentage of the population enrolled in tertiary education in the country*\n- **Population**: *Total population of the country*\n- **Unemployment rate**: *Unemployment rate in the country*\n- **Urban_population**: *Percentage of the population living in urban areas*\n- **Latitude**: *Latitude coordinate of the country's location*\n- **Longitude**: *Longitude coordinate of the country's location*\n\n# Potential Use Cases\n\n&gt;- **YouTube Analytics:** Gain valuable insights into the success factors of top YouTube channels and understand what sets them apart from the rest.\n- **Content Strategy:** Discover the most popular categories and upload frequencies that resonate with audiences.\n- **Regional Influencers:** Identify influential YouTube creators from different countries and analyze their impact on a global scale.\n- **Earnings Analysis:** Explore the correlation between channel performance and estimated earnings.\n- **Geospatial Visualization:** Visualize the distribution of successful YouTube channels on a world map and uncover geographical trends.\n- **Trending Topics:** Investigate how certain categories gain popularity over time and correlate with world events.\n\nData Source: The dataset was meticulously compiled from various reputable sources, ensuring accuracy and reliability of the information presented.\n\nIf you find this dataset helpful, your support through an upvote would be deeply appreciated \u2764\ufe0f",
+  "url": "https://www.kaggle.com/nelgiriyewithana/global-youtube-statistics-2023",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "technique, data visualization",
+    "task, classification",
+    "technique, exploratory data analysis"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3566603"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Nidula Elgiriyewithana \u26a1",
+    "url": "https://www.kaggle.com/nelgiriyewithana",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9918221-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023/download?datasetVersionNumber=1",
+      "contentSize": "61533 bytes"
+    }
+  ],
+  "commentCount": 11,
+  "dateModified": "2023-07-28T15:36:38.25Z",
+  "discussionUrl": "https://www.kaggle.com/nelgiriyewithana/global-youtube-statistics-2023/discussion",
+  "alternateName": "A collection of YouTube giants.",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3566603/6211042/d1792d7a9a89c1d2d525ee8d1e0dbd02/dataset-card.jpg?t=2023-07-28-15-41-40",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 11
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 27000
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 127916
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 729
+    }
+  ]
+}

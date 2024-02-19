@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Coffee Quality Data (CQI May-2023)",
+  "description": "# Coffee Quality Institute \nThe Coffee Quality Institute (CQI) is a non-profit organization that works to improve the quality and value of coffee worldwide. It was founded in 1996 and has its headquarters in California, USA.\n\nCQI's mission is to promote coffee quality through a range of activities that include research, training, and certification programs. The organization works with coffee growers, processors, roasters, and other stakeholders to improve coffee quality standards, promote sustainability, and support the development of the specialty coffee industry.\n\n# Data\nCQI maintains a web database that serves as a resource for coffee professionals and enthusiasts who are interested in learning about coffee quality and sustainability. The database includes a range of information on coffee production, processing, and sensory evaluation. It also contains data on coffee genetics, soil types, and other factors that can affect coffee quality.\n\n## Sensory evaluations (coffee quality scores)\n* *Aroma:* Refers to the scent or fragrance of the coffee.\n* *Flavor:* The flavor of coffee is evaluated based on the taste, including any sweetness, bitterness, acidity, and other flavor notes.\n* *Aftertaste:* Refers to the lingering taste that remains in the mouth after swallowing the coffee.\n* *Acidity:* Acidity in coffee refers to the brightness or liveliness of the taste.\n* *Body:* The body of coffee refers to the thickness or viscosity of the coffee in the mouth.\n* *Balance:* Balance refers to how well the different flavor components of the coffee work together.\n* *Uniformity:* Uniformity refers to the consistency of the coffee from cup to cup.\n* *Clean Cup:* A clean cup refers to a coffee that is free of any off-flavors or defects, such as sourness, mustiness, or staleness.\n* *Sweetness:* It can be described as caramel-like, fruity, or floral, and is a desirable quality in coffee.\n\n**PLEASE NOTE: 'Total Cup Points' is literally the total of 10 features given above. There were some notebooks trying to predict the total cup points given these features. We know the exact function underlying the total cup points.**\n\n## Defects\nDefects are undesirable qualities that can occur in coffee beans during processing or storage. Defects can be categorized into two categories: Category One and Category Two defects.\n\nCategory One defects are primary defects that can be perceived through visual inspection of the coffee beans. These defects include Black beans, sour beans, insect-damaged beans, fungus-damaged beans, etc.\n\nCategory Two defects are secondary defects that are more subtle and can only be detected through tasting. These defects include Over-fermentation, staleness, rancidness, chemical taste, etc.\n\n## Data Scraping\nOn this part, great thanks to [James LeDoux](https://github.com/jldbc). His repo [coffee-quality-database](https://github.com/jldbc/coffee-quality-database) from 2018 is efficiently written and well documented. To scrape the data, I used most of his code, but due to some changes on the website, I modified some of the lines. Also, some practices on modules were deprecated and deleted so I updated those codes also. Therefore, in May-2023 we can use this updated Python program to scrape data from this database. You can find my repo at https://github.com/fatih-boyar/coffee-quality-data-CQI/tree/main \n\n\nOnly data was collected for the arabica type. With a few modifications in [scraper_bot.py](https://github.com/fatih-boyar/coffee-quality-data-CQI/blob/main/scraper_bot.py), scraping can be easily replicated for robusta types also.",
+  "url": "https://www.kaggle.com/fatihb/coffee-quality-data-cqi",
+  "version": 1,
+  "keywords": [
+    "data type, tabular",
+    "technique, data analytics",
+    "technique, data visualization",
+    "task, classification",
+    "task, clustering"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3259501"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Fatih B.",
+    "url": "https://www.kaggle.com/fatihb",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/4427715-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/fatihb/coffee-quality-data-cqi/download?datasetVersionNumber=1",
+      "contentSize": "22279 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-05-12T13:06:39.603Z",
+  "discussionUrl": "https://www.kaggle.com/fatihb/coffee-quality-data-cqi/discussion",
+  "alternateName": "Scraped data from CQI database",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3259501/5670167/63dd7727eb0d3719735bdc4612b7804c/dataset-card.jpg?t=2023-05-12-13-09-10",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 11719
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 67535
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 222
+    }
+  ]
+}

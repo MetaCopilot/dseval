@@ -1,0 +1,71 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Netflix OTT Revenue and Subscribers (CSV File)",
+  "description": "Netflix OTT Revenue and Number of Paid Subscribers dataset contains the revenue of Netflix  in dollars and number of paid subscribers region wise. \n\n**Note** : Netflix's financial year is from Jan 1st to 31st Dec.\n\n**Data Dictionary (column description)**\n\nDate : Month-Year of Quarter .\n\nGlobal Revenue: Revenue collected Worldwide (Streaming Revenue + United States Domestic DVD Revenue).\nUCAN : United States and Canada\nEMEA : Europe, Middle East and Africa\nAPAC : Asia-Pacific\nLATM : Latin America\n\nARPU is average revenue per member and it is calculated as streaming revenue divided by number of month in period, i.e. , for quarter is 3 months (here).\nAll revenue is in US Dollars.  \n\nFor older versions :\nFrom 2019 till today, Netflix released data region wise, before that It released as Domestic market\n(UACN) and International Market.\nBefore 2019, global users are higher in number because it in lost his subscribers drastically. [Read Here](https://www.cnbc.com/2019/07/18/why-netflix-says-it-had-a-rare-subscriber-loss-in-q2-2019.html)\n[Read Here](https://www.forbes.com/sites/stephenmcbride1/2019/11/11/in-24-hours-netflix-could-lose-25-of-its-subscribers/?sh=20e217341b39)\n\n**Note #1.  In 2019, difference in global and all region sum revenue is 297217000 USD . In 2020 is 239381000 USD. In 2021 is 182348000 USD. In 2022 is 145698000 USD. In Q1, 2023 is 31502000 USD. Excludes DVD revenues of $182 million, $146 million and $32 million for the years ended December 31, 2021, 2022, and the three months ended March 31, 2023, respectively. Q1, 2023 Financial Statement Excludes DVD revenues of $0.2 billion, $0.2 billion and $0.1 billion for the years ended December 31, 2020, 2021 and 2022, respectively. Total US revenues for the years ended December 31, 2020, 2021 and 2022 were $10.8 billion, $12.1 billion and $13.0 billion, respectively. Q4, 2022 Financial Statement**",
+  "url": "https://www.kaggle.com/mauryansshivam/netflix-ott-revenue-and-subscribers-csv-file",
+  "version": 2,
+  "keywords": [
+    "subject, arts and entertainment, movies and tv shows",
+    "data type, tabular",
+    "audience, beginner",
+    "language, english"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3264141"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Shivam Maurya",
+    "url": "https://www.kaggle.com/mauryansshivam",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/mauryansshivam/netflix-ott-revenue-and-subscribers-csv-file/download?datasetVersionNumber=2",
+      "contentSize": "1281 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-07-17T12:55:09.85Z",
+  "discussionUrl": "https://www.kaggle.com/mauryansshivam/netflix-ott-revenue-and-subscribers-csv-file/discussion",
+  "alternateName": "Listed Netflix's revenue and number of paid subscribers from 2012",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3264141/5677963/2a8d8c20ecf30e55aef1aff55e8f1401/dataset-card.jpg?t=2023-05-15-16-01-48",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 5647
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 25724
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 101
+    }
+  ]
+}

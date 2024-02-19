@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Global Country Information Dataset 2023",
+  "description": "# Description\n\n&gt;This comprehensive dataset provides a wealth of information about **all countries worldwide**, covering a wide range of indicators and attributes. It encompasses demographic statistics, economic indicators, environmental factors, healthcare metrics, education statistics, and much more. With every country represented, this dataset offers a complete global perspective on various aspects of nations, enabling in-depth analyses and cross-country comparisons.\n\n\n\n\n# Key Features\n\n&gt;- **Country**: Name of the country.\n- **Density (P/Km2)**: Population density measured in persons per square kilometer.\n- **Abbreviation**: Abbreviation or code representing the country.\n- **Agricultural Land (%)**: Percentage of land area used for agricultural purposes.\n- **Land Area (Km2)**: Total land area of the country in square kilometers.\n- **Armed Forces Size**: Size of the armed forces in the country.\n- **Birth Rate**: Number of births per 1,000 population per year.\n- **Calling Code**: International calling code for the country.\n- **Capital/Major City**: Name of the capital or major city.\n- **CO2 Emissions**: Carbon dioxide emissions in tons.\n- **CPI**: Consumer Price Index, a measure of inflation and purchasing power.\n- **CPI Change (%)**: Percentage change in the Consumer Price Index compared to the previous year.\n- **Currency_Code**: Currency code used in the country.\n- **Fertility Rate**: Average number of children born to a woman during her lifetime.\n- **Forested Area (%)**: Percentage of land area covered by forests.\n- **Gasoline_Price**: Price of gasoline per liter in local currency.\n- **GDP**: Gross Domestic Product, the total value of goods and services produced in the country.\n- **Gross Primary Education Enrollment (%)**: Gross enrollment ratio for primary education.\n- **Gross Tertiary Education Enrollment (%)**: Gross enrollment ratio for tertiary education.\n- **Infant Mortality**: Number of deaths per 1,000 live births before reaching one year of age.\n- **Largest City**: Name of the country's largest city.\n- **Life Expectancy**: Average number of years a newborn is expected to live.\n- **Maternal Mortality Ratio**: Number of maternal deaths per 100,000 live births.\n- **Minimum Wage**: Minimum wage level in local currency.\n- **Official Language**: Official language(s) spoken in the country.\n- **Out of Pocket Health Expenditure (%)**: Percentage of total health expenditure paid out-of-pocket by individuals.\n- **Physicians per Thousand**: Number of physicians per thousand people.\n- **Population**: Total population of the country.\n- **Population: Labor Force Participation (%)**: Percentage of the population that is part of the labor force.\n- **Tax Revenue (%)**: Tax revenue as a percentage of GDP.\n- **Total Tax Rate**: Overall tax burden as a percentage of commercial profits.\n- **Unemployment Rate**: Percentage of the labor force that is unemployed.\n- **Urban Population**: Percentage of the population living in urban areas.\n- **Latitude**: Latitude coordinate of the country's location.\n- **Longitude**: Longitude coordinate of the country's location.\n\n\n# Potential Use Cases\n\n&gt;- Analyze population density and land area to study spatial distribution patterns.\n- Investigate the relationship between agricultural land and food security.\n- Examine carbon dioxide emissions and their impact on climate change.\n- Explore correlations between economic indicators such as GDP and various socio-economic factors.\n- Investigate educational enrollment rates and their implications for human capital development.\n- Analyze healthcare metrics such as infant mortality and life expectancy to assess overall well-being.\n- Study labor market dynamics through indicators such as labor force participation and unemployment rates.\n- Investigate the role of taxation and its impact on economic development.\n- Explore urbanization trends and their social and environmental consequences.\n\nData Source: This dataset was compiled from multiple data sources\n\nIf this was helpful, a vote is appreciated \u2764\ufe0f Thank you \ud83d\ude42\n\n\n\n",
+  "url": "https://www.kaggle.com/nelgiriyewithana/countries-of-the-world-2023",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "subject, people and society, social science",
+    "technique, data analytics",
+    "technique, data visualization",
+    "task, classification"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "identifier": [
+    "3495122"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Nidula Elgiriyewithana \u26a1",
+    "url": "https://www.kaggle.com/nelgiriyewithana",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9918221-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/nelgiriyewithana/countries-of-the-world-2023/download?datasetVersionNumber=1",
+      "contentSize": "24063 bytes"
+    }
+  ],
+  "commentCount": 8,
+  "dateModified": "2023-07-08T20:37:33.483Z",
+  "discussionUrl": "https://www.kaggle.com/nelgiriyewithana/countries-of-the-world-2023/discussion",
+  "alternateName": "A Comprehensive Dataset Empowering In-Depth Analysis and Cross-Country Insights",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3495122/6101670/13530fe8578653a2e5c343e8fd88c4c5/dataset-card.jpg?t=2023-07-08-20-51-46",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 8
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 20091
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 95155
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 678
+    }
+  ]
+}

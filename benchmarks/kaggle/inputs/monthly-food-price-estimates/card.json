@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Global Food Price Inflation",
+  "description": "# Description\n&gt;This data set includes Global Food Price Estimates and Inflation by Product, Market, and Country. It helps gain insight into price developments beyond what can be formally measured by traditional methods. <br>\nIt includes 3 CSV files:- Monthly Food Price Inflation Estimates By Country, monthly food price inflation estimates aggregated for all food products (in previous version) and Monthly food price estimates by product and market, information on model\n\n# Datasets tailored to your requirements\n\n## Leave a request at [https://trainingdata.pro/data-market](https://trainingdata.pro/data-market?utm_source=kaggle-partner-anshtanwar&amp;utm_medium=cpc&amp;utm_campaign=Monthly-Food-Price-Inflation) to discuss your requirements, learn about the pricing, and order a similar dataset.\n<br>\n# List of food products included:\n&gt;Apples, bananas, beans, bread, bulgur, cabbage, carrots, cassava, cassava flour, cassava meal, cheese, chickpeas, cocoyam, coffee instant, cowpeas, cucumbers, dates, eggplants, eggs, fish, fish catfish, fish mackerel, fish salted, fish sardine canned, fish smoked, fish tilapia, fish tuna canned, gari, garlic, groundnuts, lentils, lettuce, livestock sheep, livestock goat castrated male, livestock sheep castrated male, maize, maize flour, maize meal, meat beef, meat beef canned, meat beef minced, meat buffalo, meat chicken, meat chicken plucked, meat chicken whole frozen, meat goat, meat pork, milk, millet, oil, onions, oranges, parsley, pasta, peas, plantains, potatoes, pulses, rice, salt, sesame, sorghum, sorghum food aid, sugar, tea, tomatoes, tomatoes paste, wheat, wheat flour, yogurt\n\n# List of countries included:\n&gt;Afghanistan, Burkina Faso, Burundi, Cameroon, Central African Republic, Chad, Congo, Republic of, , Gambia, The, Guinea-Bissau, Haiti, Iraq, Lao People's Democratic Republic, Lebanon, Liberia, Mali, Mozambique, Myanmar, Niger, Nigeria, Somalia, South Sudan, Sudan, Syrian Arab Republic\n\n# Motivation\n&gt;Food price inflation is an important metric to inform economic policy but traditional sources of consumer prices are often produced with delay during crises and only at an aggregate level. This may poorly reflect the actual price trends in rural or poverty-stricken areas, where large populations reside in fragile situations.\n\n# Order Data Collection and Annotation tailored to your specifications.\n\n# [https://trainingdata.pro/data-market](https://trainingdata.pro/data-market?utm_source=kaggle-partner-anshtanwar&amp;utm_medium=cpc&amp;utm_campaign=Monthly-Food-Price-Inflation) offers high-quality data annotation tailored to your needs.\n\n\n\n\n<br>\n\n\n\n",
+  "url": "https://www.kaggle.com/anshtanwar/monthly-food-price-estimates",
+  "version": 3,
+  "keywords": [
+    "subject, people and society, business",
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "subject, health and fitness, food",
+    "technique, data visualization",
+    "task, classification"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "identifier": [
+    "3827639"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Ansh Tanwar",
+    "url": "https://www.kaggle.com/anshtanwar",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/10994896-kg.png?t=2023-09-08-03-19-07"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/anshtanwar/monthly-food-price-estimates/download?datasetVersionNumber=3",
+      "contentSize": "259813 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-10-21T15:33:25.393Z",
+  "discussionUrl": "https://www.kaggle.com/anshtanwar/monthly-food-price-estimates/discussion",
+  "alternateName": "Monthly Food Price Inflation Estimates by Product, Market and Countries.",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3827639/6635662/1ed32f5bc00e2cf3af5074b30507d6a7/dataset-card.jpg?t=2023-10-08-07-36-40",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 7406
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 44511
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 112
+    }
+  ]
+}

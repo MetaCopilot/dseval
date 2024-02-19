@@ -1,0 +1,71 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Housing Price Prediction",
+  "description": "This dataset provides comprehensive information for house price prediction, with 13 column names:\n\n1. **Price:** The price of the house.\n2. **Area:** The total area of the house in square feet.\n3. **Bedrooms:** The number of bedrooms in the house.\n4. **Bathrooms:** The number of bathrooms in the house.\n5. **Stories:** The number of stories in the house.\n6. **Mainroad:** Whether the house is connected to the main road (Yes/No).\n7. **Guestroom:** Whether the house has a guest room (Yes/No).\n8. **Basement:** Whether the house has a basement (Yes/No).\n9. **Hot water heating:** Whether the house has a hot water heating system (Yes/No).\n10. **Airconditioning:** Whether the house has an air conditioning system (Yes/No).\n11. **Parking:** The number of parking spaces available within the house.\n12. **Prefarea:** Whether the house is located in a preferred area (Yes/No).\n13. **Furnishing status:** The furnishing status of the house (Fully Furnished, Semi-Furnished, Unfurnished).\n\nKindly, upvote if you find the dataset interesting.",
+  "url": "https://www.kaggle.com/harishkumardatalab/housing-price-prediction",
+  "version": 1,
+  "keywords": [
+    "technique, data visualization",
+    "task, classification",
+    "subject, people and society, business, real estate",
+    "data type, categorical"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3489360"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "HARISH KUMARdatalab",
+    "url": "https://www.kaggle.com/harishkumardatalab",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/8051341-kg.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/harishkumardatalab/housing-price-prediction/download?datasetVersionNumber=1",
+      "contentSize": "4740 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-07-07T04:34:24.113Z",
+  "discussionUrl": "https://www.kaggle.com/harishkumardatalab/housing-price-prediction/discussion",
+  "alternateName": "A Comprehensive Dataset for Price Forecasting with 13 key Features.",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3489360/6092787/08821bf7d3f08e925246298f26496d39/dataset-card.jpeg?t=2023-07-07-04-37-52",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 7632
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 35186
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 111
+    }
+  ]
+}

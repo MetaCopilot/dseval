@@ -1,0 +1,14 @@
+[project]
+name = "dseval"
+version = "0.0.1"
+dependencies = [
+    "langchain",
+    "python-dotenv",
+    "numpy",
+    "pandas",
+    "pyyaml",
+    "colorama",
+]
+
+[tool.setuptools.packages.find]
+include = ["dseval*"]

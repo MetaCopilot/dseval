@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Fatalities in the Israeli-Palestinian",
+  "description": "### **Some Task Ideas:**\n**Analyze Fatality Trends:** Explore the dataset and track the trends in fatalities over time. Identify any significant changes, spikes, or declines in the number of fatalities.\n**Demographic Analysis:**Conduct a demographic analysis by examining the age, gender, and citizenship of the individuals killed. Determine if there are any notable patterns or disparities in the data.\n**Geospatial Analysis:** Utilize the event location, district, and region information to perform geospatial analysis. Visualize the distribution of fatalities on a map and identify areas that have experienced higher levels of violence.\n**Hostilities Participation Analysis:**Investigate the extent of individuals' participation in hostilities before their deaths. Analyze the relationship between participation and the circumstances surrounding each fatality.\nInjury Analysis: Examine the types of injuries inflicted on individuals. Identify the most common types of injuries and assess their severity.\n**Weapons Used:** Analyze the ammunition and means by which the individuals were killed. Determine the most frequently used weapons or methods and evaluate their impact.\n**Victim Profiles:** Create profiles of the victims based on the available data such as age, gender, citizenship, and place of residence. Identify common characteristics among the victims.",
+  "url": "https://www.kaggle.com/willianoliveiragibin/fatalities-in-the-israeli-palestinian",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "technique, data visualization",
+    "task, classification",
+    "technique, computer vision",
+    "technique, deep learning"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3843482"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "willian  oliveira gibin",
+    "url": "https://www.kaggle.com/willianoliveiragibin",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/16731800-kg.png?t=2023-09-14-11-42-30"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/willianoliveiragibin/fatalities-in-the-israeli-palestinian/download?datasetVersionNumber=1",
+      "contentSize": "474146 bytes"
+    }
+  ],
+  "commentCount": 2,
+  "dateModified": "2023-10-10T19:02:21.593Z",
+  "discussionUrl": "https://www.kaggle.com/willianoliveiragibin/fatalities-in-the-israeli-palestinian/discussion",
+  "alternateName": "datas about fatalies terrorists in israel and war palestine peoples ",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3843482/6660242/29a999bdd22319d43420a603b0ea9562/dataset-card.jpg?t=2023-10-10-19-07-07",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 2
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 3422
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 19659
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 130
+    }
+  ]
+}

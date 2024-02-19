@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Diabetes prediction dataset",
+  "description": "The **Diabetes prediction dataset** is a collection of medical and demographic data from patients, along with their diabetes status (positive or negative). The data includes features such as age, gender, body mass index (BMI), hypertension, heart disease, smoking history, HbA1c level, and blood glucose level. This dataset can be used to build machine learning models to predict diabetes in patients based on their medical history and demographic information. This can be useful for healthcare professionals in identifying patients who may be at risk of developing diabetes and in developing personalized treatment plans. Additionally, the dataset can be used by researchers to explore the relationships between various medical and demographic factors and the likelihood of developing diabetes.",
+  "url": "https://www.kaggle.com/iammustafatz/diabetes-prediction-dataset",
+  "version": 1,
+  "keywords": [
+    "subject, health and fitness, health",
+    "task, classification",
+    "subject, health and fitness, health, health conditions, diabetes",
+    "subject, health and fitness, health, healthcare",
+    "task, binary-classification"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Data files \u00a9 Original Authors",
+    "url": ""
+  },
+  "identifier": [
+    "3102947"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Mohammed Mustafa",
+    "url": "https://www.kaggle.com/iammustafatz",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/11427441-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/iammustafatz/diabetes-prediction-dataset/download?datasetVersionNumber=1",
+      "contentSize": "751272 bytes"
+    }
+  ],
+  "commentCount": 13,
+  "dateModified": "2023-04-08T06:11:45.837Z",
+  "discussionUrl": "https://www.kaggle.com/iammustafatz/diabetes-prediction-dataset/discussion",
+  "alternateName": "A Comprehensive Dataset for Predicting Diabetes with Medical &amp; Demographic Data",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3102947/5344155/d4f2d9d63736fff7b6ba10f73774752e/dataset-card.png?t=2023-04-08-06-42-24",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 13
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 34479
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 175963
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 396
+    }
+  ]
+}

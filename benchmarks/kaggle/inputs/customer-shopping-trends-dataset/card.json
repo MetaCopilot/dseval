@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Customer Shopping Trends Dataset",
+  "description": "### Context\n\nThe Customer Shopping Preferences Dataset offers valuable insights into consumer behavior and purchasing patterns. Understanding customer preferences and trends is critical for businesses to tailor their products, marketing strategies, and overall customer experience. This dataset captures a wide range of customer attributes including age, gender, purchase history, preferred payment methods, frequency of purchases, and more. Analyzing this data can help businesses make informed decisions, optimize product offerings, and enhance customer satisfaction. The dataset stands as a valuable resource for businesses aiming to align their strategies with customer needs and preferences. It's important to note that this dataset is a Synthetic Dataset Created for Beginners to learn more about Data Analysis and Machine Learning.\n\n### Content\n\nThis dataset encompasses various features related to customer shopping preferences, gathering essential information for businesses seeking to enhance their understanding of their customer base. The features include customer age, gender, purchase amount, preferred payment methods, frequency of purchases, and feedback ratings. Additionally, data on the type of items purchased, shopping frequency, preferred shopping seasons, and interactions with promotional offers is included. With a collection of 3900 records, this dataset serves as a foundation for businesses looking to apply data-driven insights for better decision-making and customer-centric strategies.\n\n### Dataset Glossary (Column-wise)\n\n* <b>Customer ID</b> - Unique identifier for each customer\n* <b>Age</b> - Age of the customer\n* <b>Gender</b> - Gender of the customer (Male/Female)\n* <b>Item Purchased</b> - The item purchased by the customer\n* <b>Category</b> - Category of the item purchased\n* <b>Purchase Amount (USD)</b> - The amount of the purchase in USD\n* <b>Location</b> - Location where the purchase was made\n* <b>Size</b> - Size of the purchased item\n* <b>Color</b> - Color of the purchased item\n* <b>Season</b> - Season during which the purchase was made\n* <b>Review Rating</b> - Rating given by the customer for the purchased item\n* <b>Subscription Status</b> - Indicates if the customer has a subscription (Yes/No)\n* <b>Shipping Type</b> - Type of shipping chosen by the customer\n* <b>Discount Applied</b> - Indicates if a discount was applied to the purchase (Yes/No)\n* <b>Promo Code Used</b> - Indicates if a promo code was used for the purchase (Yes/No)\n* <b>Previous Purchases</b> - The total count of transactions concluded by the customer at the store, excluding the ongoing transaction\n* <b>Payment Method</b> - Customer's most preferred payment method\n* <b>Frequency of Purchases</b> - Frequency at which the customer makes purchases (e.g., Weekly, Fortnightly, Monthly)\n\n### Structure of the Dataset\n\n![](https://i.imgur.com/6UEqejq.png)\n\n### Acknowledgement\n\nThis dataset is a synthetic creation generated using ChatGPT to simulate a realistic customer shopping experience. Its purpose is to provide a platform for beginners and data enthusiasts, allowing them to create, enjoy, practice, and learn from a dataset that mirrors real-world customer shopping behavior. The aim is to foster learning and experimentation in a simulated environment, encouraging a deeper understanding of data analysis and interpretation in the context of consumer preferences and retail scenarios.\n\nCover Photo by: <b><a href=\"https://www.freepik.com/free-vector/hand-drawn-people-shopping-sale_12063508.htm#query=shopping%20cartoon&amp;position=7&amp;from_view=keyword&amp;track=ais\">Freepik</a></b>\n\nThumbnail by: <b><a href=\"https://www.flaticon.com/free-icons/clothing\">Clothing icons created by Flat Icons - Flaticon</a></b>",
+  "url": "https://www.kaggle.com/iamsouravbanerjee/customer-shopping-trends-dataset",
+  "version": 2,
+  "keywords": [
+    "subject, people and society, business",
+    "data type, tabular",
+    "subject, people and society, people, retail and shopping",
+    "technique, data visualization",
+    "technique, exploratory data analysis",
+    "subject, people and society, business, marketing"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3808038"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Sourav Banerjee",
+    "url": "https://www.kaggle.com/iamsouravbanerjee",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/7024923-kg.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/iamsouravbanerjee/customer-shopping-trends-dataset/download?datasetVersionNumber=2",
+      "contentSize": "149846 bytes"
+    }
+  ],
+  "commentCount": 5,
+  "dateModified": "2023-10-05T06:45:37.53Z",
+  "discussionUrl": "https://www.kaggle.com/iamsouravbanerjee/customer-shopping-trends-dataset/discussion",
+  "alternateName": "Journey into Consumer Insights and Retail Evolution with Synthetic Data",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3808038/6600005/7815d4f7d96b8b04b3c15809a229575d/dataset-card.png?t=2023-10-03-06-42-36",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 5
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 25667
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 96142
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 514
+    }
+  ]
+}

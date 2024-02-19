@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Car information dataset",
+  "description": "### About Dataset\n\nif you found it useful, Make an upvote \ud83d\udd3c.\n\nyou are given dataset which contains information about automobiles.\nThe dataset contains 399 rows of 9 features\n\n### DATA OVERVIEW:\nThe dataset consists of the following columns:\n\n* Name: Unique identifier for each automobile.\n* MPG: Fuel efficiency measured in miles per gallon.\n* Cylinders: Number of cylinders in the engine.\n* Displacement: Engine displacement, indicating its size or capacity.\n* Horsepower: Power output of the engine.\n* Weight: Weight of the automobile.\n* Acceleration: Capability to increase speed, measured in seconds.\n* Model Year: Year of manufacture for the automobile model.\n* Origin: Country or region of origin for each automobile.",
+  "url": "https://www.kaggle.com/tawfikelmetwally/automobile-dataset",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science, software",
+    "subject, science and technology, transportation, automobiles and vehicles",
+    "audience, beginner",
+    "technique, data analytics",
+    "technique, data visualization",
+    "technique, exploratory data analysis"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3331115"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "tawfik elmetwally",
+    "url": "https://www.kaggle.com/tawfikelmetwally",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/12641535-kg.jpeg?t=2023-09-03-15-27-30"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/tawfikelmetwally/automobile-dataset/download?datasetVersionNumber=1",
+      "contentSize": "6602 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-05-28T18:26:48.383Z",
+  "discussionUrl": "https://www.kaggle.com/tawfikelmetwally/automobile-dataset/discussion",
+  "alternateName": "automobiles data for visualization, analysis and regression tasks",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3331115/5799875/21762c21884aa9f3d900cf494cb7ec16/dataset-card.jpg?t=2023-05-28-18-33-06",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 13165
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 62510
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 300
+    }
+  ]
+}

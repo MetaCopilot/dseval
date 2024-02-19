@@ -1,0 +1,71 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Super Market Sales",
+  "description": "Here's a brief description of each of the attributes or labels in the dataset:\n\n1. **Invoice ID**: A unique identifier for each invoice or transaction.\n2. **Branch**: The branch or location where the transaction occurred.\n3. **City**: The city where the branch is located.\n4. **Customer Type**: Indicates whether the customer is a regular or new customer.\n5. **Gender**: The gender of the customer.\n6. **Product Line**: The category or type of product purchased.\n7. **Unit Price**: The price of a single unit of the product.\n8. **Quantity**: The number of units of the product purchased.\n9. **Tax 5%**: The amount of tax (5% of the total cost) applied to the transaction.\n10. **Total**: The total cost of the transaction, including tax.\n11. **Date**: The date when the transaction took place.\n12. **Time**: The time of day when the transaction occurred.\n13. **Payment**: The payment method used (e.g., credit card, cash).\n14. **COGS (Cost of Goods Sold)**: The direct costs associated with producing or purchasing the products sold.\n15. **Gross Margin Percentage**: The profit margin percentage for the transaction.\n16. **Gross Income**: The total profit earned from the transaction.\n17. **Rating**: Customer satisfaction rating or feedback on the transaction.\n\n For instance, if you were interested in predicting customer satisfaction, **Rating** might be a suitable label. If you were trying to predict sales or revenue, **Total** or **Gross Income** could be a potential label.",
+  "url": "https://www.kaggle.com/arunjangir245/super-market-sales",
+  "version": 1,
+  "keywords": [
+    "subject, people and society, business",
+    "data type, tabular",
+    "subject, people and society, people, retail and shopping",
+    "audience, intermediate"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Database: Open Database, Contents: Database Contents",
+    "url": "http://opendatacommons.org/licenses/dbcl/1.0/"
+  },
+  "identifier": [
+    "3579304"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Arun Jangir",
+    "url": "https://www.kaggle.com/arunjangir245",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/13192197-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/arunjangir245/super-market-sales/download?datasetVersionNumber=1",
+      "contentSize": "36783 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-08-01T12:58:18.19Z",
+  "discussionUrl": "https://www.kaggle.com/arunjangir245/super-market-sales/discussion",
+  "alternateName": "Unveiling Consumer Behavior and Retail Trends through Supermarket Sales Data",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3579304/6231072/03cee44ea73431c2b11826ec703bfeab/dataset-card.jpg?t=2023-08-02-11-20-10",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 1274
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 5538
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 109
+    }
+  ]
+}

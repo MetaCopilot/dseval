@@ -1,0 +1,73 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Most Streamed Spotify Songs 2023 ",
+  "description": "# Description :\n\n&gt; This dataset contains a comprehensive list of the most famous songs of 2023 as listed on Spotify. The dataset offers a wealth of features beyond what is typically available in similar datasets. It provides insights into each song's attributes, popularity, and presence on various music platforms. The dataset includes information such as **track name, artist(s) name, release date, Spotify playlists and charts, streaming statistics, Apple Music presence, Deezer presence, Shazam charts, and various audio features**.\n\n\n# Key Features:\n\n\n&gt;- **track_name**: *Name of the song*\n- **artist(s)_name**: *Name of the artist(s) of the song*\n- **artist_count**: *Number of artists contributing to the song*\n- **released_year**: *Year when the song was released*\n- **released_month**: *Month when the song was released*\n- **released_day**: *Day of the month when the song was released*\n- **in_spotify_playlists**: *Number of Spotify playlists the song is included in*\n- **in_spotify_charts**: *Presence and rank of the song on Spotify charts*\n- **streams**: *Total number of streams on Spotify*\n- **in_apple_playlists**: *Number of Apple Music playlists the song is included in*\n- **in_apple_charts**: *Presence and rank of the song on Apple Music charts*\n- **in_deezer_playlists**: *Number of Deezer playlists the song is included in*\n- **in_deezer_charts**: *Presence and rank of the song on Deezer charts*\n- **in_shazam_charts**: *Presence and rank of the song on Shazam charts*\n- **bpm**: *Beats per minute, a measure of song tempo*\n- **key**: *Key of the song*\n- **mode**: *Mode of the song (major or minor)*\n- **danceability_%**: *Percentage indicating how suitable the song is for dancing*\n- **valence_%**: *Positivity of the song's musical content*\n- **energy_%**: *Perceived energy level of the song*\n- **acousticness_%**: *Amount of acoustic sound in the song*\n- **instrumentalness_%**: *Amount of instrumental content in the song*\n- **liveness_%**: *Presence of live performance elements*\n- **speechiness_%**: *Amount of spoken words in the song*\n\n# Potential Use Cases:\n\n&gt;- **Music analysis:** Explore patterns in audio features to understand trends and preferences in popular songs.\n- **Platform comparison:** Compare the song's popularity across different music platforms.\n- **Artist impact:** Analyze how artist involvement and attributes relate to a song's success.\n- **Temporal trends:** Identify any shifts in music attributes and preferences over time.\n- **Cross-platform presence:** Investigate how songs perform across different streaming services.\n\nIf you find this dataset useful, your support through an upvote would be greatly appreciated \u2764\ufe0f\ud83d\ude42 <br>\nThank you",
+  "url": "https://www.kaggle.com/nelgiriyewithana/top-spotify-songs-2023",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, people and society, education",
+    "subject, arts and entertainment, music",
+    "technique, data visualization",
+    "task, classification",
+    "technique, exploratory data analysis"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3668746"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Nidula Elgiriyewithana \u26a1",
+    "url": "https://www.kaggle.com/nelgiriyewithana",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9918221-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/nelgiriyewithana/top-spotify-songs-2023/download?datasetVersionNumber=1",
+      "contentSize": "48187 bytes"
+    }
+  ],
+  "commentCount": 16,
+  "dateModified": "2023-08-26T11:04:57.73Z",
+  "discussionUrl": "https://www.kaggle.com/nelgiriyewithana/top-spotify-songs-2023/discussion",
+  "alternateName": "Hottest Spotify Hits \ud83c\udfb5",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3668746/6367938/69737d0e8c9c933e73410d4c9df5e550/dataset-card.jpg?t=2023-08-26-11-11-25",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 16
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 48779
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 208595
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 1277
+    }
+  ]
+}

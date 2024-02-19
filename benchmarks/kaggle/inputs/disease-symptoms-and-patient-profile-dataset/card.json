@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Disease Symptoms and Patient Profile Dataset",
+  "description": "Note: If you find this dataset useful, Do upvote the dataset so it can reach further kagglers.\n\nUnveil the mysteries of diseases with our Comprehensive Disease Symptom and Patient Profile Dataset. This captivating dataset offers a treasure trove of information, revealing the fascinating connections between symptoms, demographics, and health indicators. Delve into the rich tapestry of fever, cough, fatigue, and difficulty breathing, intertwined with age, gender, blood pressure, and cholesterol levels. Whether you're a medical researcher, healthcare professional, or data enthusiast, this dataset holds the key to unlocking profound insights. Explore the hidden patterns, uncover unique symptom profiles, and embark on a captivating journey through the world of medical conditions. Get ready to revolutionize healthcare understanding with our dataset.\n\n**Columns and Usage:**\n&gt;Disease: The name of the disease or medical condition.<br>\nFever: Indicates whether the patient has a fever (Yes/No).<br>\nCough: Indicates whether the patient has a cough (Yes/No).<br>\nFatigue: Indicates whether the patient experiences fatigue (Yes/No).<br>\nDifficulty Breathing: Indicates whether the patient has difficulty breathing (Yes/No).<br>\nAge: The age of the patient in years.<br>\nGender: The gender of the patient (Male/Female).<br>\nBlood Pressure: The blood pressure level of the patient (Normal/High).<br>\nCholesterol Level: The cholesterol level of the patient (Normal/High).<br>\nOutcome Variable: The outcome variable indicating the result of the diagnosis or assessment for the specific disease (Positive/Negative).<br>\n\nThis dataset can be used by various stakeholders, including:\n\n- Healthcare Professionals: Medical practitioners, doctors, and researchers can utilize this dataset for clinical analysis, research studies, and epidemiological investigations related to different diseases. It can aid in understanding the prevalence and patterns of symptoms among patients with specific medical conditions.\n\n\n- Medical Researchers: Researchers focused on specific diseases or conditions mentioned in the dataset can utilize it to explore relationships between symptoms, age, gender, and other variables. This data can contribute to developing new insights, treatment strategies, and preventive measures.\n\n- Healthcare Technology Companies: Companies developing healthcare applications, diagnostic tools, or AI algorithms can use this dataset to train and validate their models. The data can assist in the development of predictive models for disease diagnosis or monitoring based on symptoms and patient characteristics.\n\nFind more datasets [here](https://www.kaggle.com/uom190346a/datasets)\n",
+  "url": "https://www.kaggle.com/uom190346a/disease-symptoms-and-patient-profile-dataset",
+  "version": 1,
+  "keywords": [
+    "subject, science and technology, computer science",
+    "subject, health and fitness, health, health conditions",
+    "task, classification",
+    "technique, exploratory data analysis",
+    "subject, health and fitness, health, medicine"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3316241"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Laksika Tharmalingam",
+    "url": "https://www.kaggle.com/uom190346a",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/9844680-kg.jpeg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/uom190346a/disease-symptoms-and-patient-profile-dataset/download?datasetVersionNumber=1",
+      "contentSize": "3139 bytes"
+    }
+  ],
+  "commentCount": 0,
+  "dateModified": "2023-05-25T07:20:24.133Z",
+  "discussionUrl": "https://www.kaggle.com/uom190346a/disease-symptoms-and-patient-profile-dataset/discussion",
+  "alternateName": "Reveals intricate relationship between patients and diseases over 100 diseases.",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3316241/5770461/18284268b79fca60c1f2667b87feaa98/dataset-card.jpg?t=2023-05-25-07-28-22",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 5616
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 31607
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 113
+    }
+  ]
+}

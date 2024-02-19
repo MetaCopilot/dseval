@@ -1,0 +1,71 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "All Countries and their Economies",
+  "description": "This dataset contains 25 features which are:\n\n1.**Country**\n\n2.**Poverty headcount ratio at $2.15 a day (2017 PPP) (% of population)**\n\n3.**Life expectancy at birth, total (years)**\n\n4.**Population, total**\n\n5.**Population growth (annual %)**\n\n6.**Net migration**\n\n7.**Human Capital Index (HCI) (scale 0-1)**\n\n8.**GDP (current US$)current US$constant US$current LCUconstant LCU**\n\n9.**GDP per capita (current US$)current US$constant US$current LCUconstant LCU**\n\n10.**GDP growth (annual %)**\n\n11.**Unemployment, total (% of total labor force) (modeled ILO estimate)**\n\n12.**Inflation, consumer prices (annual %)**\n\n13.**Personal remittances, received (% of GDP)**\n\n14.**CO2 emissions (metric tons per capita)**\n\n15.**Forest area (% of land area)**\n\n16.**Access to electricity (% of population)**\n\n17.**Annual freshwater withdrawals, total (% of internal resources)**\n\n18.**Electricity production from renewable sources, excluding hydroelectric (% of total)**\n\n19.**People using safely managed sanitation services (% of population)**\n\n20.**Intentional homicides (per 100,000 people)**\n\n21.**Central government debt, total (% of GDP)**\n\n22.**Statistical performance indicators (SPI): Overall score (scale 0-100)**\n\n23.**Individuals using the Internet (% of population)**\n\n24.**Proportion of seats held by women in national parliaments (%)**\n\n25.**Foreign direct investment, net inflows (% of GDP)**\n\n![](https://navi.com/blog/wp-content/uploads/2022/12/Planned-Economy.jpg)\n",
+  "url": "https://www.kaggle.com/diaaessam/all-countries-and-their-economies",
+  "version": 1,
+  "keywords": [
+    "data type, tabular",
+    "audience, beginner",
+    "audience, intermediate",
+    "subject, people and society, social science, economics"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Other (specified in description)",
+    "url": ""
+  },
+  "identifier": [
+    "3594840"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Diaa Eldiyn Essam",
+    "url": "https://www.kaggle.com/diaaessam",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/11500118-kg.jpg"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/diaaessam/all-countries-and-their-economies/download?datasetVersionNumber=1",
+      "contentSize": "12526 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-08-05T20:45:35.547Z",
+  "discussionUrl": "https://www.kaggle.com/diaaessam/all-countries-and-their-economies/discussion",
+  "alternateName": "Get to know the economies of all countries that exist",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3594840/6255024/370cf57f2d50d6411610b2df127c1f09/dataset-card.png?t=2023-08-06-08-38-41",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 721
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 3297
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 108
+    }
+  ]
+}

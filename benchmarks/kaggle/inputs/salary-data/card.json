@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Salary_Data",
+  "description": "A The dataset was obtained from multiple sources, including surveys, job posting sites, and other publicly available sources.A total of 6704 data points were collected.The dataset included fivevariables: age, experience, job role, and education level and salary",
+  "url": "https://www.kaggle.com/mohithsairamreddy/salary-data",
+  "version": 4,
+  "keywords": [
+    "subject, people and society, education",
+    "subject, science and technology, computer science, software",
+    "subject, people and society, social science, economics",
+    "subject, people and society, jobs and career, employment",
+    "subject, people and society, jobs and career, income"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "Community Data License Agreement - Sharing - Version 1.0",
+    "url": "https://cdla.io/sharing-1-0/"
+  },
+  "identifier": [
+    "3282301"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Mohith Sai Ram Reddy",
+    "url": "https://www.kaggle.com/mohithsairamreddy",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/mohithsairamreddy/salary-data/download?datasetVersionNumber=4",
+      "contentSize": "17048 bytes"
+    }
+  ],
+  "commentCount": 1,
+  "dateModified": "2023-05-18T14:05:19.507Z",
+  "discussionUrl": "https://www.kaggle.com/mohithsairamreddy/salary-data/discussion",
+  "alternateName": "Salary Data based on Experience,Age,Gender,Job Title and Education Level",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3282301/5716504/a74da0289c1e1d39e3248d85e0b0b13c/dataset-card.png?t=2023-05-22-17-36-08",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 1
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 15393
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 61442
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 273
+    }
+  ]
+}

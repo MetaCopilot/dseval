@@ -1,0 +1,72 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Dataset",
+  "name": "Employee dataset",
+  "description": "**Context:**\nThis dataset contains information about employees in a company, including their educational backgrounds, work history, demographics, and employment-related factors. It has been anonymized to protect privacy while still providing valuable insights into the workforce.\n\n**Columns:**\n\n1. **Education:** The educational qualifications of employees, including degree, institution, and field of study.\n\n2. **Joining Year:** The year each employee joined the company, indicating their length of service.\n\n3. **City:** The location or city where each employee is based or works.\n\n4. **Payment Tier:** Categorization of employees into different salary tiers.\n\n5. **Age:** The age of each employee, providing demographic insights.\n\n6. **Gender:** Gender identity of employees, promoting diversity analysis.\n\n7. **Ever Benched:** Indicates if an employee has ever been temporarily without assigned work.\n\n8. **Experience in Current Domain:** The number of years of experience employees have in their current field.\n\n9. **Leave or Not:** a target column\n\n**Usage:**\nThis dataset can be used for various HR and workforce-related analyses, including employee retention, salary structure assessments, diversity and inclusion studies, and leave pattern analyses. Researchers, data analysts, and HR professionals can gain valuable insights from this dataset.\n\n**Potential Research Questions:**\n1. What is the distribution of educational qualifications among employees?\n2. How does the length of service (Joining Year) vary across different cities?\n3. Is there a correlation between Payment Tier and Experience in Current Domain?\n4. What is the gender distribution within the workforce?\n5. Are there any patterns in leave-taking behavior among employees?\n\n\n**Acknowledgments:**\nWe would like to acknowledge the contributions of our HR department in providing this dataset for research and analysis purposes.\n",
+  "url": "https://www.kaggle.com/tawfikelmetwally/employee-dataset",
+  "version": 1,
+  "keywords": [
+    "audience, beginner",
+    "technique, data visualization",
+    "task, classification",
+    "technique, exploratory data analysis",
+    "task, binary-classification"
+  ],
+  "license": {
+    "@type": "CreativeWork",
+    "name": "CC0: Public Domain",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "identifier": [
+    "3707753"
+  ],
+  "includedInDataCatalog": {
+    "@type": "DataCatalog",
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "tawfik elmetwally",
+    "url": "https://www.kaggle.com/tawfikelmetwally",
+    "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/12641535-kg.jpeg?t=2023-09-03-15-27-30"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "requiresSubscription": true,
+      "encodingFormat": "zip",
+      "fileFormat": "zip",
+      "contentUrl": "https://www.kaggle.com/datasets/tawfikelmetwally/employee-dataset/download?datasetVersionNumber=1",
+      "contentSize": "18961 bytes"
+    }
+  ],
+  "commentCount": 2,
+  "dateModified": "2023-09-06T18:15:55.64Z",
+  "discussionUrl": "https://www.kaggle.com/tawfikelmetwally/employee-dataset/discussion",
+  "alternateName": "Employee data for classification task",
+  "isAccessibleForFree": true,
+  "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/3707753/6426550/fc8910f50df0d504b76e2c7835a5cc78/dataset-card.jpg?t=2023-09-06-18-24-37",
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": 2
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/DownloadAction",
+      "userInteractionCount": 13959
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/ViewAction",
+      "userInteractionCount": 54678
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/LikeAction",
+      "userInteractionCount": 202
+    }
+  ]
+}
