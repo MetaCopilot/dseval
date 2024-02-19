@@ -1,11 +1,12 @@
 import logging
-from typing import TypedDict, Any
+from typing import Any, TypedDict
 
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
 
 _logger = logging.getLogger(__name__)
+
 
 class Match(TypedDict):
     match: bool
@@ -19,11 +20,15 @@ class MatchConfig(TypedDict):
     ignore_dtypes: bool  # Ignore the difference in dtypes
     match_partial: bool  # Check if the information is presented in the submission, but ignore the rest
     type_only: bool  # Only check the type of the object
-    value_only: bool  # Ignore container type (e.g., list vs. tuple vs. numpy array vs. series; single element array vs. scalar)
+    value_only: (
+        bool  # Ignore container type (e.g., list vs. tuple vs. numpy array vs. series; single element array vs. scalar)
+    )
     strict_type: bool  # Type must be strictly the same (for numpy arrays)
     atol: float  # Absolute tolerance for numerical comparisons
     rtol: float  # Relative tolerance for numerical comparisons
-    metrictol: float | None  # Tolerance for metrics. If set to a number, the submission must be no less than the reference value multiplied by the tolerance.
+    metrictol: (
+        float | None
+    )  # Tolerance for metrics. If set to a number, the submission must be no less than the reference value multiplied by the tolerance.
 
 
 class ExactMatcher:
@@ -76,19 +81,13 @@ class ExactMatcher:
         return obj
 
     def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}("
-            + ", ".join([f"{k}={v}" for k, v in self.config.items()])
-            + ")"
-        )
+        return f"{self.__class__.__name__}(" + ", ".join([f"{k}={v}" for k, v in self.config.items()]) + ")"
 
     def __call__(self, ref: Any, sub: Any) -> Match:
         if self.config["type_only"]:
             return self.match(ref, sub)
         if self.config["value_only"]:
-            ref, sub = ExactMatcher._strip_container(
-                ref
-            ), ExactMatcher._strip_container(sub)
+            ref, sub = ExactMatcher._strip_container(ref), ExactMatcher._strip_container(sub)
         match = self.match(ref, sub)
         if not match["match"] and self.config["match_partial"]:
             match_partial = self.match_partial(ref, sub)
@@ -194,9 +193,7 @@ class BooleanMatcher(ExactMatcher):
         return isinstance(ref, (bool, np.bool_)) or isinstance(sub, (bool, np.bool_))
 
     def match(self, ref, sub) -> Match:
-        if not isinstance(sub, (bool, np.bool_)) or not isinstance(
-            ref, (bool, np.bool_)
-        ):
+        if not isinstance(sub, (bool, np.bool_)) or not isinstance(ref, (bool, np.bool_)):
             return {"match": False, "reason": f"Wrong type: {type(ref)}, {type(sub)}"}
         if ref == sub:
             return {"match": True, "reason": ""}
@@ -206,14 +203,10 @@ class BooleanMatcher(ExactMatcher):
 class NumberMatcher(ExactMatcher):
     @classmethod
     def supports(cls, ref, sub):
-        return isinstance(ref, (float, int, np.number)) or isinstance(
-            sub, (float, int, np.number)
-        )
+        return isinstance(ref, (float, int, np.number)) or isinstance(sub, (float, int, np.number))
 
     def match(self, ref, sub) -> Match:
-        if not isinstance(sub, (float, int, np.number)) or not isinstance(
-            ref, (float, int, np.number)
-        ):
+        if not isinstance(sub, (float, int, np.number)) or not isinstance(ref, (float, int, np.number)):
             return {"match": False, "reason": f"Wrong type: {type(ref)}, {type(sub)}"}
         if self.config["metrictol"] is not None:
             if sub < ref * self.config["metrictol"]:
@@ -226,9 +219,7 @@ class NumberMatcher(ExactMatcher):
                     "match": True,
                     "reason": f"Metric satisfies the condition: {sub} vs. {ref}",
                 }
-        if np.isclose(
-            sub, ref, rtol=self.config["rtol"], atol=self.config["atol"]
-        ).item():
+        if np.isclose(sub, ref, rtol=self.config["rtol"], atol=self.config["atol"]).item():
             return {"match": True, "reason": ""}
         return {"match": False, "reason": f"Wrong value: {ref} vs. {sub}"}
 
@@ -248,9 +239,7 @@ class NumpyArrayMatcher(ExactMatcher):
             }
         if ref.shape != sub.shape:
             return {"match": False, "reason": f"Wrong shape: {ref.shape}, {sub.shape}"}
-        if np.issubdtype(ref.dtype, np.floating) and np.issubdtype(
-            sub.dtype, np.floating
-        ):
+        if np.issubdtype(ref.dtype, np.floating) and np.issubdtype(sub.dtype, np.floating):
             if not np.allclose(np.isnan(ref), np.isnan(sub)):
                 return {
                     "match": False,
@@ -311,9 +300,7 @@ class CsrMatrixMatcher(ExactMatcher):
                 "match": False,
                 "reason": f"CSR matrix unequal: wrong shape: {ref.shape}, {sub.shape}",
             }
-        if not np.allclose(
-            ref.data, sub.data, rtol=self.config["rtol"], atol=self.config["atol"]
-        ):
+        if not np.allclose(ref.data, sub.data, rtol=self.config["rtol"], atol=self.config["atol"]):
             return {
                 "match": False,
                 "reason": f"CSR matrix unequal: wrong data: {ref.data}, {sub.data}",
@@ -352,9 +339,7 @@ class PandasObjectMatcher(ExactMatcher):
             }
         if self.config["ignore_names"]:
             if isinstance(ref, pd.DataFrame) and isinstance(sub, pd.DataFrame):
-                columns = (
-                    ref.columns.tolist()
-                )  # Keep columns only from expected DataFrame
+                columns = ref.columns.tolist()  # Keep columns only from expected DataFrame
                 if set(columns) == set(sub.columns.tolist()):
                     sub = sub[columns]
                 try:
@@ -382,9 +367,7 @@ class PandasObjectMatcher(ExactMatcher):
                     _logger.exception("Failed to rename name of series.")
         if self.config["ignore_order"] or self.config["ignore_index"]:
             if isinstance(ref, pd.DataFrame) and isinstance(sub, pd.DataFrame):
-                columns = (
-                    ref.columns.tolist()
-                )  # Keep columns only from expected DataFrame
+                columns = ref.columns.tolist()  # Keep columns only from expected DataFrame
                 if not set(columns) == set(sub.columns.tolist()):
                     return {
                         "match": False,
@@ -456,9 +439,7 @@ class PandasObjectMatcher(ExactMatcher):
 class ContainerMatcher(ExactMatcher):
     @classmethod
     def supports(cls, ref, sub):
-        return isinstance(ref, (list, tuple, dict, set)) or isinstance(
-            sub, (list, tuple, dict, set)
-        )
+        return isinstance(ref, (list, tuple, dict, set)) or isinstance(sub, (list, tuple, dict, set))
 
     @staticmethod
     def _general_type_sorted(sequence):
@@ -488,9 +469,7 @@ class ContainerMatcher(ExactMatcher):
                         "match": False,
                         "reason": f"Length mismatch: {len(ref)} vs. {len(sub)}",
                     }
-                for (ref_key, ref_val), (sub_key, sub_val) in zip(
-                    ref.items(), sub.items()
-                ):
+                for (ref_key, ref_val), (sub_key, sub_val) in zip(ref.items(), sub.items()):
                     match = ExactMatcher(**self.config).match(ref_val, sub_val)
                     if not match["match"]:
                         return {

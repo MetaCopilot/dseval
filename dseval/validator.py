@@ -6,26 +6,16 @@ import json
 import logging
 import random
 import re
+import tempfile
 import traceback
 import types
-import tempfile
 import uuid
 from pathlib import Path
-from typing import (
-    Any,
-    Type,
-    TypedDict,
-    Literal,
-    ClassVar,
-    Callable,
-    TYPE_CHECKING,
-    Generic,
-    TypeVar,
-    cast,
-)
-from typing_extensions import NotRequired
+from typing import (TYPE_CHECKING, Any, Callable, ClassVar, Generic, Literal,
+                    Type, TypedDict, TypeVar, cast)
 
 import numpy as np
+from typing_extensions import NotRequired
 
 from .match import ExactMatcher, Match
 from .utils import add_indent, exec_code
@@ -167,14 +157,12 @@ class NoErrorValidator(Validator[_DictWithError]):
             return {
                 "correct": False,
                 "category": self.alias,
-                "reason": "Expect no error:\n"
-                + "\n".join(submission["error"]["traceback"]),
+                "reason": "Expect no error:\n" + "\n".join(submission["error"]["traceback"]),
             }
         return {"correct": True}
 
 
 class NamespaceIntactGuard(Validator[_DictWithNamespaceDiff]):
-
     """After execution, we examine the namespace diff. By default:
 
     - Addition: allowed.
@@ -208,9 +196,7 @@ class NamespaceIntactGuard(Validator[_DictWithNamespaceDiff]):
 
         if self.treat_replacement_as_update:
             if self.replacement is not None:
-                raise ValueError(
-                    "Cannot specify replacement when treat_replacement_as_update is True."
-                )
+                raise ValueError("Cannot specify replacement when treat_replacement_as_update is True.")
 
     def __repr__(self) -> str:
         return (
@@ -222,12 +208,10 @@ class NamespaceIntactGuard(Validator[_DictWithNamespaceDiff]):
     def validate(self, reference, submission) -> ValidateResult:
         if self.treat_replacement_as_update:
             reference_diff = {
-                name: "updated" if diff == "replaced" else diff
-                for name, diff in reference["namespace_diff"].items()
+                name: "updated" if diff == "replaced" else diff for name, diff in reference["namespace_diff"].items()
             }
             submission_diff = {
-                name: "updated" if diff == "replaced" else diff
-                for name, diff in submission["namespace_diff"].items()
+                name: "updated" if diff == "replaced" else diff for name, diff in submission["namespace_diff"].items()
             }
         else:
             reference_diff = reference["namespace_diff"]
@@ -241,14 +225,10 @@ class NamespaceIntactGuard(Validator[_DictWithNamespaceDiff]):
         }
         for key in ["updated", "replaced", "deleted"]:
             if allowed[key] is None:
-                allowed[key] = [
-                    name for name, diff in reference_diff.items() if diff == key
-                ]
+                allowed[key] = [name for name, diff in reference_diff.items() if diff == key]
 
         for name, diff in submission_diff.items():
-            if allowed[diff] is False or (
-                isinstance(allowed[diff], list) and name not in allowed[diff]
-            ):
+            if allowed[diff] is False or (isinstance(allowed[diff], list) and name not in allowed[diff]):
                 return {
                     "correct": False,
                     "category": self.alias,
@@ -297,8 +277,7 @@ class ResultValidator(Validator[_DictWithExecuteResult]):
                         return {
                             "correct": False,
                             "category": self.alias,
-                            "reason": "Couldn't remediate output:\n"
-                            + traceback.format_exc(),
+                            "reason": "Couldn't remediate output:\n" + traceback.format_exc(),
                         }
                     result = self.run_compare_fn(
                         self.compare_fn,
@@ -308,9 +287,7 @@ class ResultValidator(Validator[_DictWithExecuteResult]):
                     )
                     if result["correct"]:
                         if "reason" in result:
-                            result["reason"] = (
-                                "Correct with remediated output. " + result["reason"]
-                            )
+                            result["reason"] = "Correct with remediated output. " + result["reason"]
                         else:
                             result["reason"] = "Correct with remediated output."
                     return result
@@ -326,9 +303,7 @@ class ResultValidator(Validator[_DictWithExecuteResult]):
             return {
                 "correct": True,
                 "category": self.alias,
-                "reason": ""
-                if execute_result is None
-                else "execute_result is ignored.",
+                "reason": "" if execute_result is None else "execute_result is ignored.",
             }
 
     @staticmethod
@@ -408,13 +383,7 @@ class ResultValidator(Validator[_DictWithExecuteResult]):
         if self.source_code is not None:
             return f"ResultValidator(\n{add_indent(self.source_code.rstrip(), 2)}\n)"
         elif self.source_config is not None:
-            return (
-                "ResultValidator("
-                + ", ".join(
-                    [f"{key}={value}" for key, value in self.source_config.items()]
-                )
-                + ")"
-            )
+            return "ResultValidator(" + ", ".join([f"{key}={value}" for key, value in self.source_config.items()]) + ")"
         elif isinstance(self.compare_fn, ExactMatcher):
             return "ResultValidator()"
         return f"ResultValidator({self.compare_fn})"
@@ -444,9 +413,7 @@ class ResultValidator(Validator[_DictWithExecuteResult]):
             return {
                 "correct": False,
                 "category": error_category,
-                "reason": mismatch_prefix
-                + "Comparison raises AssertionError:\n"
-                + traceback.format_exc(),
+                "reason": mismatch_prefix + "Comparison raises AssertionError:\n" + traceback.format_exc(),
             }
         except KeyboardInterrupt:
             raise
@@ -473,35 +440,21 @@ class Or(Validator[T]):
                 return {
                     "correct": True,
                     "category": validator.alias,
-                    "reason": f"Validator {validator} passed: {reason}"
-                    if reason
-                    else f"Validator {validator} passed.",
+                    "reason": f"Validator {validator} passed: {reason}" if reason else f"Validator {validator} passed.",
                 }
             results.append(result)
         return {
             "correct": False,
             "category": self.alias,
-            "reason": "No validator matches:\n"
-            + "\n".join(["- " + result["reason"] for result in results]),
+            "reason": "No validator matches:\n" + "\n".join(["- " + result["reason"] for result in results]),
         }
 
     def __repr__(self):
-        return (
-            "Or(\n"
-            + ",\n".join(
-                [add_indent(repr(validator), 2) for validator in self.validators]
-            )
-            + "\n)"
-        )
+        return "Or(\n" + ",\n".join([add_indent(repr(validator), 2) for validator in self.validators]) + "\n)"
 
     @classmethod
     def load(cls, type_, config):
-        return Or(
-            *[
-                Validator.load(subtype, subconfig)
-                for subtype, subconfig in config.items()
-            ]
-        )
+        return Or(*[Validator.load(subtype, subconfig) for subtype, subconfig in config.items()])
 
 
 class And(Validator[T]):
@@ -535,22 +488,11 @@ class And(Validator[T]):
         return {"correct": correct}
 
     def __repr__(self):
-        return (
-            "And(\n"
-            + ",\n".join(
-                [add_indent(repr(validator), 2) for validator in self.validators]
-            )
-            + "\n)"
-        )
+        return "And(\n" + ",\n".join([add_indent(repr(validator), 2) for validator in self.validators]) + "\n)"
 
     @classmethod
     def load(cls, type_, config):
-        return And(
-            *[
-                Validator.load(subtype, subconfig)
-                for subtype, subconfig in config.items()
-            ]
-        )
+        return And(*[Validator.load(subtype, subconfig) for subtype, subconfig in config.items()])
 
 
 class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
@@ -607,18 +549,12 @@ class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
     def __repr__(self) -> str:
         return (
             "NamespaceChecker(\n"
-            + ",\n".join(
-                [
-                    add_indent(f"{name}: {compare_fn}", 2)
-                    for name, compare_fn in self.names.items()
-                ]
-            )
+            + ",\n".join([add_indent(f"{name}: {compare_fn}", 2) for name, compare_fn in self.names.items()])
             + "\n)"
         )
 
 
 class StreamOutputValidator(Validator[_DictWithStreamOutput]):
-
     """Check the output of the cell."""
 
     alias: ClassVar[str] = "output"
@@ -639,7 +575,6 @@ class StreamOutputValidator(Validator[_DictWithStreamOutput]):
 
 
 class AnswerInSourceCodeValidator(Validator[_DictWithCodeAndResult]):
-
     """Check whehter the answer is directly shown in the code."""
 
     alias: ClassVar[str] = "answer_in_source"
@@ -654,8 +589,7 @@ class AnswerInSourceCodeValidator(Validator[_DictWithCodeAndResult]):
                 return {
                     "correct": False,
                     "category": self.alias,
-                    "reason": "Couldn't convert the result to string:\n"
-                    + traceback.format_exc(),
+                    "reason": "Couldn't convert the result to string:\n" + traceback.format_exc(),
                 }
             if re.search(r"\b" + re.escape(res_string) + r"\b", source_code):
                 return {
@@ -680,7 +614,6 @@ class AnswerInSourceCodeValidator(Validator[_DictWithCodeAndResult]):
 
 
 class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
-
     """The moel will be tested against inputs, and the outputs will be compared with the labels,
     with the ``metric_type`` metric. The metric will be compared against the reference metric with the ``tolerance``.
 
@@ -707,9 +640,7 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
             metric_type = [metric_type]
         if not isinstance(tolerance, list):
             tolerance = [tolerance for _ in range(len(metric_type))]
-        assert len(metric_type) == len(
-            tolerance
-        ), "metric_type and tolerance should have the same length."
+        assert len(metric_type) == len(tolerance), "metric_type and tolerance should have the same length."
 
         self.metric_type = metric_type
 
@@ -798,9 +729,7 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
         for metric_type, tolerance in zip(self.metric_type, self.tolerance):
             reference_metric = self.evaluate_metric(metric_type, labels, reference_pred)
             try:
-                submission_metric = self.evaluate_metric(
-                    metric_type, labels, submission_pred
-                )
+                submission_metric = self.evaluate_metric(metric_type, labels, submission_pred)
             except Exception:
                 return {
                     "correct": False,
@@ -833,7 +762,6 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
 
 
 class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
-
     """The defined function will be tested against multiple inputs.
 
     Parameters:
@@ -895,31 +823,19 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
                     raise ValueError("No test case to repeat.")
                 else:
                     # Generate the case with a different random seed
-                    new_case = self.code_to_test_case(
-                        last_case, case_id, assume_list_as_tuple=True
-                    )
+                    new_case = self.code_to_test_case(last_case, case_id, assume_list_as_tuple=True)
             else:
-                new_case = self.code_to_test_case(
-                    test_case, case_id, assume_list_as_tuple=True
-                )
+                new_case = self.code_to_test_case(test_case, case_id, assume_list_as_tuple=True)
                 last_case = test_case
             if not isinstance(new_case, tuple) and not isinstance(new_case, dict):
-                raise ValueError(
-                    f"Invalid test case (#{case_id}), not a tuple and not a dict: {new_case}"
-                )
+                raise ValueError(f"Invalid test case (#{case_id}), not a tuple and not a dict: {new_case}")
             try:
-                if (
-                    isinstance(new_case, dict)
-                    and self.input_validator(**new_case) is False
-                ) or (
-                    isinstance(new_case, tuple)
-                    and self.input_validator(*new_case) is False
+                if (isinstance(new_case, dict) and self.input_validator(**new_case) is False) or (
+                    isinstance(new_case, tuple) and self.input_validator(*new_case) is False
                 ):
                     raise ValueError(f"Invalid test case (#{case_id}): {new_case}")
             except AssertionError:
-                raise ValueError(
-                    f"Invalid test case (#{case_id}): {new_case}\n{traceback.format_exc()}"
-                )
+                raise ValueError(f"Invalid test case (#{case_id}): {new_case}\n{traceback.format_exc()}")
             self.test_cases.append(new_case)
 
     @staticmethod
@@ -932,20 +848,12 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
         return ns["_validate"]
 
     @staticmethod
-    def code_to_test_case(
-        parameter: Any, case_id: int | None = None, assume_list_as_tuple: bool = False
-    ) -> Any:
+    def code_to_test_case(parameter: Any, case_id: int | None = None, assume_list_as_tuple: bool = False) -> Any:
         if isinstance(parameter, tuple):
-            return tuple(
-                TableTestValidator.code_to_test_case(item, case_id)
-                for item in parameter
-            )
+            return tuple(TableTestValidator.code_to_test_case(item, case_id) for item in parameter)
         if assume_list_as_tuple and isinstance(parameter, list):
             # YAML has trouble expressing a tuple. So list should be treated as tuple on the top-level.
-            return tuple(
-                TableTestValidator.code_to_test_case(item, case_id)
-                for item in parameter
-            )
+            return tuple(TableTestValidator.code_to_test_case(item, case_id) for item in parameter)
         import pandas as pd
 
         if isinstance(parameter, str):
@@ -955,19 +863,11 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
                 ns = exec_code(param_stripped, "test-generate")
                 if "_test_case" in ns:
                     parameter = ns["_test_case"]
-                elif "_generate" in ns and isinstance(
-                    ns["_generate"], types.FunctionType
-                ):
+                elif "_generate" in ns and isinstance(ns["_generate"], types.FunctionType):
                     parameter = ns["_generate"]()
                 else:
-                    raise ValueError(
-                        f"Couldn't find _test_case or function _generate in {ns.keys()}"
-                    )
-        if (
-            isinstance(parameter, str)
-            and parameter.startswith("`")
-            and parameter.endswith("`")
-        ):
+                    raise ValueError(f"Couldn't find _test_case or function _generate in {ns.keys()}")
+        if isinstance(parameter, str) and parameter.startswith("`") and parameter.endswith("`"):
             parameter = parameter[1:-1]
             parameter = exec_code(parameter, "test-expression", mode="eval")
         return parameter
@@ -975,10 +875,7 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
     def __repr__(self) -> str:
         return (
             f"TableTestValidator(\n"
-            + ",\n".join(
-                [self.function_name]
-                + [add_indent(repr(test_case), 2) for test_case in self.test_cases]
-            )
+            + ",\n".join([self.function_name] + [add_indent(repr(test_case), 2) for test_case in self.test_cases])
             + "\n)"
         )
 

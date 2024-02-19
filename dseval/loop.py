@@ -8,9 +8,10 @@ from typing import Any, TypedDict
 import colorama
 from typing_extensions import NotRequired
 
-from .simulation import Environment
 from .problem import ProblemSet
-from .solver import Solver, TentativeSolution, TentativeSolutions, SolverException
+from .simulation import Environment
+from .solver import (Solver, SolverException, TentativeSolution,
+                     TentativeSolutions)
 
 _logger = logging.getLogger(__name__)
 
@@ -35,9 +36,7 @@ class EvaluationResult:
     num_passed: int
     details: list[EvaluationDetail]
 
-    def __init__(
-        self, num_problems: int, num_passed: int, details: list[EvaluationDetail]
-    ):
+    def __init__(self, num_problems: int, num_passed: int, details: list[EvaluationDetail]):
         self.num_problems = num_problems
         self.num_passed = num_passed
         self.details = details
@@ -98,9 +97,7 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question.strip())
             playground_env = environment.fork()
-            environment.execute(
-                problem.reference_code, **(problem.execution or {}), raise_error=True
-            )
+            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
             playground_env.execute(problem.reference_code, **(problem.execution or {}))
 
             if problem.validator is not None:
@@ -110,23 +107,21 @@ class Evaluator:
                 _logger.info(
                     "[Question %d] %s%s%s! (time elapsed: %s%.2f%s seconds)",
                     total,
-                    colorama.Fore.GREEN
-                    if validate_result["correct"]
-                    else colorama.Fore.RED,
+                    colorama.Fore.GREEN if validate_result["correct"] else colorama.Fore.RED,
                     "Correct" if validate_result["correct"] else "Incorrect",
                     colorama.Fore.RESET,
-                    colorama.Fore.GREEN
-                    if environment.last_cell.output["execute_time"]
-                    < (problem.execution or {}).get("max_time", 1) / 3
-                    else colorama.Fore.YELLOW,
+                    (
+                        colorama.Fore.GREEN
+                        if environment.last_cell.output["execute_time"]
+                        < (problem.execution or {}).get("max_time", 1) / 3
+                        else colorama.Fore.YELLOW
+                    ),
                     environment.last_cell.output["execute_time"],
                     colorama.Fore.RESET,
                 )
                 correct += int(validate_result["correct"])
                 if not validate_result["correct"]:
-                    _logger.warning(
-                        "[Question %d] %s", total, validate_result["reason"]
-                    )
+                    _logger.warning("[Question %d] %s", total, validate_result["reason"])
             else:
                 correct += 1
 
@@ -170,9 +165,7 @@ class Evaluator:
             )
 
             code_with_errors.append(code)
-            environment.execute(
-                problem.reference_code, **(problem.execution or {}), raise_error=True
-            )
+            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
 
             codes.append(
                 {
@@ -204,9 +197,7 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question)
             playground_env = environment.fork()
-            environment.execute(
-                problem.reference_code, **(problem.execution or {}), raise_error=True
-            )
+            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
             assert environment.last_cell is not None
             answer = environment.last_cell.output
 
@@ -268,9 +259,7 @@ class Evaluator:
 
                 # Using the same playground_env throughout all retries
                 # Won't rollback even for failed attempts.
-                produced_output = playground_env.execute(
-                    code, **(problem.execution or {})
-                )
+                produced_output = playground_env.execute(code, **(problem.execution or {}))
                 code_with_errors.append(code)
                 assert playground_env.last_cell is not None
 
@@ -284,16 +273,12 @@ class Evaluator:
                     )
 
                 if problem.validator is not None:
-                    validate_result = problem.validator.validate(
-                        answer, playground_env.last_cell.output
-                    )
+                    validate_result = problem.validator.validate(answer, playground_env.last_cell.output)
                     hint = validate_result.get("reason", "")
                     current_correct = validate_result["correct"]
 
                 if problem.validator_loose is not None:
-                    validate_result_loose = problem.validator_loose.validate(
-                        answer, playground_env.last_cell.output
-                    )
+                    validate_result_loose = problem.validator_loose.validate(answer, playground_env.last_cell.output)
                     current_correct_loose = validate_result_loose["correct"]
 
                 retry_count += 1

@@ -1,10 +1,12 @@
 # Got inspirations from https://github.com/fortierq/flimit
 
-from contextlib import contextmanager
-import time
-import signal
+import os
 import resource
-import os, psutil
+import signal
+import time
+from contextlib import contextmanager
+
+import psutil
 
 
 class TimeLimitError(Exception):

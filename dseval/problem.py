@@ -3,11 +3,11 @@ from __future__ import annotations
 import json
 import os
 import re
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, TypedDict
 
 import requests
 import yaml
-from pathlib import Path
-from typing import Any, TYPE_CHECKING, TypedDict
 from typing_extensions import NotRequired
 
 from .validator import Validator, add_indent
@@ -39,17 +39,11 @@ class SubProblem:
         self.reference_code = reference_code
         validator_ = validator_loose = None
         if question is not None and validator is None:
-            validator_ = Validator.load(
-                "and", Validator.augment_config({}, "comparison")
-            )
-            validator_loose = Validator.load(
-                "and", Validator.augment_config({}, "comparison", loose=True)
-            )
+            validator_ = Validator.load("and", Validator.augment_config({}, "comparison"))
+            validator_loose = Validator.load("and", Validator.augment_config({}, "comparison", loose=True))
         elif isinstance(validator, dict):
             template = validator.pop("template", "comparison")
-            validator_ = Validator.load(
-                "and", Validator.augment_config(validator, template)
-            )
+            validator_ = Validator.load("and", Validator.augment_config(validator, template))
             validator_loose = Validator.load(
                 "and",
                 Validator.augment_config(validator, template, loose=True),
@@ -135,11 +129,6 @@ class ProblemSet:
     def __repr__(self) -> str:
         return (
             "ProblemSet(\n"
-            + ",\n".join(
-                [
-                    add_indent(str(i) + ": " + repr(problem), 2)
-                    for i, problem in enumerate(self.problems)
-                ]
-            )
+            + ",\n".join([add_indent(str(i) + ": " + repr(problem), 2) for i, problem in enumerate(self.problems)])
             + "\n)"
         )

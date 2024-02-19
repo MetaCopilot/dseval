@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
+
 from .match import ExactMatcher
 
 
@@ -92,8 +93,8 @@ def test_numpy_array_matcher_equal():
     result = ExactMatcher(strict_type=True)(one, other.astype(np.float32))
     assert result["match"] == False
 
-    one = np.array([-np.inf, np.inf, np.nan, 0.])
-    other = np.array([-np.inf, np.inf, np.nan, 0.])
+    one = np.array([-np.inf, np.inf, np.nan, 0.0])
+    other = np.array([-np.inf, np.inf, np.nan, 0.0])
     result = ExactMatcher()(one, other)
     assert result == {"match": True, "reason": ""}
 
@@ -228,7 +229,7 @@ def test_pandas_object_ignore():
     result = ExactMatcher(ignore_names=True)(one, other)
     assert result == {"match": True, "reason": ""}
 
-    one = pd.DataFrame({"a": [1., 2., 3.], "b": [4, 5, 6]})
+    one = pd.DataFrame({"a": [1.0, 2.0, 3.0], "b": [4, 5, 6]})
     other = pd.DataFrame({"a": [1, 2, 3], "b": ["4", "5", "6"]})
     result = ExactMatcher()(one, other)
     assert not result["match"]
@@ -244,10 +245,12 @@ def test_partial_match():
     result = ExactMatcher(ignore_index=True, ignore_names=True, match_partial=True)(one, other)
     assert result == {"match": True, "reason": "Partial match on index: Index([1, 2, 3], dtype='int64', name='a')"}
 
-    other = pd.DataFrame({
-        "a": [1, 2, 3],
-        "b": [4, 5, 6],
-    })
+    other = pd.DataFrame(
+        {
+            "a": [1, 2, 3],
+            "b": [4, 5, 6],
+        }
+    )
     result = ExactMatcher(ignore_index=True, ignore_names=True, match_partial=True)(one, other)
     assert result == {"match": True, "reason": "Partial match on column: a"}
 
@@ -273,10 +276,7 @@ def test_metric_tolerance():
         "accuracy": 0.8,
         "precision": 0.9,
     }
-    other = {
-        "a": 0.73,
-        "p": 0.82
-    }
+    other = {"a": 0.73, "p": 0.82}
     result = ExactMatcher(metrictol=0.9, ignore_index=True)(one, other)
     assert result == {"match": True, "reason": ""}
 
@@ -287,7 +287,7 @@ def test_value_only():
     assert not ExactMatcher()(one, other)["match"]
     assert ExactMatcher(value_only=True)(one, other)["match"]
 
-    other = np.array([1.])
+    other = np.array([1.0])
     assert not ExactMatcher()(one, other)["match"]
     assert ExactMatcher(value_only=True)(one, other)["match"]
 

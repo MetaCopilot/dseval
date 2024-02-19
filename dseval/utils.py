@@ -1,5 +1,5 @@
-import tempfile
 import atexit
+import tempfile
 import uuid
 from pathlib import Path
 from typing import Any, Literal
@@ -21,7 +21,10 @@ def get_temporary_file_name(prefix: str) -> Path:
 
 
 def default_namespace() -> dict[str, Any]:
-    import pandas, numpy, random
+    import random
+
+    import numpy
+    import pandas
 
     return {**globals(), "pd": pandas, "np": numpy, "random": random}
 

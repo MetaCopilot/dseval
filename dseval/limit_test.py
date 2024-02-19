@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from .limit import get_memory, limit_memory, limit_time, TimeLimitError
+from .limit import TimeLimitError, get_memory, limit_memory, limit_time
 
 
 def test_memory_error():
@@ -35,7 +35,7 @@ def test_limit_time():
     @limit_time(1)
     def f():
         time.sleep(2)
-    
+
     with pytest.raises(TimeLimitError):
         f()
 
@@ -44,5 +44,5 @@ def test_time_nolimit():
     @limit_time(2)
     def f():
         time.sleep(1)
-    
+
     f()

@@ -7,7 +7,7 @@ This comes from my other projects.
 import logging
 import sys
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 _file_handlers: Dict[Path, logging.FileHandler] = {}
 _logger_init: bool = False
@@ -21,7 +21,7 @@ def init_logger() -> None:
     if _logger_init:
         return
 
-    logger = logging.getLogger('dseval')
+    logger = logging.getLogger("dseval")
     logger.setLevel(level=logging.INFO)
     add_handler(logger)
 
@@ -34,8 +34,8 @@ def add_handler(logger: logging.Logger, file: Optional[Path] = None) -> logging.
     If ``file`` is specified, log to file.
     Otherwise, add a handler to stdout.
     """
-    fmt = '[%(asctime)s] %(levelname)s (%(name)s) %(message)s'
-    datefmt = '%Y-%m-%d %H:%M:%S'
+    fmt = "[%(asctime)s] %(levelname)s (%(name)s) %(message)s"
+    datefmt = "%Y-%m-%d %H:%M:%S"
 
     formatter = logging.Formatter(fmt, datefmt)
     if file is None:

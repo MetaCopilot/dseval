@@ -5,26 +5,14 @@ import pytest
 
 from .match import Match
 from .simulation import CellOutput, Error
-from .validator import (
-    NamespaceIntactGuard,
-    ResultValidator,
-    _DictWithNamespaceDiff,
-    _DictWithExecuteResult,
-    _DictWithNamespaceSnapshot,
-    _DictWithError,
-    _DictWithStreamOutput,
-    _DictWithCodeAndResult,
-    ValidateResult,
-    NamespaceChecker,
-    NoErrorValidator,
-    Validator,
-    Or,
-    And,
-    TableTestValidator,
-    ModelValidator,
-    StreamOutputValidator,
-    AnswerInSourceCodeValidator,
-)
+from .validator import (And, AnswerInSourceCodeValidator, ModelValidator,
+                        NamespaceChecker, NamespaceIntactGuard,
+                        NoErrorValidator, Or, ResultValidator,
+                        StreamOutputValidator, TableTestValidator,
+                        ValidateResult, Validator, _DictWithCodeAndResult,
+                        _DictWithError, _DictWithExecuteResult,
+                        _DictWithNamespaceDiff, _DictWithNamespaceSnapshot,
+                        _DictWithStreamOutput)
 
 
 def test_no_error_validator():
@@ -35,9 +23,7 @@ def test_no_error_validator():
     assert result == {"correct": True}
 
     reference = _DictWithError(error=None)
-    submission = _DictWithError(
-        error=Error(ename="ValueError", evalue="Some error message", traceback=[])
-    )
+    submission = _DictWithError(error=Error(ename="ValueError", evalue="Some error message", traceback=[]))
     result = validator.validate(reference, submission)
     assert result == {
         "correct": False,
@@ -117,9 +103,7 @@ def test_deletion_allowed():
 def test_specific_variables_allowed():
     guard = NamespaceIntactGuard(update=["foo"], deletion=["bar"])
     reference = _DictWithNamespaceDiff(namespace_diff={})
-    submission = _DictWithNamespaceDiff(
-        namespace_diff={"foo": "updated", "bar": "deleted"}
-    )
+    submission = _DictWithNamespaceDiff(namespace_diff={"foo": "updated", "bar": "deleted"})
     result = guard.validate(reference, submission)
     assert result == ValidateResult(correct=True)
 
@@ -144,9 +128,7 @@ def test_validate_fuzzy_match():
     assert not result["correct"]
     assert "reason" in result and result["reason"].startswith("Series not equal.")
 
-    validator = ResultValidator(
-        ignore_index=True, ignore_names=True, match_partial=True
-    )
+    validator = ResultValidator(ignore_index=True, ignore_names=True, match_partial=True)
     result = validator.validate(reference, submission)
     assert result["correct"]
     assert "reason" in result and result["reason"].startswith("Partial match on index:")
@@ -297,9 +279,7 @@ def test_or_with_one_validator_passing():
     validator1 = ResultValidator(lambda a, b: Match(match=False, reason=""))
     validator2 = ResultValidator()
     validator = Or(validator1, validator2)
-    assert re.match(
-        r"Or\(\n  ResultValidator\(.*\),\n  ResultValidator\(.*\)\n\)", repr(validator)
-    )
+    assert re.match(r"Or\(\n  ResultValidator\(.*\),\n  ResultValidator\(.*\)\n\)", repr(validator))
     reference = _DictWithExecuteResult(execute_result="Hello, world!")
     submission = _DictWithExecuteResult(execute_result="Hello, world!")
     result = validator.validate(reference, submission)
@@ -313,9 +293,7 @@ def test_or_with_one_validator_passing():
 def test_or_with_multiple_validators():
     validator1 = ResultValidator(lambda ref, sub: {"match": ref == sub, "reason": ""})
     validator2 = ResultValidator(lambda ref, sub: {"match": ref != sub, "reason": ""})
-    validator3 = ResultValidator(
-        lambda ref, sub: {"match": (ref + sub).sum() == 0, "reason": ""}
-    )
+    validator3 = ResultValidator(lambda ref, sub: {"match": (ref + sub).sum() == 0, "reason": ""})
     validator = Or(validator1, validator2, validator3)
     reference = _DictWithExecuteResult(execute_result=np.array([1, 2, 3]))
     submission = _DictWithExecuteResult(execute_result=np.array([-1, -2, -3]))
@@ -343,9 +321,7 @@ def test_and_with_fuzzy_match():
             "b": [4, 5, 6],
         }
     )
-    validator = And(
-        ResultValidator(ignore_index=True, ignore_names=True, match_partial=True)
-    )
+    validator = And(ResultValidator(ignore_index=True, ignore_names=True, match_partial=True))
     reference = _DictWithExecuteResult(execute_result=one)
     submission = _DictWithExecuteResult(execute_result=other)
     result = validator.validate(reference, submission)
@@ -373,9 +349,7 @@ def test_and_with_one_validator_failing():
 def test_answer_in_source():
     validator = ResultValidator()
     reference = _DictWithCodeAndResult(source_code="", execute_result=123)
-    submission = _DictWithCodeAndResult(
-        execute_result=None, source_code="Has 123 observations in total."
-    )
+    submission = _DictWithCodeAndResult(execute_result=None, source_code="Has 123 observations in total.")
     result = validator.validate(reference, submission)
     assert not result["correct"]
     validator = AnswerInSourceCodeValidator()
@@ -386,9 +360,7 @@ def test_answer_in_source():
 def test_namespace_checker_with_exact_match():
     checker = NamespaceChecker(foo=None)
     reference = _DictWithNamespaceSnapshot(namespace_snapshot={"foo": "bar", "baz": 42})
-    submission = _DictWithNamespaceSnapshot(
-        namespace_snapshot={"foo": "bar", "baz": 43}
-    )
+    submission = _DictWithNamespaceSnapshot(namespace_snapshot={"foo": "bar", "baz": 43})
     result = checker.validate(reference, submission)
     assert result == {"correct": True}
 
@@ -396,9 +368,7 @@ def test_namespace_checker_with_exact_match():
 def test_namespace_checker_with_mismatch():
     checker = NamespaceChecker(foo=None, baz=None)
     reference = _DictWithNamespaceSnapshot(namespace_snapshot={"foo": "bar", "baz": 42})
-    submission = _DictWithNamespaceSnapshot(
-        namespace_snapshot={"foo": "bar", "baz": 43}
-    )
+    submission = _DictWithNamespaceSnapshot(namespace_snapshot={"foo": "bar", "baz": 43})
     result = checker.validate(reference, submission)
     assert result == {
         "correct": False,
@@ -435,12 +405,10 @@ def test_namespace_checker_with_custom_compare_fn():
 
 def test_model_validator():
     from sklearn.datasets import make_classification
-    from sklearn.linear_model import LogisticRegression
     from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
 
-    X, y = make_classification(
-        n_samples=100, n_features=20, n_informative=2, n_redundant=10, random_state=1
-    )
+    X, y = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, random_state=1)
     X_train, X_test, y_train, y_test = X[:80], X[80:], y[:80], y[80:]
     reference = _DictWithNamespaceSnapshot(
         namespace_snapshot={
@@ -468,9 +436,7 @@ def test_model_validator():
     result = validator.validate(reference, submission)
     assert result["correct"]
 
-    validator = ModelValidator(
-        "model", "inputs", "labels", ["accuracy", "roc_auc"], -0.1
-    )
+    validator = ModelValidator("model", "inputs", "labels", ["accuracy", "roc_auc"], -0.1)
     result = validator.validate(reference, submission)
     assert result["correct"]
 
@@ -636,9 +602,7 @@ def test_code_to_test_case():
     assert (v1_0 == v2_0).all()
 
     with pytest.raises(ValueError, match=r"^Invalid test case"):
-        TableTestValidator(
-            "my_function", [(0, 0), (3, 4)], input_validator=lambda x, _: x > 0
-        )
+        TableTestValidator("my_function", [(0, 0), (3, 4)], input_validator=lambda x, _: x > 0)
 
     def foo(x, y):
         assert x + 1 >= y
@@ -683,9 +647,7 @@ def test_validator_loose():
     }
 
     submission["namespace_diff"] = {}
-    validator = Validator.load(
-        "and", Validator.augment_config({}, "comparison", loose=False)
-    )
+    validator = Validator.load("and", Validator.augment_config({}, "comparison", loose=False))
     result = validator.validate(reference, submission)
     assert result == {
         "correct": False,

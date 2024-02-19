@@ -1,25 +1,23 @@
 import ast
 import copy
-import colorama
 import io
-import json
 import logging
-import re
 import traceback
 import types
-from contextlib import redirect_stdout, redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
-from typing import Any, TYPE_CHECKING, Literal, TypedDict, IO
+from typing import IO, TYPE_CHECKING, Any, Literal, TypedDict
 
-import yaml
+import colorama
 import numpy as np
 import pandas as pd
+import yaml
 
-from .limit import limit_time, limit_memory, measure_time
+from .limit import limit_memory, limit_time, measure_time
 from .match import ExactMatcher
-from .validator import Validator
 from .utils import exec_code
+from .validator import Validator
 
 if TYPE_CHECKING:
     from .solver import Solver
@@ -82,9 +80,7 @@ class Environment:
         self._missing = self._Missing()
 
     @staticmethod
-    def exec_with_output(
-        script: str, globals: dict | None = None, locals: dict | None = None
-    ) -> Any:
+    def exec_with_output(script: str, globals: dict | None = None, locals: dict | None = None) -> Any:
         # https://stackoverflow.com/q/33908794/6837658
         a = ast.parse(script)
         last_expression = None
@@ -98,9 +94,7 @@ class Environment:
             #     last_expression = ast.unparse(a_last.target)
         exec_code(ast.unparse(a), "submission", globals, locals, mode="exec")
         if last_expression:
-            return exec_code(
-                last_expression, "submission-last-line", globals, locals, mode="eval"
-            )
+            return exec_code(last_expression, "submission-last-line", globals, locals, mode="eval")
 
     def execute(
         self,
@@ -172,9 +166,7 @@ class Environment:
                 CellOutput(
                     source_code=code,
                     stream_output=io.getvalue(),
-                    execute_time=time_measurer.interval
-                    if time_measurer is not None
-                    else 0.0,
+                    execute_time=time_measurer.interval if time_measurer is not None else 0.0,
                     execute_result=output,
                     error=error,
                     namespace_snapshot=self.namespace,
@@ -206,11 +198,9 @@ class Environment:
     def namespace_copy(self) -> dict[str, Any]:
         new_namespace = {}
         for name, value in self.namespace.items():
-            if isinstance(
-                value, (types.ModuleType, types.FunctionType, types.BuiltinFunctionType, io.IOBase)
-            ):
+            if isinstance(value, (types.ModuleType, types.FunctionType, types.BuiltinFunctionType, io.IOBase)):
                 new_namespace[name] = value
-            elif name == '__builtins__':
+            elif name == "__builtins__":
                 new_namespace[name] = value
             else:
                 try:
@@ -219,14 +209,13 @@ class Environment:
                     # Index error is raised rarely for pandas dataframes.
                     _logger.exception(
                         "Deep copy failed for object of type: %s (name = %s). The object might be manipulated unintentionally.",
-                        type(value), name,
+                        type(value),
+                        name,
                     )
                     try:
                         new_namespace[name] = copy.copy(value)
                     except:
-                        _logger.error(
-                            "Unable to copy an object of type: %s", type(value)
-                        )
+                        _logger.error("Unable to copy an object of type: %s", type(value))
                         new_namespace[name] = value
         return new_namespace
 

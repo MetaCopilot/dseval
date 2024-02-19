@@ -2,24 +2,19 @@ import json
 import logging
 import re
 import textwrap
-import types
 import traceback
+import types
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, List, Literal, TYPE_CHECKING, TypedDict, Optional, cast
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, TypedDict, cast
 
 import colorama
 from langchain.chat_models.base import BaseChatModel
-from langchain.schema import (
-    BaseMessage,
-    SystemMessage,
-    AIMessage,
-    HumanMessage,
-    AgentAction,
-    AgentFinish,
-)
-from .simulation import Environment
+from langchain.schema import (AgentAction, AgentFinish, AIMessage, BaseMessage,
+                              HumanMessage, SystemMessage)
+
 from .problem import ProblemSet
+from .simulation import Environment
 
 if TYPE_CHECKING:
     from .loop import TentativeSolution
@@ -53,8 +48,8 @@ class Solver:
         else:
             llm = None
 
-        from langchain_community.chat_models import ChatOpenAI
         from langchain_community.callbacks import get_openai_callback
+        from langchain_community.chat_models import ChatOpenAI
 
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
@@ -88,10 +83,7 @@ class Solver:
 class DummySolver(Solver):
     def solve(self, question: str, environment: Environment) -> str:
         return (
-            "import pandas as pd\n"
-            "import numpy as np\n"
-            "\n"
-            "pd.DataFrame(np.random.uniform(0, 1, size=(300, 300)))"
+            "import pandas as pd\n" "import numpy as np\n" "\n" "pd.DataFrame(np.random.uniform(0, 1, size=(300, 300)))"
         )
 
 
@@ -187,33 +179,25 @@ Some extra instructions:
 
     @staticmethod
     def _smart_repr(value: Any) -> str:
-        import numpy, pandas
+        import numpy
+        import pandas
 
         if isinstance(value, numpy.ndarray):
             return "numpy.ndarray(shape={})".format(value.shape)
         elif isinstance(value, pandas.DataFrame):
-            return "pandas.DataFrame(shape={}, columns={})".format(
-                value.shape, value.columns
-            )
+            return "pandas.DataFrame(shape={}, columns={})".format(value.shape, value.columns)
         elif isinstance(value, pandas.Series):
             return "pandas.Series(shape={})".format(value.shape)
         elif isinstance(value, list):
             if len(value) > 30:
-                return "[{}, ...]".format(
-                    ", ".join(GPTSolver._smart_repr(v) for v in value[:30])
-                )
+                return "[{}, ...]".format(", ".join(GPTSolver._smart_repr(v) for v in value[:30]))
             return "[{}]".format(", ".join(GPTSolver._smart_repr(v) for v in value))
         elif isinstance(value, dict):
             if len(value) > 30:
                 return "{{{}, ...}}".format(
-                    ", ".join(
-                        f"{k}: {GPTSolver._smart_repr(v)}"
-                        for k, v in list(value.items())[:30]
-                    )
+                    ", ".join(f"{k}: {GPTSolver._smart_repr(v)}" for k, v in list(value.items())[:30])
                 )
-            return "{{{}}}".format(
-                ", ".join(f"{k}: {GPTSolver._smart_repr(v)}" for k, v in value.items())
-            )
+            return "{{{}}}".format(", ".join(f"{k}: {GPTSolver._smart_repr(v)}" for k, v in value.items()))
         elif isinstance(value, str):
             return f'"{value}"'
         elif isinstance(value, (bool, int, float)):
@@ -246,13 +230,7 @@ Some extra instructions:
             HumanMessage(content=human_message),
         ]
         for message in messages:
-            print(
-                colorama.Fore.BLUE
-                + message.type
-                + ":\n"
-                + message.content
-                + colorama.Fore.RESET
-            )
+            print(colorama.Fore.BLUE + message.type + ":\n" + message.content + colorama.Fore.RESET)
         response = self.llm(messages)
         match = re.search(r"```.*\n([\s\S]+?)\n```", response.content)
         if match is not None:
@@ -287,7 +265,7 @@ class CoMLSolver(Solver):
         self.history = []
 
     def solve(self, question: str, environment: Environment) -> str:
-        from coml.prompt_utils import filter_variables, describe_variable
+        from coml.prompt_utils import describe_variable, filter_variables
 
         if not self.history and environment.cells:
             for cell in environment.cells:
@@ -301,17 +279,13 @@ class CoMLSolver(Solver):
         if not self.shots_shrinking:
             if self.dataframe_format == "comlconcise":
                 describe_config = {
-                    "pandas_description_config": dict(
-                        max_cols=2, max_colwidth=5, max_rows=2
-                    ),
+                    "pandas_description_config": dict(max_cols=2, max_colwidth=5, max_rows=2),
                     "maximum_list_items": 2,
                 }
                 dataframe_format = "coml"
             elif self.dataframe_format == "comlverbose":
                 describe_config = {
-                    "pandas_description_config": dict(
-                        max_cols=30, max_colwidth=25, max_rows=10
-                    ),
+                    "pandas_description_config": dict(max_cols=30, max_colwidth=25, max_rows=10),
                     "maximum_list_items": 30,
                 }
                 dataframe_format = "coml"
@@ -321,9 +295,7 @@ class CoMLSolver(Solver):
                 dataframe_format = cast(Literal["coml", "lida"], self.dataframe_format)
 
             variables = {
-                key: describe_variable(
-                    value, **describe_config, dataframe_format=dataframe_format
-                )
+                key: describe_variable(value, **describe_config, dataframe_format=dataframe_format)
                 for key, value in filter_variables(environment.namespace).items()
             }
             try:
@@ -342,15 +314,12 @@ class CoMLSolver(Solver):
                     codes = []
                 if config["describe_config"] is None:
                     variables = {
-                        key: "Description unavailable"
-                        for key in filter_variables(environment.namespace).keys()
+                        key: "Description unavailable" for key in filter_variables(environment.namespace).keys()
                     }
                 else:
                     variables = {
                         key: describe_variable(value, **config["describe_config"])
-                        for key, value in filter_variables(
-                            environment.namespace
-                        ).items()
+                        for key, value in filter_variables(environment.namespace).items()
                     }
 
                 try:
@@ -364,9 +333,7 @@ class CoMLSolver(Solver):
                     if "Input is too long" not in str(e):
                         raise
                     if idx < len(configs) - 1:
-                        _logger.warning(
-                            "%s. Retrying with: %s", str(e), configs[idx + 1]
-                        )
+                        _logger.warning("%s. Retrying with: %s", str(e), configs[idx + 1])
                     else:
                         _logger.warning("%s. Trying the last resort.", str(e))
             else:
@@ -375,9 +342,7 @@ class CoMLSolver(Solver):
         self.prev_code = self.context["answer"]
         self.hint = None
 
-        self.history.append(
-            textwrap.indent(question.rstrip(), "# ") + "\n" + self.prev_code
-        )
+        self.history.append(textwrap.indent(question.rstrip(), "# ") + "\n" + self.prev_code)
 
         return self.prev_code
 
@@ -415,9 +380,7 @@ class CoMLSolver(Solver):
                 "num_examples": 1.0,
                 "num_codes": 1.0,
                 "describe_config": {
-                    "pandas_description_config": dict(
-                        max_cols=10, max_colwidth=15, max_rows=5
-                    ),
+                    "pandas_description_config": dict(max_cols=10, max_colwidth=15, max_rows=5),
                     "maximum_list_items": 10,
                 },
             },
@@ -425,9 +388,7 @@ class CoMLSolver(Solver):
                 "num_examples": 0.8,
                 "num_codes": 1.0,
                 "describe_config": {
-                    "pandas_description_config": dict(
-                        max_cols=10, max_colwidth=15, max_rows=4
-                    ),
+                    "pandas_description_config": dict(max_cols=10, max_colwidth=15, max_rows=4),
                     "maximum_list_items": 5,
                 },
             },
@@ -435,9 +396,7 @@ class CoMLSolver(Solver):
                 "num_examples": 0.6,
                 "num_codes": 0.8,
                 "describe_config": {
-                    "pandas_description_config": dict(
-                        max_cols=8, max_colwidth=12, max_rows=4
-                    ),
+                    "pandas_description_config": dict(max_cols=8, max_colwidth=12, max_rows=4),
                     "maximum_list_items": 5,
                 },
             },
@@ -445,9 +404,7 @@ class CoMLSolver(Solver):
                 "num_examples": 0.4,
                 "num_codes": 0.6,
                 "describe_config": {
-                    "pandas_description_config": dict(
-                        max_cols=6, max_colwidth=10, max_rows=3
-                    ),
+                    "pandas_description_config": dict(max_cols=6, max_colwidth=10, max_rows=3),
                     "maximum_list_items": 3,
                 },
             },
@@ -455,9 +412,7 @@ class CoMLSolver(Solver):
                 "num_examples": 0.2,
                 "num_codes": 0.3,
                 "describe_config": {
-                    "pandas_description_config": dict(
-                        max_cols=2, max_colwidth=5, max_rows=2
-                    ),
+                    "pandas_description_config": dict(max_cols=2, max_colwidth=5, max_rows=2),
                     "maximum_list_items": 2,
                 },
             },
@@ -487,8 +442,7 @@ class JupyterAISolver(Solver):
             self.memory.append(AIMessage(content=environment.last_cell.source))
 
         prompt = (
-            "{prompt}\n\nProduce output as source code only, "
-            "with no text or explanation before or after it."
+            "{prompt}\n\nProduce output as source code only, " "with no text or explanation before or after it."
         ).format(prompt=question.strip())
         self.memory.append(HumanMessage(content=prompt))
         content = self.llm(self.memory).content
@@ -512,22 +466,16 @@ class ChapyterSolver(Solver):
     def solve(self, question: str, environment: Environment) -> str:
         if environment.cells:
             history_code = self.get_execution_history(environment)
-            question = (
-                question.strip() + "\n\nHere is my python code so far:\n" + history_code
-            )
+            question = question.strip() + "\n\nHere is my python code so far:\n" + history_code
 
         messages = [
-            SystemMessage(
-                content="You are a helpful and assistant and you are chatting with an python programmer."
-            ),
+            SystemMessage(content="You are a helpful and assistant and you are chatting with an python programmer."),
             HumanMessage(
                 content="From now on, you are ought to generate only the python code based on the description from the programmer."
             ),
             AIMessage(content="Ok, I will do that. Let's do a practice round."),
             HumanMessage(content="Load the json file called orca.json"),
-            AIMessage(
-                content="import json \nwith open('orca.json') as file:\n    data = json.load(file)"
-            ),
+            AIMessage(content="import json \nwith open('orca.json') as file:\n    data = json.load(file)"),
             HumanMessage(content="That was great, now let's do another one."),
             AIMessage(content="Sounds good."),
             HumanMessage(content=question),
@@ -551,9 +499,7 @@ class ChapyterSolver(Solver):
             if cell.output["execute_result"] is not None:
                 output = str(cell.output["execute_result"])
             elif cell.output["error"]:
-                output = (
-                    f'{cell.output["error"]["ename"]}: {cell.output["error"]["evalue"]}'
-                )
+                output = f'{cell.output["error"]["ename"]}: {cell.output["error"]["evalue"]}'
             elif cell.output["stream_output"]:
                 output = cell.output["stream_output"]
             else:
@@ -584,20 +530,14 @@ class ChapyterSolver(Solver):
         for cur_start, cur_end in all_code_spans:
             non_code_str = raw_response_str[cur_pos:cur_start]
             non_code_str = "\n".join(
-                [
-                    f"# {ele}"
-                    for ele in non_code_str.split("\n")
-                    if not ele.startswith("```") and ele.strip()
-                ]
+                [f"# {ele}" for ele in non_code_str.split("\n") if not ele.startswith("```") and ele.strip()]
             )
             code_str = raw_response_str[cur_start:cur_end].strip()
             cur_pos = cur_end
             all_converted_str.extend([non_code_str, code_str])
 
         last_non_code_str = [
-            f"# {ele}"
-            for ele in raw_response_str[cur_pos:].split("\n")
-            if not ele.startswith("```") and ele.strip()
+            f"# {ele}" for ele in raw_response_str[cur_pos:].split("\n") if not ele.startswith("```") and ele.strip()
         ]
         if len(last_non_code_str) > 0:
             all_converted_str.append("\n".join(last_non_code_str))
@@ -680,23 +620,15 @@ class CodeInterpreterSolver(Solver):
                 tool_input={
                     "code": last_source,
                 },
-                log="Invoking: `{}` with `{}`\n".format(
-                    tool.name, {"code": last_source}
-                ),
+                log="Invoking: `{}` with `{}`\n".format(tool.name, {"code": last_source}),
                 message_log=[
                     AIMessage(
                         content="",
                         additional_kwargs={
                             "function_call": {
-                                "arguments": json.dumps(
-                                    {"code": last_source}, indent=2
-                                ),
+                                "arguments": json.dumps({"code": last_source}, indent=2),
                                 "name": tool.name,
-                                **(
-                                    {"id": self.last_call_id}
-                                    if self.last_call_id
-                                    else {}
-                                ),
+                                **({"id": self.last_call_id} if self.last_call_id else {}),
                             }
                         },
                     )
@@ -709,13 +641,9 @@ class CodeInterpreterSolver(Solver):
                 chat_history=self.memory,
             )
             if isinstance(agent_action, AgentFinish):
-                self.memory.append(
-                    AIMessage(content=agent_action.return_values["output"])
-                )
+                self.memory.append(AIMessage(content=agent_action.return_values["output"]))
             else:
-                _logger.warning(
-                    "Agent failed to finish with ground truth code: %s", agent_action
-                )
+                _logger.warning("Agent failed to finish with ground truth code: %s", agent_action)
                 self.memory.append(
                     AIMessage(
                         content=f"The task can be solved with the following code:\n\n```python\n{last_source}\n```"
@@ -727,25 +655,17 @@ class CodeInterpreterSolver(Solver):
         self.last_call_id = None
 
         try:
-            agent_action = self.agent.plan(
-                intermediate_steps, input=question, chat_history=self.memory
-            )
+            agent_action = self.agent.plan(intermediate_steps, input=question, chat_history=self.memory)
 
             if isinstance(agent_action, AgentActionMessageLog):
-                self.last_call_id = (
-                    agent_action.message_log[-1]
-                    .additional_kwargs["function_call"]
-                    .get("id")
-                )
+                self.last_call_id = agent_action.message_log[-1].additional_kwargs["function_call"].get("id")
         except OutputParserException as e:
             error_message = e.args[0]
             _logger.warning(
                 "Failed to parse the output. Retrying with regex parsing: %s",
                 error_message,
             )
-            match = re.search(
-                r"\{'arguments': (.*), 'name': 'python'(.*?)\}", error_message
-            )
+            match = re.search(r"\{'arguments': (.*), 'name': 'python'(.*?)\}", error_message)
             if match is not None:
                 tool_input = {"code": eval(match.group(0))["arguments"]}
                 agent_action = AgentAction(
@@ -767,10 +687,7 @@ class CodeInterpreterSolver(Solver):
             return output
         elif isinstance(agent_action.tool_input, str):
             return agent_action.tool_input
-        elif (
-            isinstance(agent_action.tool_input, dict)
-            and "code" in agent_action.tool_input
-        ):
+        elif isinstance(agent_action.tool_input, dict) and "code" in agent_action.tool_input:
             return agent_action.tool_input["code"]
         else:
             return "Invalid code"

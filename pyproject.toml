@@ -12,3 +12,11 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["dseval*"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "flake8",
+    "black",
+    "isort",
+]
