@@ -16,7 +16,7 @@ from langchain.storage import LocalFileStore
 from langchain_community.embeddings import AzureOpenAIEmbeddings, OpenAIEmbeddings
 
 import dotenv
-from dseval import ProblemSet, ChatDataSolver, Evaluator
+from dseval import ProblemSet, CoMLSolver, Evaluator
 from dseval.solver import (
     PreloadSolver,
     ChapyterSolver,
@@ -214,7 +214,7 @@ def configure_solver(model: str, prompt: str, llm: BaseChatModel, debug: bool):
         else:
             prompt_version = "v2"
 
-        return ChatDataSolver(
+        return CoMLSolver(
             llm,
             shots_shrinking=model.startswith("llama2"),
             prompt_version=prompt_version,

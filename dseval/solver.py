@@ -261,7 +261,7 @@ Some extra instructions:
         return response.content
 
 
-class ChatDataSolver(Solver):
+class CoMLSolver(Solver):
     def __init__(
         self,
         llm: BaseChatModel,
