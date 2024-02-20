@@ -9,6 +9,7 @@ dependencies = [
     "scipy",
     "pyyaml",
     "colorama",
+    "psutil",
 ]
 
 [tool.setuptools.packages.find]
