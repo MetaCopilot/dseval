@@ -32,10 +32,6 @@ jobs:
         run: black dseval --check --line-length=120
         if: success() || failure()
 
-      - name: Check isort formatting
-        run: isort dseval --check
-        if: success() || failure()
-
   build:
 
     runs-on: ubuntu-latest
