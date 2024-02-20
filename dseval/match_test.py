@@ -30,7 +30,7 @@ def test_type_match():
 
     other = Foo("hello")
     result = ExactMatcher(type_only=True)(one, other)
-    assert result["match"] == False
+    assert result["match"] is False
     assert result["reason"].startswith("Type mismatch:")
 
     result = ExactMatcher()(one, other)
@@ -41,7 +41,7 @@ def test_boolean_matcher():
     one = True
     other = False
     result = ExactMatcher()(one, other)
-    assert result["match"] == False
+    assert result["match"] is False
 
     other = np.bool_(True)
     result = ExactMatcher()(one, other)
@@ -91,7 +91,7 @@ def test_numpy_array_matcher_equal():
     assert result == {"match": True, "reason": ""}
 
     result = ExactMatcher(strict_type=True)(one, other.astype(np.float32))
-    assert result["match"] == False
+    assert result["match"] is False
 
     one = np.array([-np.inf, np.inf, np.nan, 0.0])
     other = np.array([-np.inf, np.inf, np.nan, 0.0])
@@ -123,25 +123,25 @@ def test_csr_matrix_matcher():
 
     matcher = ExactMatcher(rtol=1e-05, atol=1e-08)
     result = matcher.match(ref, sub)
-    assert result["match"] == True
+    assert result["match"] is True
     assert result["reason"] == ""
 
     # Change one element in the 'sub' matrix
     sub[0, 0] = 10
     result = matcher.match(ref, sub)
-    assert result["match"] == False
+    assert result["match"] is False
     assert "wrong data" in result["reason"]
 
     # Change the shape of the 'sub' matrix
     sub = csr_matrix((data, indices, indptr), shape=(3, 6))
     result = matcher.match(ref, sub)
-    assert result["match"] == False
+    assert result["match"] is False
     assert "wrong shape" in result["reason"]
 
     # Test with non-CSR matrix
     sub = np.array([1, 2, 3])
     result = matcher.match(ref, sub)
-    assert result["match"] == False
+    assert result["match"] is False
     assert "Wrong type" in result["reason"]
 
 
@@ -161,7 +161,7 @@ def test_pandas_object_matcher_dataframe_not_equal():
     one = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
     other = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 7]})
     result = ExactMatcher()(one, other)
-    assert result["match"] == False
+    assert result["match"] is False
     assert "DataFrame not equal" in result["reason"]
 
 
@@ -176,7 +176,7 @@ def test_pandas_object_matcher_series_not_equal():
     one = pd.Series([1, 2, 3])
     other = pd.Series([1, 2, 4])
     result = ExactMatcher()(one, other)
-    assert result["match"] == False
+    assert result["match"] is False
     assert "Series not equal" in result["reason"]
 
 
@@ -191,7 +191,7 @@ def test_pandas_object_matcher_index_not_equal():
     one = pd.Index([1, 2, 3])
     other = pd.Index([1, 2, 4])
     result = ExactMatcher()(one, other)
-    assert result["match"] == False
+    assert result["match"] is False
     assert "Index not equal" in result["reason"]
 
 

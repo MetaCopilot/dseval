@@ -7,11 +7,11 @@ from .limit import TimeLimitError, get_memory, limit_memory, limit_time
 
 
 def test_memory_error():
-    memory = get_memory()
+    memory = get_memory()  # noqa
 
     @limit_memory(1)
     def f():
-        L = [0 for _ in range(2 * 10**6 // sys.getsizeof(0))]  # allocate 2 Mo
+        L = [0 for _ in range(2 * 10**6 // sys.getsizeof(0))]  # allocate 2 Mo  # noqa
 
     try:
         f()
@@ -22,11 +22,11 @@ def test_memory_error():
 
 
 def test_memory_noerror():
-    memory = get_memory()
+    memory = get_memory()  # noqa
 
     @limit_memory(1)
     def f():
-        L = [0 for _ in range(10**5 // sys.getsizeof(0))]  # allocate 100 Ko
+        L = [0 for _ in range(10**5 // sys.getsizeof(0))]  # allocate 100 Ko  # noqa
 
     f()
 

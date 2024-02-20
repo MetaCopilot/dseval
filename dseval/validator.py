@@ -6,13 +6,9 @@ import json
 import logging
 import random
 import re
-import tempfile
 import traceback
 import types
-import uuid
-from pathlib import Path
-from typing import (TYPE_CHECKING, Any, Callable, ClassVar, Generic, Literal,
-                    Type, TypedDict, TypeVar, cast)
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Literal, TypedDict, TypeVar, cast
 
 import numpy as np
 from typing_extensions import NotRequired
@@ -21,7 +17,7 @@ from .match import ExactMatcher, Match
 from .utils import add_indent, exec_code
 
 if TYPE_CHECKING:
-    from .simulation import CellOutput, DiffType, Error
+    from .simulation import DiffType, Error
 
 _logger = logging.getLogger(__name__)
 
@@ -854,7 +850,6 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
         if assume_list_as_tuple and isinstance(parameter, list):
             # YAML has trouble expressing a tuple. So list should be treated as tuple on the top-level.
             return tuple(TableTestValidator.code_to_test_case(item, case_id) for item in parameter)
-        import pandas as pd
 
         if isinstance(parameter, str):
             param_stripped = parameter.strip()
@@ -874,7 +869,7 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
 
     def __repr__(self) -> str:
         return (
-            f"TableTestValidator(\n"
+            "TableTestValidator(\n"
             + ",\n".join([self.function_name] + [add_indent(repr(test_case), 2) for test_case in self.test_cases])
             + "\n)"
         )

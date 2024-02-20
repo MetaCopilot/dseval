@@ -103,7 +103,7 @@ class ExactMatcher:
                 # First reset index to make sure index is also treated as a column.
                 try:
                     sub = sub.reset_index()
-                except Exception as e:
+                except Exception:
                     _logger.exception("Failed to reset index.")
                 if sub.columns.tolist() != ref.columns.tolist() and all(
                     column in sub.columns.tolist() for column in ref.columns.tolist()
@@ -161,11 +161,11 @@ class ExactMatcher:
                         "reason": f"Partial match on `to_frame`: {sub.to_frame()}",
                     }
 
-        return {"match": False, "reason": f"Partial match failed"}
+        return {"match": False, "reason": "Partial match failed"}
 
     def match(self, ref, sub) -> Match:
         if self.config["type_only"]:
-            if type(ref) == type(sub):
+            if type(ref) is type(sub):
                 return {"match": True, "reason": ""}
             return {
                 "match": False,
@@ -183,7 +183,7 @@ class ExactMatcher:
         except:
             return {
                 "match": False,
-                "reason": f"Couldn't match reference and submission.",
+                "reason": "Couldn't match reference and submission.",
             }
 
 

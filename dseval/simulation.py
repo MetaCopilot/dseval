@@ -6,21 +6,11 @@ import traceback
 import types
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
-from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Literal, TypedDict
-
-import colorama
-import numpy as np
-import pandas as pd
-import yaml
+from typing import Any, Literal, TypedDict
 
 from .limit import limit_memory, limit_time, measure_time
 from .match import ExactMatcher
 from .utils import exec_code
-from .validator import Validator
-
-if TYPE_CHECKING:
-    from .solver import Solver
 
 _logger = logging.getLogger(__name__)
 

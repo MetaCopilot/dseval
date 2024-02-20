@@ -6,18 +6,14 @@ import traceback
 import types
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, List, Literal, Optional, TypedDict, cast
+from typing import Any, List, Literal, Optional, TypedDict, cast
 
 import colorama
 from langchain.chat_models.base import BaseChatModel
-from langchain.schema import (AgentAction, AgentFinish, AIMessage, BaseMessage,
-                              HumanMessage, SystemMessage)
+from langchain.schema import AgentAction, AgentFinish, AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from .problem import ProblemSet
 from .simulation import Environment
-
-if TYPE_CHECKING:
-    from .loop import TentativeSolution
 
 _logger = logging.getLogger(__name__)
 
@@ -63,7 +59,9 @@ class Solver:
         elif google_genai_available and isinstance(llm, ChatGoogleGenerativeAI):
             from msllm_extensions.callback import get_gemini_callback
 
-            callback_fn = lambda: get_gemini_callback(llm)
+            def callback_fn():
+                return get_gemini_callback(llm)
+
         elif hasattr(llm, "tracking_callback"):
             callback_fn = llm.tracking_callback  # type: ignore
         else:
@@ -674,7 +672,7 @@ class CodeInterpreterSolver(Solver):
                     log="Failed to parse the output. Attempting to fix the code.",
                 )
             else:
-                _logger.warning(f"Failed to parse the output after retry.")
+                _logger.warning("Failed to parse the output after retry.")
                 raise
 
         self.memory.append(HumanMessage(content=question))

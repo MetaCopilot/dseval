@@ -4,15 +4,27 @@ import numpy as np
 import pytest
 
 from .match import Match
-from .simulation import CellOutput, Error
-from .validator import (And, AnswerInSourceCodeValidator, ModelValidator,
-                        NamespaceChecker, NamespaceIntactGuard,
-                        NoErrorValidator, Or, ResultValidator,
-                        StreamOutputValidator, TableTestValidator,
-                        ValidateResult, Validator, _DictWithCodeAndResult,
-                        _DictWithError, _DictWithExecuteResult,
-                        _DictWithNamespaceDiff, _DictWithNamespaceSnapshot,
-                        _DictWithStreamOutput)
+from .simulation import Error
+from .validator import (
+    And,
+    AnswerInSourceCodeValidator,
+    ModelValidator,
+    NamespaceChecker,
+    NamespaceIntactGuard,
+    NoErrorValidator,
+    Or,
+    ResultValidator,
+    StreamOutputValidator,
+    TableTestValidator,
+    ValidateResult,
+    Validator,
+    _DictWithCodeAndResult,
+    _DictWithError,
+    _DictWithExecuteResult,
+    _DictWithNamespaceDiff,
+    _DictWithNamespaceSnapshot,
+    _DictWithStreamOutput,
+)
 
 
 def test_no_error_validator():
@@ -247,7 +259,9 @@ def test_validate_with_none_submission():
 
 
 def test_validate_with_compare_fn():
-    compare_fn = lambda _, __: Match(match=True, reason="")
+    def compare_fn(ref, sub):
+        return Match(match=True, reason="")
+
     validator = ResultValidator(compare_fn)
     reference = _DictWithExecuteResult(execute_result="Hello, world!")
     submission = _DictWithExecuteResult(execute_result="Goodbye, world!")
@@ -517,7 +531,7 @@ def test_stream_output_validator():
 
     submission = _DictWithStreamOutput(stream_output="Goodbye, world!")
     result = validator.validate(reference, submission)
-    assert result["correct"] == False
+    assert result["correct"] is False
 
 
 def test_input_output_checker():

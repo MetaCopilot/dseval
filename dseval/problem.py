@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import json
 import os
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TypedDict
 
 import requests
 import yaml

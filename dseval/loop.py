@@ -10,8 +10,7 @@ from typing_extensions import NotRequired
 
 from .problem import ProblemSet
 from .simulation import Environment
-from .solver import (Solver, SolverException, TentativeSolution,
-                     TentativeSolutions)
+from .solver import Solver, SolverException, TentativeSolution, TentativeSolutions
 
 _logger = logging.getLogger(__name__)
 

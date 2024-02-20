@@ -1,3 +1,5 @@
+# flake8: noqa
+
 from .logging import init_logger
 from .loop import EvaluationResult, Evaluator
 from .problem import ProblemSet, SubProblem
