@@ -26,10 +26,10 @@ jobs:
           pip install -e .[dev]
 
       - name: Lint with flake8
-        run: flake8 --ignore=E501,E722,W503,E203 dseval
+        run: flake8 --ignore=E501,E722,W503,E203 dseval scripts
 
       - name: Check black formatting
-        run: black dseval --check --line-length=120
+        run: black dseval scripts --check --line-length=120
         if: success() || failure()
 
   build:

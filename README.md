@@ -1,5 +1,9 @@
 # DSEval
 
+DSEval is a series of benchmarks aiming at evaluating LLM-powered data science agents.
+
+## Benchmark Summary
+
 ## Environment setup
 
 - Create `.env` folder and put `aiyyds.env` and `aoai.env` inside. Add extra services if necessary (requires editing `scripts/test.py`).

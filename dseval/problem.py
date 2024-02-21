@@ -131,3 +131,37 @@ class ProblemSet:
             + ",\n".join([add_indent(str(i) + ": " + repr(problem), 2) for i, problem in enumerate(self.problems)])
             + "\n)"
         )
+
+
+class Benchmark:
+    problemsets: list[ProblemSet]
+
+    def __init__(self, problemsets: list[ProblemSet], input_directory: Path | None = None):
+        self.problemsets = problemsets
+
+    def __iter__(self):
+        return iter(self.problemsets)
+
+    def __getitem__(self, index: int) -> ProblemSet:
+        return self.problemsets[index]
+
+    def __len__(self):
+        return len(self.problemsets)
+
+    @classmethod
+    def frompath(cls, benchmark_path: Path | str) -> "Benchmark":
+        if not isinstance(benchmark_path, Path):
+            benchmark_path = Path(benchmark_path)
+        if benchmark_path.is_dir():
+            problemsets = [path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")]
+            return cls([ProblemSet.fromfile(problemset) for problemset in problemsets])
+        else:
+            # for debugging purposes
+            return cls([ProblemSet.fromfile(benchmark_path)])
+
+    def __repr__(self) -> str:
+        return (
+            "Benchmark(\n"
+            + ",\n".join([add_indent(str(i) + ": " + repr(problemset), 2) for i, problemset in enumerate(self.problemsets)])
+            + "\n)"
+        )

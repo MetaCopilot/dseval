@@ -46,12 +46,9 @@ def resolve_running_environment(problemset_path: Path, run_dir: Path = Path("run
             shutil.rmtree(file)
 
     # Link input directory
-    if "autoproblems/" in str(problemset_path):
-        input_dir = problemset_path / ".." / ".." / "kaggle_data" / problemset_path.stem
-        shutil.copytree(input_dir.resolve(), run_dir / "inputs")
-    elif (problemset_path.parent / "inputs").exists():
+    if (problemset_path.parent / "_inputs").exists():
         shutil.copytree(
-            (problemset_path.parent / "inputs").resolve(), run_dir / "inputs"
+            (problemset_path.parent / "_inputs").resolve(), run_dir / "_inputs"
         )
     else:
         # No data required.
