@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import re
 from pathlib import Path
-from typing import TypedDict
+from typing import Iterable, TypedDict
 
 import requests
 import yaml
@@ -62,6 +62,15 @@ class SubProblem:
                 with open(file_path, "wb") as f:
                     f.write(requests.get(url, allow_redirects=True).content)
 
+    @property
+    def is_complete(self) -> bool:
+        """Check if the problem is complete.
+
+        A problem is complete if it has a question and a reference code.
+        Otherwise, it's considered an auxiliary problem providing contexts.
+        """
+        return bool(self.question is not None and self.reference_code)
+
     def __repr__(self):
         return (
             f"SubProblem(\n  question: {self.question!r},\n  reference_code: {self.reference_code!r},\n"
@@ -94,6 +103,13 @@ class ProblemSet:
 
     def __len__(self):
         return len(self.problems)
+
+    def enumerate(self, complete_only: bool = True) -> Iterable[tuple[int, SubProblem]]:
+        problem_count = 0
+        for problem in self.problems:
+            if not complete_only or problem.is_complete:
+                yield problem_count, problem
+                problem_count += 1
 
     def to_plain_text(self) -> str:
         texts = []
@@ -136,8 +152,11 @@ class ProblemSet:
 class Benchmark:
     problemsets: list[ProblemSet]
 
-    def __init__(self, problemsets: list[ProblemSet], input_directory: Path | None = None):
+    def __init__(self, problemsets: list[ProblemSet], data_directory: Path | None = None, name: str | None = None, version: str | None = None):
         self.problemsets = problemsets
+        self.data_directory = data_directory
+        self.name = name
+        self.version = version
 
     def __iter__(self):
         return iter(self.problemsets)
@@ -154,7 +173,17 @@ class Benchmark:
             benchmark_path = Path(benchmark_path)
         if benchmark_path.is_dir():
             problemsets = [path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")]
-            return cls([ProblemSet.fromfile(problemset) for problemset in problemsets])
+            if (benchmark_path / "_inputs").exists():
+                data_directory = benchmark_path / "_inputs"
+            else:
+                data_directory = None
+            manifest_path = benchmark_path / "_manifest.yaml"
+            if not manifest_path.exists():
+                raise FileNotFoundError(f"Manifest file not found in {benchmark_path}")
+            manifest = yaml.safe_load(manifest_path.read_text())
+            benchmark_name = manifest["name"]
+            benchmark_version = manifest["version"]
+            return cls([ProblemSet.fromfile(problemset) for problemset in problemsets], data_directory, benchmark_name, benchmark_version)
         else:
             # for debugging purposes
             return cls([ProblemSet.fromfile(benchmark_path)])

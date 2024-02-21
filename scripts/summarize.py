@@ -1,10 +1,13 @@
-from dseval import ProblemSet
+import ast
+from pathlib import Path
+
+import pandas as pd
 from radon.metrics import h_visit
+
+from dseval import ProblemSet, Benchmark
 
 
 def get_code_complexity(code: str) -> float:
-    import ast
-
     module = ast.parse(code)
 
     complexity = 0.0
@@ -34,11 +37,19 @@ def get_code_complexity(code: str) -> float:
     return complexity
 
 
-def get_problems_metrics(problem_path):
-    from pathlib import Path
-    import pandas as pd
-
+def compute_benchmark_difficulty(benchmark: Benchmark):
     difficulties = []
+    for problemset in benchmark:
+        for index, problem in problemset.enumerate():
+            if problem.question and problem.reference_code:
+                difficulties.append(
+                    {
+                        "problemset": problemset,
+                        "index": problem.index,
+                        "dseval_complexity": get_code_complexity(problem.reference_code),
+                        **h_visit(problem.reference_code).total._asdict(),
+                    }
+                )
     for path in Path(problem_path).glob("*.py"):
         problem_count = 0
         for problem in ProblemSet.fromfile(path):
