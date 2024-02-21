@@ -21,4 +21,5 @@ dev = [
     "flake8",
     "black",
     "isort",
+    "scikit-learn",
 ]
