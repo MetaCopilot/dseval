@@ -22,11 +22,11 @@ _logger = logging.getLogger(__name__)
 MARKDOWN_CODE_PATTERN = re.compile(r"`{3}([\w]*)\n([\S\s]+?)\n`{3}")
 
 
-class SolverException(Exception):
+class AgentException(Exception):
     pass
 
 
-class Solver:
+class Agent:
     stats: dict[str, Any] = {}
 
     def reset(self) -> None:
@@ -80,14 +80,14 @@ class Solver:
             yield  # do nothing
 
 
-class DummySolver(Solver):
+class DummyAgent(Agent):
     def solve(self, question: str, environment: Environment) -> str:
         return (
             "import pandas as pd\n" "import numpy as np\n" "\n" "pd.DataFrame(np.random.uniform(0, 1, size=(300, 300)))"
         )
 
 
-class PerfectSolver(Solver):
+class PerfectAgent(Agent):
     def __init__(self, problems: ProblemSet | None = None):
         if problems is not None:
             self.memory = {
@@ -112,7 +112,7 @@ class PerfectSolver(Solver):
 class TentativeSolution(TypedDict):
     question: str
     code: str
-    solver_stats: dict[str, Any]
+    agent_stats: dict[str, Any]
 
 
 class TentativeSolutions:
@@ -144,7 +144,7 @@ class TentativeSolutions:
         return cls(solutions)
 
 
-class PreloadSolver(Solver):
+class PreloadAgent(Agent):
     solutions: TentativeSolutions
 
     def load_tentative_solutions(self, solutions: TentativeSolutions) -> None:
@@ -152,7 +152,7 @@ class PreloadSolver(Solver):
 
     def solve(self, question: str, environment: Environment) -> str:
         solution = self.solutions.pop_solution(question)
-        self.stats = solution["solver_stats"]
+        self.stats = solution["agent_stats"]
         return solution["code"]
 
     @contextmanager
@@ -160,7 +160,7 @@ class PreloadSolver(Solver):
         yield  # stats are already tracked in solve()
 
 
-class GPTSolver(Solver):
+class GPTAgent(Agent):
     system_message = """You're a data scientist. You're good at writing Python code to do data analysis, visualization, and machine learning. You can leverage the Python libraries such as `pandas`, `sklearn`, `matplotlib`, `seaborn`, and etc. to achieve user's request.
 
 Specifically, the user will present a question and optionally some variables (e.g., pandas DataFrame) they already have. Your task is to write a cell in an iPython notebook that serves the user's request. The cell's output should be exactly what the user has asked for.
@@ -190,14 +190,14 @@ Some extra instructions:
             return "pandas.Series(shape={})".format(value.shape)
         elif isinstance(value, list):
             if len(value) > 30:
-                return "[{}, ...]".format(", ".join(GPTSolver._smart_repr(v) for v in value[:30]))
-            return "[{}]".format(", ".join(GPTSolver._smart_repr(v) for v in value))
+                return "[{}, ...]".format(", ".join(GPTAgent._smart_repr(v) for v in value[:30]))
+            return "[{}]".format(", ".join(GPTAgent._smart_repr(v) for v in value))
         elif isinstance(value, dict):
             if len(value) > 30:
                 return "{{{}, ...}}".format(
-                    ", ".join(f"{k}: {GPTSolver._smart_repr(v)}" for k, v in list(value.items())[:30])
+                    ", ".join(f"{k}: {GPTAgent._smart_repr(v)}" for k, v in list(value.items())[:30])
                 )
-            return "{{{}}}".format(", ".join(f"{k}: {GPTSolver._smart_repr(v)}" for k, v in value.items()))
+            return "{{{}}}".format(", ".join(f"{k}: {GPTAgent._smart_repr(v)}" for k, v in value.items()))
         elif isinstance(value, str):
             return f'"{value}"'
         elif isinstance(value, (bool, int, float)):
@@ -214,7 +214,7 @@ Some extra instructions:
         human_message = f"Question: {question}"
         variables = "\n".join(
             [
-                f"- {name}: {GPTSolver._smart_repr(value)}"
+                f"- {name}: {GPTAgent._smart_repr(value)}"
                 for name, value in environment.namespace.items()
                 if not isinstance(
                     value,
@@ -239,7 +239,7 @@ Some extra instructions:
         return response.content
 
 
-class CoMLSolver(Solver):
+class CoMLAgent(Agent):
     def __init__(
         self,
         llm: BaseChatModel,
@@ -302,7 +302,7 @@ class CoMLSolver(Solver):
                 self.context = self.agent.generate_code(question, variables, codes)
             except Exception as e:
                 self.context = None
-                raise SolverException(e)
+                raise AgentException(e)
         else:
             configs = self._shrinking_configs()
 
@@ -424,8 +424,8 @@ class CoMLSolver(Solver):
         ]
 
 
-class JupyterAISolver(Solver):
-    """Solver inspired by Jupyter AI.
+class JupyterAIAgent(Agent):
+    """Agent inspired by Jupyter AI.
 
     Reference: https://github.com/jupyterlab/jupyter-ai/blob/976f8b9303d198fb339f7b594d29e4cd879618a4/packages/jupyter-ai-magics/jupyter_ai_magics/magics.py#L528
     """
@@ -454,8 +454,8 @@ class JupyterAISolver(Solver):
             return content
 
 
-class ChapyterSolver(Solver):
-    """Solver with the method in Chapyter.
+class ChapyterAgent(Agent):
+    """Agent with the method in Chapyter.
 
     https://github.com/chapyter/chapyter/blob/a7c8a4c296cec4dfa03da81c4906bd0c53168bb2/chapyter/programs.py#L49
     """
@@ -545,8 +545,8 @@ class ChapyterSolver(Solver):
         return "\n".join(all_converted_str)
 
 
-class CodeInterpreterSolver(Solver):
-    """Solver with the method in codeinterpreter-api.
+class CodeInterpreterAgent(Agent):
+    """Agent with the method in codeinterpreter-api.
 
     The original implementation uses langchain tools and agents,
     but we need to interrupt the generated tool configuration.

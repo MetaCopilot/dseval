@@ -1,10 +1,8 @@
 import ast
-from pathlib import Path
 
 import pandas as pd
-from radon.metrics import h_visit
 
-from dseval import ProblemSet, Benchmark
+from dseval import Benchmark
 
 
 def get_code_complexity(code: str) -> float:
@@ -37,33 +35,42 @@ def get_code_complexity(code: str) -> float:
     return complexity
 
 
-def compute_benchmark_difficulty(benchmark: Benchmark):
+def compute_benchmark_difficulty(benchmark: Benchmark) -> float:
     difficulties = []
     for problemset in benchmark:
         for index, problem in problemset.enumerate():
-            if problem.question and problem.reference_code:
-                difficulties.append(
-                    {
-                        "problemset": problemset,
-                        "index": problem.index,
-                        "dseval_complexity": get_code_complexity(problem.reference_code),
-                        **h_visit(problem.reference_code).total._asdict(),
-                    }
-                )
-    for path in Path(problem_path).glob("*.py"):
-        problem_count = 0
-        for problem in ProblemSet.fromfile(path):
-            if problem.question and problem.reference_code:
-                difficulties.append(
-                    {
-                        "problemset": path.stem,
-                        "index": problem_count,
-                        "dseval_complexity": get_code_complexity(
-                            problem.reference_code
-                        ),
-                        **h_visit(problem.reference_code).total._asdict(),
-                    }
-                )
-            problem_count += 1
+            difficulties.append(
+                {
+                    "problemset": problemset.name,
+                    "index": index,
+                    "dseval_complexity": get_code_complexity(problem.reference_code),
+                }
+            )
     difficulties = pd.DataFrame(difficulties)
-    return difficulties
+    print(difficulties)
+    return difficulties["dseval_complexity"].mean()
+
+
+def summarize():
+    summary = []
+    for benchmark in Benchmark.list("benchmarks"):
+        difficulty = compute_benchmark_difficulty(benchmark)
+        summary.append(
+            {
+                "Benchmark": benchmark.name,
+                "Latest": f"v{benchmark.version}",
+                "# Sets": len(benchmark.problemsets),
+                "# Problems": sum(problemset.num_complete for problemset in benchmark),
+                "Difficulty": difficulty,
+            }
+        )
+
+    print(
+        pd.DataFrame(summary).to_markdown(
+            index=False, numalign=None, stralign=None, floatfmt=".1f"
+        )
+    )
+
+
+if __name__ == "__main__":
+    summarize()

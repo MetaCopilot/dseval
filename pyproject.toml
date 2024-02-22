@@ -22,4 +22,5 @@ dev = [
     "black",
     "isort",
     "scikit-learn",
+    "tabulate",
 ]

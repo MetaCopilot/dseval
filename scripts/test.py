@@ -16,19 +16,14 @@ from langchain.storage import LocalFileStore
 from langchain_community.embeddings import AzureOpenAIEmbeddings, OpenAIEmbeddings
 
 import dotenv
-from dseval import ProblemSet, CoMLSolver, Evaluator
-from dseval.solver import (
-    PreloadSolver,
-    ChapyterSolver,
-    JupyterAISolver,
-    CodeInterpreterSolver,
+from dseval import ProblemSet, Evaluator
+from dseval.agent import (
+    CoMLAgent,
+    PreloadAgent,
+    ChapyterAgent,
+    JupyterAIAgent,
+    CodeInterpreterAgent,
     TentativeSolutions,
-)
-from msllm_extensions import (
-    AzureChatOpenAIWithTooling,
-    SubstrateChatLLM,
-    AzureMLModel,
-    LlamaCppClient,
 )
 
 
@@ -64,7 +59,7 @@ def glob_problemsets(problemset_path: Path) -> list[Path]:
 
 def configure_llm(model: str, endpoint: str):
     if endpoint == "aoai":
-        dotenv.load_dotenv(".env/aoai.env")
+        from msllm_extensions import AzureChatOpenAIWithTooling
         return AzureChatOpenAIWithTooling(
             temperature=0.0,
             azure_deployment=model,
@@ -87,8 +82,10 @@ def configure_llm(model: str, endpoint: str):
     elif endpoint == "substrate":
         if model != "gpt-35-turbo":
             raise ValueError("Only gpt-35-turbo is supported for SubstrateChatLLM")
+        from msllm_extensions import SubstrateChatLLM
         return SubstrateChatLLM(temperature=0.0, max_retries=10, max_tokens=1000)
     elif endpoint == "azureml":
+        from msllm_extensions import AzureMLModel
         dotenv.load_dotenv(".env/azureml.env")
         if model == "llama2-70b":
             model = "llama-2-70b-chat-13"
@@ -105,6 +102,7 @@ def configure_llm(model: str, endpoint: str):
         dotenv.load_dotenv(".env/google.env")
         return ChatGoogleGenerativeAI(model=model, temperature=0.0)
     elif endpoint == "llamacpp":
+        from msllm_extension import LlamaCppClient
         dotenv.load_dotenv(".env/llamacpp.env")
         if model == "codellama-7b":
             model = "CodeLlama-7B-Instruct"
@@ -123,115 +121,15 @@ def configure_llm(model: str, endpoint: str):
         raise ValueError(f"Unknown endpoint {endpoint}")
 
 
-def configure_solver(model: str, prompt: str, llm: BaseChatModel, debug: bool):
+def configure_agent(model: str, prompt: str, llm: BaseChatModel, debug: bool):
     if prompt.startswith("coml"):
-        if debug:
-            import coml.core
-
-            coml.core._debug_mode = True
-
-        # Ensemble: -esm3 (ensemble size = 3)
-        ensemble_size = None
-        if "-esm" in prompt:
-            match = re.search(r"-esm(\d+)", prompt)
-            assert (
-                match is not None
-            ), "To use ensemble, format the prompt as coml-esm<ensemble_size>"
-            ensemble_size = int(match.group(1))
-
-        # Temperature: -tmp6 (temperature = 0.6)
-        if "-tmp" in prompt:
-            match = re.search(r"-tmp(\d+)", prompt)
-            assert (
-                match is not None
-            ), "To use temperature, format the prompt as coml-tmp<temperature>. Temperature is multiplied by 10."
-            temperature = float(match.group(1)) / 10
-            llm.temperature = temperature
-
-        # Zero-shot, few-shot: -0shot, -1shot, -3shot
-        if "-0shot" in prompt:
-            num_examples = 0
-        elif "-1shot" in prompt:
-            num_examples = 1
-        elif "-3shot" in prompt:
-            num_examples = 3
-        else:
-            num_examples = 1.0
-
-        # W/ or w/o retrieval: -retrieval
-        if "-retrieval" in prompt:
-            if isinstance(llm, AzureChatOpenAI):
-                underlying_embeddings = AzureOpenAIEmbeddings()
-            else:
-                underlying_embeddings = OpenAIEmbeddings()
-            store = LocalFileStore("./assets/embedding_cache")
-            example_ranking = CacheBackedEmbeddings.from_bytes_store(
-                underlying_embeddings, store, namespace=underlying_embeddings.model
-            )
-        else:
-            example_ranking = None
-
-        # -ordervcr, -ordervr, -orderr, ...
-        # Available orders are: "vcr", "cvr", "rvc", "rcv", "vr", "rv", "cr", "rc", "r"
-        if "-order" in prompt:
-            match = re.search(r"-order([vcr]+)", prompt)
-            assert (
-                match is not None
-            ), "To use context order, format the prompt as coml-order<order>."
-            context_order = match.group(1)
-        else:
-            context_order = "vcr"
-
-        # Variable representations: -dflida, -dfcomlconcise, -dfcomlverbose
-        if "-dflida" in prompt:
-            dataframe_format = "lida"
-        elif "-dfcomlconcise" in prompt:
-            dataframe_format = "comlconcise"
-        elif "-dfcomlverbose" in prompt:
-            dataframe_format = "comlverbose"
-        else:
-            dataframe_format = "coml"
-
-        # Code history representations: -codewithq
-        code_history_with_question = "-codewithq" in prompt
-
-        # Chain of thought: -cot
-        chain_of_thought = "-cot" in prompt
-
-        # Without intact instruction: -wointact
-        intact_instruction = "-wointact" not in prompt
-
-        # Prompt version: -promptv2, -promptkaggle, -promptleetcode
-        if "-promptv2" in prompt:
-            prompt_version = "v2"
-        elif "-promptkaggle" in prompt:
-            prompt_version = "kaggle"
-        elif "-promptleetcode" in prompt:
-            prompt_version = "leetcode"
-        else:
-            prompt_version = "v2"
-
-        return CoMLSolver(
-            llm,
-            shots_shrinking=model.startswith("llama2"),
-            prompt_version=prompt_version,
-            message_style="gemini" if model.startswith("gemini") else "chatgpt",
-            chain_of_thought=chain_of_thought,
-            ensemble=ensemble_size,
-            ensemble_shuffle=True,
-            num_examples=num_examples,
-            context_order=context_order,
-            example_ranking=example_ranking,
-            code_history_with_question=code_history_with_question,
-            dataframe_format=dataframe_format,
-            intact_instruction=intact_instruction,
-        )
+        return CoMLAgent(llm)
     elif prompt == "chapyter":
-        return ChapyterSolver(llm)
+        return ChapyterAgent(llm)
     elif prompt == "jupyterai":
-        return JupyterAISolver(llm)
+        return JupyterAIAgent(llm)
     elif prompt == "codeinterpreterapi":
-        return CodeInterpreterSolver(llm)
+        return CodeInterpreterAgent(llm)
     else:
         raise ValueError(f"Unknown prompt {prompt}")
 
@@ -256,11 +154,11 @@ def _test_problemset(args: argparse.Namespace, problemset_path: Path):
             args.evaluate_from,
         )
         output_dir = Path(args.evaluate_from)
-        solver = PreloadSolver()
+        agent = PreloadAgent()
     else:
-        # Configure th solver
+        # Configure th agent
         llm = configure_llm(args.model, args.endpoint)
-        solver = configure_solver(args.model, args.prompt, llm, args.debug)
+        agent = configure_agent(args.model, args.prompt, llm, args.debug)
 
         # Guessing the output directory
         output_dir = (

@@ -90,10 +90,9 @@ class SubProblem:
 
 
 class ProblemSet:
-    problems: list[SubProblem]
-
-    def __init__(self, problems: list[SubProblem]):
+    def __init__(self, problems: list[SubProblem], name: str | None = None):
         self.problems = problems
+        self.name = name
 
     def __iter__(self):
         return iter(self.problems)
@@ -103,6 +102,10 @@ class ProblemSet:
 
     def __len__(self):
         return len(self.problems)
+
+    @property
+    def num_complete(self) -> int:
+        return sum(int(problem.is_complete) for problem in self.problems)
 
     def enumerate(self, complete_only: bool = True) -> Iterable[tuple[int, SubProblem]]:
         problem_count = 0
@@ -139,7 +142,7 @@ class ProblemSet:
                 problems.append(SubProblem(reference_code=code.strip(), **setup))
             else:
                 problems.append(SubProblem(reference_code=section))
-        return cls(problems)
+        return cls(problems, code_path.stem)
 
     def __repr__(self) -> str:
         return (
@@ -172,7 +175,7 @@ class Benchmark:
         if not isinstance(benchmark_path, Path):
             benchmark_path = Path(benchmark_path)
         if benchmark_path.is_dir():
-            problemsets = [path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")]
+            problemsets = sorted([path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")])
             if (benchmark_path / "_inputs").exists():
                 data_directory = benchmark_path / "_inputs"
             else:
@@ -187,6 +190,13 @@ class Benchmark:
         else:
             # for debugging purposes
             return cls([ProblemSet.fromfile(benchmark_path)])
+
+    @classmethod
+    def list(cls, directory: Path | str) -> Iterable[Benchmark]:
+        if not isinstance(directory, Path):
+            directory = Path(directory)
+        for path in directory.glob("**/_manifest.yaml"):
+            yield Benchmark.frompath(path.parent)
 
     def __repr__(self) -> str:
         return (

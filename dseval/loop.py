@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import shutil
 import traceback
 from contextlib import contextmanager
 from pathlib import Path
@@ -10,9 +12,9 @@ from typing import Any, TypedDict
 import colorama
 from typing_extensions import NotRequired
 
-from .problem import ProblemSet
+from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .solver import Solver, SolverException, TentativeSolution, TentativeSolutions
+from .agent import Solver, SolverException, TentativeSolution, TentativeSolutions
 
 _logger = logging.getLogger(__name__)
 
@@ -315,3 +317,35 @@ class Evaluator:
             evaluation_results.append(summary)
 
         return EvaluationResult(total, correct, evaluation_results)
+
+
+@contextmanager
+def running_environment(run_directory: Path, data_source: Path | None = None):
+    current_working_directory = Path.cwd().resolve()
+    try:
+        run_directory.mkdir(exist_ok=True, parents=True)
+
+        # Delete old files
+        for file in run_directory.iterdir():
+            if file.is_file() or file.is_symlink():
+                file.unlink()
+            else:
+                shutil.rmtree(file)
+
+        # Link input directory
+        if data_source is not None:
+            shutil.copytree(data_source.resolve(), run_directory / "inputs")
+
+        os.chdir(run_directory)
+
+        yield
+
+    finally:
+        # Clean up
+        for file in run_directory.iterdir():
+            if file.is_file() or file.is_symlink():
+                file.unlink()
+            else:
+                shutil.rmtree(file)
+
+        os.chdir(current_working_directory)

@@ -4,6 +4,15 @@ DSEval is a series of benchmarks aiming at evaluating LLM-powered data science a
 
 ## Benchmark Summary
 
+This table summarizes the currently-provided benchmarks in this repository.
+
+| Benchmark | Latest | # Sets | # Problems | Difficulty |
+|-------------|----------|----------|--------------|--------------|
+| Exercise | v1 | 21 | 187 | 17.3 |
+| SO | v1 | 202 | 202 | 16.2 |
+| LeetCode | v1 | 40 | 40 | 56.0 |
+| Kaggle | v1 | 31 | 396 | 35.9 |
+
 ## Environment setup
 
 - Create `.env` folder and put `aiyyds.env` and `aoai.env` inside. Add extra services if necessary (requires editing `scripts/test.py`).
