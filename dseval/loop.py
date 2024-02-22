@@ -6,32 +6,84 @@ import os
 import shutil
 import traceback
 from contextlib import contextmanager
+from enum import Enum
 from pathlib import Path
 from typing import Any, TypedDict
 
 import colorama
 from typing_extensions import NotRequired
 
+from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
+from .validator  import ValidateResult
 
 _logger = logging.getLogger(__name__)
 
 
+class Verdict(Enum):
+    CORRECT = "correct"
+    INTACT_VIOLATION = "Intact Violation"
+    PRESENTATION_ERROR = "Presentation Error"
+    WRONG_OUTPUT = "Wrong Output"
+    WRONG_VARIABLES = "Wrong Variables"
+    UNIT_TEST_FAILURE = "Unit-test Failure"
+    TIMEOUT = "Timeout"
+    CRASH = "Crash"
+    SYNTAX_ERROR = "Syntax Error"
+    CRASHED = "crashed"
+    UNKNOWN = "unknown"
+
+
+class Subverdict(Enum):
+    UNCATEGORIZED = "Uncategorized"
+    # For presentation error
+    INDEX_MISMATCH = "Index Mismatch"
+    MISSING_RETURN = "Missing Return"
+    PARTIAL_MATCH = "Partial Match"
+    NON_CODE = "Non-code"
+    # For wrong output / variables / unit-test failure
+    SHAPE_MISMATCH = "Shape Mismatch"
+    DTYPE_MISMATCH = "Dtype Mismatch"
+    COLUMNS_MISMATCH = "Columns Mismatch"
+    VALUE_MISMATCH = "Value Mismatch"
+    UNEXPECTED_TYPE = "Unexpected Type"
+    # Crash
+    MODULE_NOT_FOUND = "Module Not Found"
+    ATTRIBUTE_ERROR = "Attribute Error"
+    KEY_ERROR = "Key Error"
+    NAME_ERROR = "Name Error"
+    TYPE_ERROR = "Type Error"
+    VALUE_ERROR = "Value Error"
+
+
+def validator_comments_to_verdict(comments: ValidateResult) -> tuple[Verdict, Subverdict]:
+    ...
+
+
 class EvaluationDetail(TypedDict):
-    correct: bool
-    correct_loose: bool
-    tries: int
+    # To locate the current problem
+    benchmark: str
+    version: str
+    problemset: str
+    index: int
+    # Attempt ID
+    attempt: int
+    # Safe to drop duplicates from above if needed
+    # ========================
+    # Evaluation results
+    # Correct put upfront for ease of inspection
+    verdict: 
+    # Question content
     question: str
+    # If agent crashes
+    agent_exception: str
+    # Validator comments
+    validator: dict
+    # Generated code by agents
     code: str
-    crashed: bool
-    solver_crashed: str
-    val_category: NotRequired[str]
-    val_reason: NotRequired[str]
-    val_loose_category: NotRequired[str]
-    val_loose_reason: NotRequired[str]
-    solver_stats: NotRequired[dict[str, Any]]
+    # Computation costs from agents
+    agent_stats: NotRequired[dict[str, Any]]
 
 
 class EvaluationResult:
@@ -39,7 +91,9 @@ class EvaluationResult:
     num_passed: int
     details: list[EvaluationDetail]
 
-    def __init__(self, num_problems: int, num_passed: int, details: list[EvaluationDetail]):
+    def __init__(
+        self, num_problems: int, num_passed: int, details: list[EvaluationDetail]
+    ):
         self.num_problems = num_problems
         self.num_passed = num_passed
         self.details = details
@@ -59,23 +113,23 @@ class EvaluationResult:
 class Evaluator:
     def __init__(
         self,
-        max_retries: int = 0,
+        max_attempts: int = 1,
         retry_hint: bool = False,
         retry_reset: bool = False,
-        ignore_solver_failure: bool = False,
+        ignore_agent_exception: bool = False,
         error_propagation: bool = False,
     ):
-        self.max_retries = max_retries
+        self.max_attempts = max_attempts
         self.retry_hint = retry_hint
         self.retry_reset = retry_reset
-        self.ignore_solver_failure = ignore_solver_failure
+        self.ignore_agent_exception = ignore_agent_exception
         self.error_propagation = error_propagation
 
     @contextmanager
     def propagate_errors(self, environment: Environment, code_with_errors: list[str]):
         if self.error_propagation:
             previous_sources = [cell.source for cell in environment.cells]
-            if self.max_retries == 0:
+            if self.max_attempts == 1:
                 assert len(code_with_errors) == len(previous_sources)
             for cell, code in zip(environment.cells, code_with_errors):
                 cell.update_source(code)
@@ -100,7 +154,9 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question.strip())
             playground_env = environment.fork()
-            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
+            environment.execute(
+                problem.reference_code, **(problem.execution or {}), raise_error=True
+            )
             playground_env.execute(problem.reference_code, **(problem.execution or {}))
 
             if problem.validator is not None:
@@ -110,7 +166,11 @@ class Evaluator:
                 _logger.info(
                     "[Question %d] %s%s%s! (time elapsed: %s%.2f%s seconds)",
                     total,
-                    colorama.Fore.GREEN if validate_result["correct"] else colorama.Fore.RED,
+                    (
+                        colorama.Fore.GREEN
+                        if validate_result["correct"]
+                        else colorama.Fore.RED
+                    ),
                     "Correct" if validate_result["correct"] else "Incorrect",
                     colorama.Fore.RESET,
                     (
@@ -124,7 +184,9 @@ class Evaluator:
                 )
                 correct += int(validate_result["correct"])
                 if not validate_result["correct"]:
-                    _logger.warning("[Question %d] %s", total, validate_result["reason"])
+                    _logger.warning(
+                        "[Question %d] %s", total, validate_result["reason"]
+                    )
             else:
                 correct += 1
 
@@ -157,7 +219,9 @@ class Evaluator:
             total += 1
 
             _logger.info("[Question %d] %s", total, problem.question.strip())
-            with solver.track_stats(), self.propagate_errors(environment, code_with_errors):
+            with solver.track_stats(), self.propagate_errors(
+                environment, code_with_errors
+            ):
                 code = solver.solve(problem.question, environment)
             _logger.info(
                 "[Question %d] Code:\n%s%s%s",
@@ -168,7 +232,9 @@ class Evaluator:
             )
 
             code_with_errors.append(code)
-            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
+            environment.execute(
+                problem.reference_code, **(problem.execution or {}), raise_error=True
+            )
 
             codes.append(
                 {
@@ -200,7 +266,9 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question)
             playground_env = environment.fork()
-            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
+            environment.execute(
+                problem.reference_code, **(problem.execution or {}), raise_error=True
+            )
             assert environment.last_cell is not None
             answer = environment.last_cell.output
 
@@ -208,18 +276,20 @@ class Evaluator:
             hint = ""
             produced_output = validate_result = validate_result_loose = None
             playground_env_backup = None
-            if self.retry_reset and self.max_retries >= 1:
+            if self.retry_reset and self.max_attempts >= 1:
                 playground_env_backup = playground_env.fork()
             current_correct = current_correct_loose = False
             retry_count = 0
             solver_stats_accumulator = {}
-            while retry_count <= self.max_retries and not current_correct:
+            while retry_count <= self.max_attempts and not current_correct:
                 current_correct = current_correct_loose = True  # reset to true
                 if retry_count >= 1 and playground_env_backup is not None:
                     # Reset the playground_env in case there is a backup
                     playground_env = playground_env_backup.fork()
 
-                with solver.track_stats(), self.propagate_errors(playground_env, code_with_errors):
+                with solver.track_stats(), self.propagate_errors(
+                    playground_env, code_with_errors
+                ):
                     try:
                         if retry_count == 0:
                             code = solver.solve(problem.question, playground_env)
@@ -232,11 +302,15 @@ class Evaluator:
                                 produced_output,
                             )
                             if self.retry_hint and not crashed:
-                                _logger.info("[Question %d] Retry with hint: %s", total, hint)
-                                code = solver.retry(crashed or "", produced_output, hint)
+                                _logger.info(
+                                    "[Question %d] Retry with hint: %s", total, hint
+                                )
+                                code = solver.retry(
+                                    crashed or "", produced_output, hint
+                                )
                             code = solver.retry(crashed or "", produced_output)
                     except SolverException:
-                        if not self.ignore_solver_failure:
+                        if not self.ignore_agent_exception:
                             raise
                         _logger.exception(
                             "[Question %d] Solver failed to produce a solution.",
@@ -262,7 +336,9 @@ class Evaluator:
 
                 # Using the same playground_env throughout all retries
                 # Won't rollback even for failed attempts.
-                produced_output = playground_env.execute(code, **(problem.execution or {}))
+                produced_output = playground_env.execute(
+                    code, **(problem.execution or {})
+                )
                 code_with_errors.append(code)
                 assert playground_env.last_cell is not None
 
@@ -276,12 +352,16 @@ class Evaluator:
                     )
 
                 if problem.validator is not None:
-                    validate_result = problem.validator.validate(answer, playground_env.last_cell.output)
+                    validate_result = problem.validator.validate(
+                        answer, playground_env.last_cell.output
+                    )
                     hint = validate_result.get("reason", "")
                     current_correct = validate_result["correct"]
 
                 if problem.validator_loose is not None:
-                    validate_result_loose = problem.validator_loose.validate(answer, playground_env.last_cell.output)
+                    validate_result_loose = problem.validator_loose.validate(
+                        answer, playground_env.last_cell.output
+                    )
                     current_correct_loose = validate_result_loose["correct"]
 
                 retry_count += 1
