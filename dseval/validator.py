@@ -2,13 +2,22 @@ from __future__ import annotations
 
 import ast
 import copy
-import json
 import logging
 import random
 import re
 import traceback
 import types
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Literal, TypedDict, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Generic,
+    Literal,
+    TypedDict,
+    TypeVar,
+    cast,
+)
 
 import numpy as np
 from typing_extensions import NotRequired
@@ -28,6 +37,8 @@ class _DictWithStreamOutput(TypedDict):
 
 class _DictWithExecuteResult(TypedDict):
     execute_result: Any
+    source_code: NotRequired[str]
+    namespace_snapshot: NotRequired[dict[str, Any]]
 
 
 class _DictWithError(TypedDict):
@@ -42,15 +53,10 @@ class _DictWithNamespaceSnapshot(TypedDict):
     namespace_snapshot: dict[str, Any]
 
 
-class _DictWithCodeAndResult(TypedDict):
-    execute_result: Any
-    source_code: str
-
-
 class ValidateResult(TypedDict):
-    correct: bool
-    category: NotRequired[str]
-    reason: NotRequired[str]
+    correct: Literal["yes", "partial", "no"]
+    category: str
+    reason: str | list["ValidateResult"]
 
 
 T = TypeVar("T")
@@ -82,16 +88,15 @@ class Validator(Generic[T]):
     def augment_config(
         config: dict[str, Any],
         template: Literal["basic", "empty", "intact", "comparison"],
-        loose: bool = False,
     ):
         if template == "empty":
             base_config = {}
         elif template == "basic":
-            base_config = {"error": None}
+            base_config = {"crash": None}
         elif template == "intact":
-            base_config = {"error": None, "namespace_intact": None}
+            base_config = {"crash": None, "namespace_intact": None}
         elif template == "comparison":
-            base_config = {"error": None, "namespace_intact": None, "result": None}
+            base_config = {"crash": None, "namespace_intact": None, "result": None}
 
         # Deep merge the base config and the user config.
         def merge(base, user):
@@ -107,55 +112,30 @@ class Validator(Generic[T]):
 
         config = merge(base_config, config)
 
-        if loose:
-            # Loose the comparison
-            updates = {
-                "ignore_order": True,
-                "ignore_names": True,
-                "ignore_dtypes": True,
-                "match_partial": True,
-            }
-            if "namespace_check" in config:
-                for value in config["namespace_check"].values():
-                    if isinstance(value, dict):
-                        value.update(updates)
-            if "table_test" in config:
-                if "output_checker" not in config["table_test"]:
-                    config["table_test"]["output_checker"] = updates
-                elif isinstance(config["table_test"]["output_checker"], dict):
-                    config["table_test"]["output_checker"].update(updates)
-            if "result" in config and isinstance(config["result"], dict):
-                config["result"].update(remediate_output=True, **updates)
-            else:
-                config["result"] = dict(remediate_output=True, **updates)
-
-            if "result" in config:
-                err_and_result = {"result": config.pop("result")}
-                if "error" in config:
-                    # Syntax error doesn't matter now.
-                    err_and_result["error"] = config.pop("error")
-                config["or"] = {
-                    "and": err_and_result,
-                    "answer_in_source": None,
-                }
-
         return config
 
 
-class NoErrorValidator(Validator[_DictWithError]):
-    alias: ClassVar[str] = "error"
+class CrashValidator(Validator[_DictWithError]):
+    """Ensure that the code didn't crash."""
+
+    alias: ClassVar[str] = "crash"
 
     def __repr__(self) -> str:
-        return "NoErrorValidator()"
+        return "CrashValidator()"
 
     def validate(self, reference, submission) -> ValidateResult:
         if submission["error"] is not None:
             return {
-                "correct": False,
+                "correct": "no",
                 "category": self.alias,
-                "reason": "Expect no error:\n" + "\n".join(submission["error"]["traceback"]),
+                "reason": "Submission crashes"
+                + (":\n" + "\n".join(submission["error"]["traceback"]) if submission["error"]["traceback"] else "."),
             }
-        return {"correct": True}
+        return {
+            "correct": "yes",
+            "category": self.alias,
+            "reason": "Execution finishes successfully.",
+        }
 
 
 class NamespaceIntactGuard(Validator[_DictWithNamespaceDiff]):
@@ -226,154 +206,294 @@ class NamespaceIntactGuard(Validator[_DictWithNamespaceDiff]):
         for name, diff in submission_diff.items():
             if allowed[diff] is False or (isinstance(allowed[diff], list) and name not in allowed[diff]):
                 return {
-                    "correct": False,
+                    "correct": "no",
                     "category": self.alias,
                     "reason": f"Unexpected variable {diff}: {name}",
                 }
-        return {"correct": True}
+        return {
+            "correct": "yes",
+            "category": self.alias,
+            "reason": "Namespace is intact.",
+        }
+
+
+def _guess_print_output(source_code: str, namespace: dict, expected: Any) -> Any:
+    parsed_code = ast.parse(source_code)
+    eval_objects = []
+
+    # 1. Handle prints
+    def walk_print(node):
+        if (
+            isinstance(node, ast.expr)
+            and not isinstance(node, ast.Constant)
+            and not isinstance(node, ast.FormattedValue)
+            and not isinstance(node, ast.JoinedStr)
+        ):
+            yield node
+        else:
+            for child in ast.iter_child_nodes(node):
+                yield from walk_print(child)
+
+    for line in parsed_code.body:
+        if (
+            isinstance(line, ast.Expr)
+            and isinstance(line.value, ast.Call)
+            and isinstance(line.value.func, ast.Name)
+            and line.value.func.id == "print"
+        ):
+            for arg in line.value.args:
+                for value in walk_print(arg):
+                    code = ast.unparse(value)
+                    obj = exec_code(code, "print", globals=namespace, mode="eval")
+                    eval_objects.append(obj)
+
+    # 2. Handle assignments
+    if len(eval_objects) == 0 and len(parsed_code.body) >= 1:
+        target = None
+        for line in parsed_code.body[::-1]:
+            if isinstance(line, ast.Assign):
+                target = line.targets[0]
+            elif isinstance(line, ast.AnnAssign) or isinstance(line, ast.AugAssign):
+                target = line.target
+            if target is not None:
+                break
+
+        if target is not None:
+            # Handle assignments like `.columns`
+            if isinstance(target, (ast.Attribute, ast.Subscript)):
+                target = target.value
+            stmt = ast.unparse(target)
+            obj = exec_code(stmt, "assignment", globals=namespace, mode="eval")
+            eval_objects.append(obj)
+
+    if len(eval_objects) == 0:
+        return None
+    if len(eval_objects) == 1:
+        return eval_objects[0]
+    if isinstance(expected, tuple):
+        return tuple(eval_objects)
+    if isinstance(expected, list):
+        return list(eval_objects)
+    if isinstance(expected, dict):
+        if len(eval_objects) > len(expected):
+            return dict(zip(expected.keys(), eval_objects[-len(expected) :]))
+        elif len(eval_objects) < len(expected):
+            return dict(
+                zip(
+                    expected.keys(),
+                    [None] * (len(expected) - len(eval_objects)) + eval_objects,
+                )
+            )
+        else:
+            return dict(zip(expected.keys(), eval_objects))
+    _logger.warning("Couldn't guess the print output, assuming the last.")
+    return eval_objects[-1]
+
+
+def _find_answer_in_source_code(source_code: str, expected_result: Any) -> str:
+    # When returns something, the answer is found in source code.
+    if expected_result is not None:
+        res_string = str(expected_result)
+        if re.search(r"\b" + re.escape(res_string) + r"\b", source_code):
+            return f"Output is directly shown in the code: " + res_string
+    return ""
+
+
+CompareFunction = Callable[[Any, Any], Match]
+
+
+def _compare_fn_from_config(
+    code_or_config_or_fn: str | dict | CompareFunction | None,
+    loose: bool = False,
+) -> CompareFunction:
+    if loose:
+        if code_or_config_or_fn is None:
+            code_or_config_or_fn = {}
+        if isinstance(code_or_config_or_fn, dict):
+            code_or_config_or_fn.update(
+                {
+                    "ignore_order": True,
+                    "ignore_names": True,
+                    "ignore_dtypes": True,
+                    "match_partial": True,
+                }
+            )
+        return _compare_fn_from_config(code_or_config_or_fn)
+
+    if isinstance(code_or_config_or_fn, str):
+        return _code_to_compare_fn(code_or_config_or_fn)
+    elif isinstance(code_or_config_or_fn, dict):
+        return ExactMatcher(**code_or_config_or_fn)
+    elif callable(code_or_config_or_fn):
+        return code_or_config_or_fn
+    elif code_or_config_or_fn is None:
+        return ExactMatcher()
+    else:
+        raise ValueError(f"Unsupported type: {code_or_config_or_fn}")
+
+
+def _code_to_compare_fn(code: str) -> CompareFunction:
+    ns = exec_code(code, "compare-fn")
+    return ns["compare_fn"]
+
+
+def _run_compare_fn(
+    compare_fn: CompareFunction,
+    compare_fn_loose: CompareFunction | None,
+    expected: Any,
+    found: Any,
+    validator_alias: str,
+    mismatch_prefix: str = "",
+    failure_prefix: str = "Comparison failure:\n{}",
+) -> ValidateResult:
+    """Run the comparison function and return the result.
+
+    Args:
+        compare_fn: The comparison function.
+        compare_fn_loose: The comparison function for loose comparison.
+        expected: The expected value.
+        found: The found value.
+        validator_alias: The alias of the validator.
+        mismatch_prefix: The prefix for the mismatch reason.
+        failure_prefix: The prefix for the failure reason.
+    """
+    try:
+        match = compare_fn(expected, found)
+        if match["match"]:
+            return {
+                "correct": "yes",
+                "category": validator_alias,
+                "reason": "Result matches the expected" + (":\n" + match["reason"] if match["reason"] else "."),
+            }
+        if compare_fn_loose is not None:
+            match = compare_fn_loose(expected, found)
+            if match["match"]:
+                return {
+                    "correct": "partial",
+                    "category": validator_alias,
+                    "reason": "Result matches the expected with looser constraints"
+                    + (":\n" + match["reason"] if match["reason"] else "."),
+                }
+
+        return {
+            "correct": "yes" if match["match"] else "no",
+            "category": validator_alias,
+            "reason": mismatch_prefix + match["reason"] if match["reason"] else "",
+        }
+    except AssertionError:
+        return {
+            "correct": "no",
+            "category": validator_alias,
+            "reason": mismatch_prefix + "Comparison raises AssertionError:\n" + traceback.format_exc(),
+        }
+    except KeyboardInterrupt:
+        raise
+    except:
+        return {
+            "correct": "no",
+            "category": validator_alias,
+            "reason": failure_prefix + traceback.format_exc(),
+        }
 
 
 class ResultValidator(Validator[_DictWithExecuteResult]):
+    """Compare the result (aka cell's execute output).
+
+    Returns "yes" if the result is a perfect match.
+    Returns "partial" in the following cases:
+    1. Submission is wrong in the index / columns.
+    2. Data in submission is part of the reference data (e.g., a sub-dataframe or one column).
+    3. The output is printed to the console rather than returned.
+    4. The output is directly shown within the source code.
+    Returns "no" otherwise.
+    """
+
     alias: ClassVar[str] = "result"
 
     def __init__(
         self,
-        compare_fn: Callable[[Any, Any], Match] | str | dict | None = None,
-        remediate_output: bool = False,
+        compare_fn: CompareFunction | str | dict | None = None,
         **kwargs: Any,
     ):
         self.source_code = None
         self.source_config = None
-        self.remediate_output = remediate_output
         if compare_fn is None and kwargs:
             compare_fn = kwargs
         if isinstance(compare_fn, str):
             self.source_code = compare_fn
-            self.compare_fn = self.code_to_compare_fn(compare_fn)
         elif isinstance(compare_fn, dict):
             self.source_config = compare_fn
-            self.compare_fn = ExactMatcher(**compare_fn)
-        else:
-            self.compare_fn = compare_fn or ExactMatcher()
+
+        self.compare_fn = _compare_fn_from_config(compare_fn)
+        self.loose_compare_fn = _compare_fn_from_config(compare_fn, loose=True)
 
     def validate(self, reference, submission) -> ValidateResult:
         execute_result_ref = reference["execute_result"]
         execute_result = submission["execute_result"]
         if execute_result_ref is not None:
+            output_inferred = False
             if execute_result is None:
-                if self.remediate_output:
-                    # Trying to guess the meant output.
+                # 1. Try to find answer in source code.
+                if "source_code" in submission:
                     try:
-                        execute_result = self._guess_print_output(
+                        answer_in_source = _find_answer_in_source_code(submission["source_code"], execute_result_ref)
+                        if answer_in_source:
+                            return {
+                                "correct": "partial",
+                                "category": self.alias,
+                                "reason": answer_in_source,
+                            }
+                    except:
+                        pass
+
+                # 2. Trying to guess the missing output.
+                try:
+                    if "source_code" in submission and "namespace_snapshot" in submission:
+                        execute_result = _guess_print_output(
                             cast(Any, submission)["source_code"],
                             cast(Any, submission)["namespace_snapshot"],
                             execute_result_ref,
                         )
-                    except Exception:
-                        return {
-                            "correct": False,
-                            "category": self.alias,
-                            "reason": "Couldn't remediate output:\n" + traceback.format_exc(),
-                        }
-                    result = self.run_compare_fn(
-                        self.compare_fn,
-                        execute_result_ref,
-                        execute_result,
-                        self.alias,
-                    )
-                    if result["correct"]:
-                        if "reason" in result:
-                            result["reason"] = "Correct with remediated output. " + result["reason"]
-                        else:
-                            result["reason"] = "Correct with remediated output."
-                    return result
-                else:
+                        output_inferred = True
+                except Exception:
                     return {
-                        "correct": False,
+                        "correct": "no",
                         "category": self.alias,
-                        "reason": "Expect non-empty execute_result",
+                        "reason": "Output is missing and cannot be inferred:\n" + traceback.format_exc(),
                     }
-            return self.run_compare_fn(self.compare_fn, execute_result_ref, execute_result, self.alias)  # type: ignore
+
+                # 3. still empty
+                if execute_result is None:
+                    return {
+                        "correct": "no",
+                        "category": self.alias,
+                        "reason": "Output is missing.",
+                    }
+
+            result = _run_compare_fn(
+                self.compare_fn,
+                self.loose_compare_fn,
+                execute_result_ref,
+                execute_result,
+                self.alias,
+            )
+            if output_inferred and result["correct"] != "no":
+                return {
+                    "correct": "partial",
+                    "category": self.alias,
+                    "reason": "Correct with inferred output:"
+                    + ("\n" + str(result["reason"]) if result["reason"] else "."),
+                }
+            return result
         else:
             # Ignore any result as ground-truth does not have one.
             return {
-                "correct": True,
+                "correct": "yes",
                 "category": self.alias,
-                "reason": "" if execute_result is None else "execute_result is ignored.",
+                "reason": (
+                    "Correct. Both none." if execute_result is None else "Result is ignored since ground-truth is none."
+                ),
             }
-
-    @staticmethod
-    def _guess_print_output(source_code: str, namespace: dict, expected: Any) -> Any:
-        parsed_code = ast.parse(source_code)
-        eval_objects = []
-
-        # 1. Handle prints
-        def walk_print(node):
-            if (
-                isinstance(node, ast.expr)
-                and not isinstance(node, ast.Constant)
-                and not isinstance(node, ast.FormattedValue)
-                and not isinstance(node, ast.JoinedStr)
-            ):
-                yield node
-            else:
-                for child in ast.iter_child_nodes(node):
-                    yield from walk_print(child)
-
-        for line in parsed_code.body:
-            if (
-                isinstance(line, ast.Expr)
-                and isinstance(line.value, ast.Call)
-                and isinstance(line.value.func, ast.Name)
-                and line.value.func.id == "print"
-            ):
-                for arg in line.value.args:
-                    for value in walk_print(arg):
-                        code = ast.unparse(value)
-                        obj = exec_code(code, "print", globals=namespace, mode="eval")
-                        eval_objects.append(obj)
-
-        # 2. Handle assignments
-        if len(eval_objects) == 0 and len(parsed_code.body) >= 1:
-            target = None
-            for line in parsed_code.body[::-1]:
-                if isinstance(line, ast.Assign):
-                    target = line.targets[0]
-                elif isinstance(line, ast.AnnAssign) or isinstance(line, ast.AugAssign):
-                    target = line.target
-                if target is not None:
-                    break
-
-            if target is not None:
-                # Handle assignments like `.columns`
-                if isinstance(target, (ast.Attribute, ast.Subscript)):
-                    target = target.value
-                stmt = ast.unparse(target)
-                obj = exec_code(stmt, "assignment", globals=namespace, mode="eval")
-                eval_objects.append(obj)
-
-        if len(eval_objects) == 0:
-            return None
-        if len(eval_objects) == 1:
-            return eval_objects[0]
-        if isinstance(expected, tuple):
-            return tuple(eval_objects)
-        if isinstance(expected, list):
-            return list(eval_objects)
-        if isinstance(expected, dict):
-            if len(eval_objects) > len(expected):
-                return dict(zip(expected.keys(), eval_objects[-len(expected) :]))
-            elif len(eval_objects) < len(expected):
-                return dict(
-                    zip(
-                        expected.keys(),
-                        [None] * (len(expected) - len(eval_objects)) + eval_objects,
-                    )
-                )
-            else:
-                return dict(zip(expected.keys(), eval_objects))
-        _logger.warning("Couldn't guess the print output, assuming the last.")
-        return eval_objects[-1]
 
     def __repr__(self):
         if self.source_code is not None:
@@ -383,42 +503,6 @@ class ResultValidator(Validator[_DictWithExecuteResult]):
         elif isinstance(self.compare_fn, ExactMatcher):
             return "ResultValidator()"
         return f"ResultValidator({self.compare_fn})"
-
-    @staticmethod
-    def code_to_compare_fn(code: str) -> Callable[[Any, Any], Match]:
-        ns = exec_code(code, "compare-fn")
-        return ns["compare_fn"]
-
-    @staticmethod
-    def run_compare_fn(
-        compare_fn: Callable[[Any, Any], Match],
-        expected: Any,
-        found: Any,
-        error_category: str,
-        mismatch_prefix: str = "",
-        failure_prefix: str = "Couldn't compare execute_result:\n{}",
-    ) -> ValidateResult:
-        try:
-            match = compare_fn(expected, found)
-            return {
-                "correct": bool(match["match"]),
-                "category": error_category,
-                "reason": mismatch_prefix + match["reason"] if match["reason"] else "",
-            }
-        except AssertionError:
-            return {
-                "correct": False,
-                "category": error_category,
-                "reason": mismatch_prefix + "Comparison raises AssertionError:\n" + traceback.format_exc(),
-            }
-        except KeyboardInterrupt:
-            raise
-        except:
-            return {
-                "correct": False,
-                "category": error_category,
-                "reason": failure_prefix + traceback.format_exc(),
-            }
 
 
 class Or(Validator[T]):
@@ -430,20 +514,14 @@ class Or(Validator[T]):
     def validate(self, reference, submission):
         results = []
         for validator in self.validators:
-            result = validator.validate(reference, submission)
-            if result["correct"]:
-                reason = result.get("reason")
-                return {
-                    "correct": True,
-                    "category": validator.alias,
-                    "reason": f"Validator {validator} passed: {reason}" if reason else f"Validator {validator} passed.",
-                }
-            results.append(result)
-        return {
-            "correct": False,
-            "category": self.alias,
-            "reason": "No validator matches:\n" + "\n".join(["- " + result["reason"] for result in results]),
-        }
+            results.append(validator.validate(reference, submission))
+        if any(r["correct"] == "yes" for r in results):
+            correct = "yes"
+        elif any(r["correct"] == "partial" for r in results):
+            correct = "partial"
+        else:
+            correct = "no"
+        return {"correct": correct, "category": self.alias, "reason": results}
 
     def __repr__(self):
         return "Or(\n" + ",\n".join([add_indent(repr(validator), 2) for validator in self.validators]) + "\n)"
@@ -460,28 +538,17 @@ class And(Validator[T]):
         self.validators = validators
 
     def validate(self, reference, submission):
-        reasons = []
-        correct = True
+        results = []
         for validator in self.validators:
-            result = validator.validate(reference, submission)
-            if not result["correct"]:
-                correct = False
-            if "category" in result and "reason" in result and result["reason"]:
-                reasons.append(
-                    {
-                        "correct": result["correct"],
-                        "category": result["category"],
-                        "reason": result["reason"],
-                    }
-                )
+            results.append(validator.validate(reference, submission))
 
-        if reasons:
-            return {
-                "correct": correct,
-                "category": self.alias,
-                "reason": json.dumps(reasons),
-            }
-        return {"correct": correct}
+        if any(r["correct"] == "no" for r in results):
+            correct = "no"
+        elif any(r["correct"] == "partial" for r in results):
+            correct = "partial"
+        else:
+            correct = "yes"
+        return {"correct": correct, "category": self.alias, "reason": results}
 
     def __repr__(self):
         return "And(\n" + ",\n".join([add_indent(repr(validator), 2) for validator in self.validators]) + "\n)"
@@ -496,51 +563,44 @@ class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
 
     alias: ClassVar[str] = "namespace_check"
 
-    def __init__(self, **names: Callable[[Any, Any], Match] | str | dict | None):
-        self.names: dict[str, Callable[[Any, Any], Match]] = {}
+    def __init__(self, **names: CompareFunction | str | dict | None):
+        self.names: dict[str, tuple[CompareFunction, CompareFunction]] = {}
         for name, compare_fn in names.items():
-            if isinstance(compare_fn, str):
-                compare_fn = ResultValidator.code_to_compare_fn(compare_fn)
-            elif isinstance(compare_fn, dict):
-                compare_fn = ExactMatcher(**compare_fn)
-            elif compare_fn is None:
-                compare_fn = ExactMatcher()
-            self.names[name] = compare_fn
+            self.names[name] = (
+                _compare_fn_from_config(compare_fn),
+                _compare_fn_from_config(compare_fn, loose=True),
+            )
 
     def validate(self, reference, submission):
         namespace_ref = reference["namespace_snapshot"]
         namespace = submission["namespace_snapshot"]
-        reasons = []
-        for name, compare_fn in self.names.items():
+        results = []
+        for name, (compare_fn, compare_loose) in self.names.items():
             if name not in namespace_ref:
                 raise ValueError(f"Variable {name} not found in reference.")
             if name not in namespace:
-                return {
-                    "correct": False,
-                    "category": self.alias,
-                    "reason": f"Variable {name} not found in submission.",
-                }
-            result = ResultValidator.run_compare_fn(
-                compare_fn,
-                namespace_ref[name],
-                namespace[name],
-                self.alias,
-                mismatch_prefix=f"Variable {name}: ",
-                failure_prefix=f"Couldn't compare variable {name}:\n",
-            )
-            if not result["correct"]:
-                return result
-            elif "reason" in result and result["reason"]:
-                reasons.append(result["reason"])
+                results.append(
+                    {"correct": "no", "variable": name, "reason": f"Variable {name} not found in submission."}
+                )
+            else:
+                result = _run_compare_fn(
+                    compare_fn,
+                    compare_loose,
+                    namespace_ref[name],
+                    namespace[name],
+                    self.alias,
+                    mismatch_prefix=f"Variable {name}: ",
+                    failure_prefix=f"Cannot compare variable {name}:\n",
+                )
+                results.append({"correct": result["correct"], "variable": name, "reason": result["reason"]})
 
-        if reasons:
-            return {
-                "correct": True,
-                "category": self.alias,
-                "reason": "\n".join(reasons),
-            }
+        if any(r["correct"] == "no" for r in results):
+            correct = "no"
+        elif any(r["correct"] == "partial" for r in results):
+            correct = "partial"
         else:
-            return {"correct": True}
+            correct = "yes"
+        return {"correct": correct, "category": self.alias, "reason": results}
 
     def __repr__(self) -> str:
         return (
@@ -553,60 +613,21 @@ class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
 class StreamOutputValidator(Validator[_DictWithStreamOutput]):
     """Check the output of the cell."""
 
-    alias: ClassVar[str] = "output"
+    alias: ClassVar[str] = "stream"
 
     def validate(self, reference, submission):
         stream_output_ref = reference["stream_output"]
         stream_output = submission["stream_output"]
         if stream_output_ref != stream_output:
             return {
-                "correct": False,
+                "correct": "no",
                 "category": self.alias,
-                "reason": f"Output is incorrect:\n{stream_output}\nExpect:\n{stream_output_ref}",
+                "reason": f"Stream output is incorrect:\nExpected:\n{stream_output_ref}\nFound:\n{stream_output}",
             }
-        return {"correct": True}
+        return {"correct": "yes", "category": self.alias, "reason": "Stream output is correct."}
 
     def __repr__(self) -> str:
         return "StreamOutputValidator()"
-
-
-class AnswerInSourceCodeValidator(Validator[_DictWithCodeAndResult]):
-    """Check whehter the answer is directly shown in the code."""
-
-    alias: ClassVar[str] = "answer_in_source"
-
-    def validate(self, reference, submission):
-        source_code = submission["source_code"]
-        execute_result = reference["execute_result"]
-        if execute_result is not None:
-            try:
-                res_string = str(execute_result)
-            except:
-                return {
-                    "correct": False,
-                    "category": self.alias,
-                    "reason": "Couldn't convert the result to string:\n" + traceback.format_exc(),
-                }
-            if re.search(r"\b" + re.escape(res_string) + r"\b", source_code):
-                return {
-                    "correct": True,
-                    "category": self.alias,
-                    "reason": f"Output is directly shown in the code: {res_string}",
-                }
-            else:
-                return {
-                    "correct": False,
-                    "category": self.alias,
-                    "reason": f"Output is not directly shown in the code: {res_string}",
-                }
-        return {
-            "correct": False,
-            "category": self.alias,
-            "reason": "Empty execute_result",
-        }
-
-    def __repr__(self) -> str:
-        return "AnswerInSourceCodeValidator()"
 
 
 class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
@@ -708,7 +729,7 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
 
         if self.model_name not in submission["namespace_snapshot"]:
             return {
-                "correct": False,
+                "correct": "no",
                 "category": self.alias,
                 "reason": f"Model {self.model_name} not found in submission.",
             }
@@ -717,7 +738,7 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
             submission_pred = submission_model.predict(inputs)
         except Exception:
             return {
-                "correct": False,
+                "correct": "no",
                 "category": self.alias,
                 "reason": f"Model {self.model_name} raised an exception when predicting:\n{traceback.format_exc()}",
             }
@@ -728,7 +749,7 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
                 submission_metric = self.evaluate_metric(metric_type, labels, submission_pred)
             except Exception:
                 return {
-                    "correct": False,
+                    "correct": "no",
                     "category": self.alias,
                     "reason": f"Model {self.model_name} raised an exception when calculating metric {metric_type}:\n{traceback.format_exc()}",
                 }
@@ -736,25 +757,25 @@ class ModelValidator(Validator[_DictWithNamespaceSnapshot]):
             if tolerance == 0:
                 if not np.isclose(submission_metric, reference_metric):
                     return {
-                        "correct": False,
+                        "correct": "no",
                         "category": self.alias,
                         "reason": f"Metric {metric_type} is incorrect: {submission_metric} vs {reference_metric}",
                     }
             elif tolerance > 0:
                 if submission_metric > (1 + tolerance) * reference_metric:
                     return {
-                        "correct": False,
+                        "correct": "no",
                         "category": self.alias,
                         "reason": f"Metric {metric_type} is incorrect: {submission_metric} vs {reference_metric} (tolerance = {tolerance})",
                     }
             elif tolerance < 0:
                 if submission_metric < (1 + tolerance) * reference_metric:
                     return {
-                        "correct": False,
+                        "correct": "no",
                         "category": self.alias,
                         "reason": f"Metric {metric_type} is incorrect: {submission_metric} vs {reference_metric} (tolerance = {tolerance})",
                     }
-        return {"correct": True}
+        return {"correct": "yes", "category": self.alias, "reason": "Model satisfies the specified criterion."}
 
 
 class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
@@ -777,8 +798,8 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
         function_name: str,
         test_cases: list[tuple[Any, ...] | dict[str, Any] | str],
         input_validator: str | Callable[..., bool | None] | None = None,
-        input_checker: str | Callable[[Any, Any], Match] | dict | bool | None = None,
-        output_checker: str | Callable[[Any, Any], Match] | dict | None = None,
+        input_checker: str | CompareFunction | dict | bool | None = None,
+        output_checker: str | CompareFunction | dict | None = None,
     ):
         self.function_name = function_name
         self.test_cases: list[tuple[Any, ...] | dict[str, Any]] = []
@@ -789,25 +810,20 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
         else:
             self.input_validator = input_validator
 
-        if isinstance(input_checker, str):
-            self.input_checker = ResultValidator.code_to_compare_fn(input_checker)
-        elif isinstance(input_checker, bool):
-            self.input_checker = ExactMatcher() if input_checker else None
-        elif isinstance(input_checker, dict):
-            self.input_checker = ExactMatcher(**input_checker)
-        elif input_checker is None:
+        if input_checker is False:
             self.input_checker = None
         else:
-            self.input_checker = input_checker
+            if input_checker in (True, None):
+                input_checker = None  # default
+            self.input_checker = (
+                _compare_fn_from_config(input_checker),
+                _compare_fn_from_config(input_checker, loose=True),
+            )
 
-        if isinstance(output_checker, str):
-            self.output_checker = ResultValidator.code_to_compare_fn(output_checker)
-        elif isinstance(output_checker, dict):
-            self.output_checker = ExactMatcher(**output_checker)
-        elif output_checker is None:
-            self.output_checker = ExactMatcher()
-        else:
-            self.output_checker = output_checker
+        self.output_checker = (
+            _compare_fn_from_config(output_checker),
+            _compare_fn_from_config(output_checker, loose=True),
+        )
 
         last_case = None
         for case_id, test_case in enumerate(test_cases):
@@ -881,7 +897,7 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
             raise ValueError(f"Function {self.function_name} not found in reference.")
         if self.function_name not in namespace:
             return {
-                "correct": False,
+                "correct": "no",
                 "category": self.alias,
                 "reason": f"Function {self.function_name} not found in submission.",
             }
@@ -903,42 +919,42 @@ class TableTestValidator(Validator[_DictWithNamespaceSnapshot]):
                 raise
             except:
                 return {
-                    "correct": False,
-                    "category": "error",
+                    "correct": "no",
+                    "category": "crash",
                     "reason": f"Function {self.function_name} raised an exception on test case {args}:\n{traceback.format_exc()}",
                 }
 
             if self.input_checker is not None:
-                result = ResultValidator.run_compare_fn(
-                    self.input_checker,
+                check, check_loose = self.input_checker
+                result = _run_compare_fn(
+                    check,
+                    check_loose,
                     input_expected,
                     input_found,
                     self.alias,
-                    mismatch_prefix=f"Input of function {self.function_name} after execution on test case {args}: ",
-                    failure_prefix=f"Couldn't compare input of function {self.function_name} after execution on test case {args}:\n",
+                    mismatch_prefix=f"Input of function {self.function_name} is problematic after execution on test case #{args}: ",
+                    failure_prefix=f"Failed to compare input of function {self.function_name} after execution on test case #{args}:\n",
                 )
-                if not result["correct"]:
+                if result["correct"] != "yes":
                     return result
 
-            result = ResultValidator.run_compare_fn(
-                self.output_checker,
+            check, check_loose = self.output_checker
+            result = _run_compare_fn(
+                check,
+                check_loose,
                 output_expected,
                 output_found,
                 self.alias,
-                mismatch_prefix=f"Function {self.function_name} on test case {args}: ",
-                failure_prefix=f"Couldn't compare function {self.function_name} on test case {args}:\n",
+                mismatch_prefix=f"Output of function {self.function_name} is problematic on test case {args}: ",
+                failure_prefix=f"Failed to compare output of function {self.function_name} on test case {args}:\n",
             )
-            if not result["correct"]:
+            if result["correct"] != "yes":
                 return result
-        return {"correct": True}
+
+        return {"correct": "yes", "category": self.alias, "reason": "All test cases pass."}
 
 
 class VisualizationValidator(Validator):
     alias: ClassVar[str] = "vis"
 
-    def __repr__(self) -> str:
-        return "VisualizationValidator()"
-
-    def validate(self, reference, submission) -> ValidateResult:
-        # TODO
-        return {"correct": True}
+    # TODO: implement this

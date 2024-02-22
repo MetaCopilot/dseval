@@ -75,7 +75,7 @@ regiment.groupby(['regiment', 'company']).size()
 question: Iterate over a group and, for each group, print the name in a line and the dataframe from the regiment. Don't print extra empty lines after each group.
 
 validator:
-  output:
+  stream:
 """
 
 for name, group in regiment.groupby('regiment'):

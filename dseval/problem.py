@@ -155,7 +155,13 @@ class ProblemSet:
 class Benchmark:
     problemsets: list[ProblemSet]
 
-    def __init__(self, problemsets: list[ProblemSet], data_directory: Path | None = None, name: str | None = None, version: str | None = None):
+    def __init__(
+        self,
+        problemsets: list[ProblemSet],
+        data_directory: Path | None = None,
+        name: str | None = None,
+        version: str | None = None,
+    ):
         self.problemsets = problemsets
         self.data_directory = data_directory
         self.name = name
@@ -186,7 +192,12 @@ class Benchmark:
             manifest = yaml.safe_load(manifest_path.read_text())
             benchmark_name = manifest["name"]
             benchmark_version = manifest["version"]
-            return cls([ProblemSet.fromfile(problemset) for problemset in problemsets], data_directory, benchmark_name, benchmark_version)
+            return cls(
+                [ProblemSet.fromfile(problemset) for problemset in problemsets],
+                data_directory,
+                benchmark_name,
+                benchmark_version,
+            )
         else:
             # for debugging purposes
             return cls([ProblemSet.fromfile(benchmark_path)])
@@ -201,6 +212,8 @@ class Benchmark:
     def __repr__(self) -> str:
         return (
             "Benchmark(\n"
-            + ",\n".join([add_indent(str(i) + ": " + repr(problemset), 2) for i, problemset in enumerate(self.problemsets)])
+            + ",\n".join(
+                [add_indent(str(i) + ": " + repr(problemset), 2) for i, problemset in enumerate(self.problemsets)]
+            )
             + "\n)"
         )

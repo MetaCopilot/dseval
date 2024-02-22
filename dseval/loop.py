@@ -14,7 +14,7 @@ from typing_extensions import NotRequired
 
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .agent import Solver, SolverException, TentativeSolution, TentativeSolutions
+from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 
 _logger = logging.getLogger(__name__)
 
