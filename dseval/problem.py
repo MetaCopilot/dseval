@@ -21,8 +21,7 @@ class ExecutionConfig(TypedDict):
 class SubProblem:
     reference_code: str
     question: str | None
-    validator: Validator | None
-    validator_loose: Validator | None
+    validator: Validator
     data: dict | None
     execution: ExecutionConfig | None
 
@@ -36,19 +35,13 @@ class SubProblem:
     ):
         self.question = question
         self.reference_code = reference_code
-        validator_ = validator_loose = None
         if question is not None and validator is None:
-            validator_ = Validator.load("and", Validator.augment_config({}, "comparison"))
-            validator_loose = Validator.load("and", Validator.augment_config({}, "comparison", loose=True))
+            validator = Validator.load("and", Validator.augment_config({}, "comparison"))
         elif isinstance(validator, dict):
             template = validator.pop("template", "comparison")
-            validator_ = Validator.load("and", Validator.augment_config(validator, template))
-            validator_loose = Validator.load(
-                "and",
-                Validator.augment_config(validator, template, loose=True),
-            )
-        self.validator = validator_
-        self.validator_loose = validator_loose
+            validator = Validator.load("and", Validator.augment_config(validator, template))
+        assert validator is not None
+        self.validator = validator
         self.data = data
         self.execution = execution
 

@@ -16,16 +16,16 @@ from typing_extensions import NotRequired
 from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .validator import Verdict, Subverdict
+from .validator import Verdict, Subverdict, ValidateResult, validator_comments_to_verdict
 
 _logger = logging.getLogger(__name__)
 
 
 class EvaluationDetail(TypedDict):
     # To locate the current problem
-    benchmark: str
-    version: str
-    problemset: str
+    benchmark: str | None
+    version: str | None
+    problemset: str | None
     index: int
     # Attempt ID
     attempt: int
@@ -41,21 +41,17 @@ class EvaluationDetail(TypedDict):
     # If agent crashes
     agent_exception: str
     # Validator comments
-    validator: dict
+    validation: ValidateResult
     # Generated code by agents
     code: str
     # Computation costs from agents
-    agent_stats: NotRequired[dict[str, Any]]
+    agent_stats: dict[str, Any]
 
 
 class EvaluationResult:
-    num_problems: int
-    num_passed: int
     details: list[EvaluationDetail]
 
-    def __init__(self, num_problems: int, num_passed: int, details: list[EvaluationDetail]):
-        self.num_problems = num_problems
-        self.num_passed = num_passed
+    def __init__(self, details: list[EvaluationDetail]):
         self.details = details
 
     def write(self, path: Path | str) -> None:
@@ -67,7 +63,7 @@ class EvaluationResult:
 
     @property
     def score(self) -> float:
-        return self.num_passed / self.num_problems
+        return len([detail for detail in self.details if detail["verdict"] == Verdict.Correct]) / len(self.details)
 
 
 class Evaluator:
@@ -106,11 +102,11 @@ class Evaluator:
         for problem in problems:
             problem.prepare_data()
 
-            if not problem.question:
-                if problem.reference_code:
-                    environment.execute(problem.reference_code, raise_error=True)
+            if not problem.is_complete:
+                environment.execute(problem.reference_code, raise_error=True)
                 continue
 
+            assert problem.question is not None
             total += 1
             _logger.info("[Question %d] %s", total, problem.question.strip())
             playground_env = environment.fork()
@@ -118,8 +114,10 @@ class Evaluator:
             playground_env.execute(problem.reference_code, **(problem.execution or {}))
 
             if problem.validator is not None:
+                last_cell, last_cell_playground = environment.last_cell, playground_env.last_cell
+                assert last_cell is not None and last_cell_playground is not None
                 validate_result = problem.validator.validate(
-                    environment.last_cell.output, playground_env.last_cell.output
+                    last_cell.output, last_cell_playground.output
                 )
                 _logger.info(
                     "[Question %d] %s%s%s! (time elapsed: %s%.2f%s seconds)",
@@ -129,11 +127,11 @@ class Evaluator:
                     colorama.Fore.RESET,
                     (
                         colorama.Fore.GREEN
-                        if environment.last_cell.output["execute_time"]
+                        if last_cell.output["execute_time"]
                         < (problem.execution or {}).get("max_time", 1) / 3
                         else colorama.Fore.YELLOW
                     ),
-                    environment.last_cell.output["execute_time"],
+                    last_cell.output["execute_time"],
                     colorama.Fore.RESET,
                 )
                 correct += int(validate_result["correct"])
@@ -146,7 +144,7 @@ class Evaluator:
 
         return correct / total
 
-    def solve_only(self, problems: ProblemSet, solver: Solver) -> TentativeSolutions:
+    def solve_only(self, problems: ProblemSet, agent: Agent) -> TentativeSolutions:
         """Solve the problems and return the codes.
 
         Solve with retry is not supported in this mode.
@@ -162,17 +160,16 @@ class Evaluator:
         for problem in problems:
             problem.prepare_data()
 
-            if not problem.question:
-                if problem.reference_code:
-                    environment.execute(problem.reference_code, raise_error=True)
-                    code_with_errors.append(problem.reference_code)
-                continue
+            if not problem.is_complete:
+                environment.execute(problem.reference_code, raise_error=True)
+                code_with_errors.append(problem.reference_code)
+            assert problem.question is not None
 
             total += 1
 
             _logger.info("[Question %d] %s", total, problem.question.strip())
-            with solver.track_stats(), self.propagate_errors(environment, code_with_errors):
-                code = solver.solve(problem.question, environment)
+            with agent.track_stats(), self.propagate_errors(environment, code_with_errors):
+                code = agent.solve(problem.question, environment)
             _logger.info(
                 "[Question %d] Code:\n%s%s%s",
                 total,
@@ -188,15 +185,15 @@ class Evaluator:
                 {
                     "question": problem.question,
                     "code": code,
-                    "solver_stats": solver.stats,
+                    "agent_stats": agent.stats,
                 }
             )
 
         return TentativeSolutions(codes)
 
-    def solve_evaluate(self, problems: ProblemSet, solver: Solver) -> EvaluationResult:
+    def evaluate(self, problems: ProblemSet, agent: Agent, benchmark_name: str | None = None, version: str | None = None) -> EvaluationResult:
         environment = Environment()
-        correct = total = 0
+        total = 0
         evaluation_results: list[EvaluationDetail] = []
 
         # For error propagation
@@ -204,67 +201,51 @@ class Evaluator:
 
         for problem in problems:
             problem.prepare_data()
-            if not problem.question:
-                # Problem without a prompt
-                if problem.reference_code:
-                    environment.execute(problem.reference_code, raise_error=True)
-                    code_with_errors.append(problem.reference_code)
+            if not problem.is_complete:
+                environment.execute(problem.reference_code, raise_error=True)
+                code_with_errors.append(problem.reference_code)
                 continue
+            assert problem.question is not None
 
             total += 1
             _logger.info("[Question %d] %s", total, problem.question)
             playground_env = environment.fork()
+
+            # Execute ground truth code
             environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
             assert environment.last_cell is not None
             answer = environment.last_cell.output
 
-            crashed = code = solver_crashed = ""
-            hint = ""
-            produced_output = validate_result = validate_result_loose = None
+            code = agent_exception = ""
+            retry_kwargs = {}
+
+            # Rollback the playground for another retry
             playground_env_backup = None
             if self.retry_reset and self.max_attempts >= 1:
                 playground_env_backup = playground_env.fork()
-            current_correct = current_correct_loose = False
-            retry_count = 0
-            solver_stats_accumulator = {}
-            while retry_count <= self.max_attempts and not current_correct:
-                current_correct = current_correct_loose = True  # reset to true
-                if retry_count >= 1 and playground_env_backup is not None:
+
+            for attempt_id in range(1, self.max_attempts + 1):
+                if attempt_id > 1 and playground_env_backup is not None:
                     # Reset the playground_env in case there is a backup
                     playground_env = playground_env_backup.fork()
 
-                with solver.track_stats(), self.propagate_errors(playground_env, code_with_errors):
+                # Invoke agent for code generation.
+                with agent.track_stats(), self.propagate_errors(playground_env, code_with_errors):
                     try:
-                        if retry_count == 0:
-                            code = solver.solve(problem.question, playground_env)
+                        if attempt_id == 1:
+                            code = agent.solve(problem.question, playground_env)
                         else:
-                            _logger.info(
-                                "[Question %d] Retry %d:\nError:\n%s\nOutput:\n%s",
-                                total,
-                                retry_count,
-                                crashed,
-                                produced_output,
-                            )
-                            if self.retry_hint and not crashed:
-                                _logger.info("[Question %d] Retry with hint: %s", total, hint)
-                                code = solver.retry(crashed or "", produced_output, hint)
-                            code = solver.retry(crashed or "", produced_output)
-                    except SolverException:
+                            _logger.info("[Question %d] Attempt #%d: %s", total, attempt_id, retry_kwargs)
+                            code = agent.retry(**retry_kwargs)
+                    except AgentException:
                         if not self.ignore_agent_exception:
                             raise
                         _logger.exception(
-                            "[Question %d] Solver failed to produce a solution.",
+                            "[Question %d] Agent failed to produce a solution.",
                             total,
                         )
-                        solver_crashed = traceback.format_exc()
+                        agent_exception = traceback.format_exc()
                         code = ""
-
-                # Accumulate token counts, ...
-                for stat_key, stat_value in solver.stats.items():
-                    if stat_key in solver_stats_accumulator:
-                        solver_stats_accumulator[stat_key] += stat_value
-                    else:
-                        solver_stats_accumulator[stat_key] = stat_value
 
                 _logger.info(
                     "[Question %d] Code:\n%s%s%s",
@@ -274,63 +255,59 @@ class Evaluator:
                     colorama.Fore.RESET,
                 )
 
-                # Using the same playground_env throughout all retries
-                # Won't rollback even for failed attempts.
-                produced_output = playground_env.execute(code, **(problem.execution or {}))
+                # Execute the generated code.
+                playground_env.execute(code, **(problem.execution or {}))
                 code_with_errors.append(code)
                 assert playground_env.last_cell is not None
 
-                crashed = playground_env.last_exception
-                if crashed is not None:
+                # Validate the generation result.
+                validate_result = problem.validator.validate(answer, playground_env.last_cell.output)
+                verdict, subverdict, extended_verdict = validator_comments_to_verdict(validate_result)
+
+                # Set information needed for retries
+                if playground_env.last_exception is not None:
                     _logger.warning(
                         "%sError occurred while executing the code:\n%s%s",
                         colorama.Fore.YELLOW,
-                        crashed,
+                        playground_env.last_exception,
                         colorama.Fore.RESET,
                     )
+                    retry_kwargs["error"] = playground_env.last_exception
+                else:
+                    retry_kwargs["error"] = "No exception."
+                retry_kwargs["output"] = playground_env.last_cell.output
+                if self.retry_hint:
+                    retry_kwargs["hint"] = json.dumps(validate_result)
 
-                if problem.validator is not None:
-                    validate_result = problem.validator.validate(answer, playground_env.last_cell.output)
-                    hint = validate_result.get("reason", "")
-                    current_correct = validate_result["correct"]
+                _logger.info(
+                    "[Question %d]%s %s!",
+                    total,
+                    " (attempt #%d)" % attempt_id if attempt_id > 1 else "",
+                    "Correct" if validate_result["correct"] else "Incorrect",
+                )
 
-                if problem.validator_loose is not None:
-                    validate_result_loose = problem.validator_loose.validate(answer, playground_env.last_cell.output)
-                    current_correct_loose = validate_result_loose["correct"]
+                summary: EvaluationDetail = {
+                    "benchmark": benchmark_name,
+                    "version": version,
+                    "problemset": problems.name,
+                    "index": total,
+                    "attempt": attempt_id,
+                    "verdict": verdict,
+                    "subverdict": subverdict,
+                    "extended_verdict": extended_verdict,
+                    "question": problem.question,
+                    "agent_exception": agent_exception,
+                    "validation": validate_result,
+                    "code": code,
+                    "agent_stats": agent.stats,
+                }
 
-                retry_count += 1
+                evaluation_results.append(summary)
 
-            _logger.info(
-                "[Question %d] %s!",
-                total,
-                "Correct" if current_correct else "Incorrect",
-            )
-            if current_correct:
-                correct += 1
+                if verdict == Verdict.Correct:
+                    break
 
-            summary: EvaluationDetail = {
-                "correct": current_correct,
-                "correct_loose": current_correct_loose,
-                "tries": retry_count,
-                "question": problem.question,
-                "code": code,
-                "crashed": bool(crashed),
-                "solver_stats": solver_stats_accumulator,
-                "solver_crashed": solver_crashed,
-            }
-            if validate_result:
-                if "category" in validate_result:
-                    summary["val_category"] = validate_result["category"]
-                if "reason" in validate_result:
-                    summary["val_reason"] = validate_result["reason"]
-            if validate_result_loose:
-                if "category" in validate_result_loose:
-                    summary["val_loose_category"] = validate_result_loose["category"]
-                if "reason" in validate_result_loose:
-                    summary["val_loose_reason"] = validate_result_loose["reason"]
-            evaluation_results.append(summary)
-
-        return EvaluationResult(total, correct, evaluation_results)
+        return EvaluationResult(evaluation_results)
 
 
 @contextmanager
