@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import ast
 import copy
+import json
 import logging
 import random
 import re
 import traceback
 import types
+from enum import Enum
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -43,6 +45,9 @@ class _DictWithExecuteResult(TypedDict):
 
 class _DictWithError(TypedDict):
     error: Error | None
+    execute_result: NotRequired[Any]
+    source_code: NotRequired[str]
+    namespace_snapshot: NotRequired[dict[str, Any]]
 
 
 class _DictWithNamespaceDiff(TypedDict):
@@ -116,7 +121,10 @@ class Validator(Generic[T]):
 
 
 class CrashValidator(Validator[_DictWithError]):
-    """Ensure that the code didn't crash."""
+    """Ensure that the code didn't crash.
+
+    It also returns "partial" when the code raises an exception, but the answer is contained in the code.
+    """
 
     alias: ClassVar[str] = "crash"
 
@@ -125,6 +133,19 @@ class CrashValidator(Validator[_DictWithError]):
 
     def validate(self, reference, submission) -> ValidateResult:
         if submission["error"] is not None:
+            # Try to find answer in source code, in which case we can forgive the crash.
+            if "source_code" in submission and "execute_result" in reference:
+                execute_result_ref = reference["execute_result"]
+                try:
+                    answer_in_source = _find_answer_in_source_code(submission["source_code"], execute_result_ref)
+                    if answer_in_source:
+                        return {
+                            "correct": "partial",
+                            "category": self.alias,
+                            "reason": answer_in_source,
+                        }
+                except:
+                    pass
             return {
                 "correct": "no",
                 "category": self.alias,
@@ -580,7 +601,7 @@ class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
                 raise ValueError(f"Variable {name} not found in reference.")
             if name not in namespace:
                 results.append(
-                    {"correct": "no", "variable": name, "reason": f"Variable {name} not found in submission."}
+                    {"correct": "no", "category": self.alias, "variable": name, "reason": f"Variable {name} not found in submission."}
                 )
             else:
                 result = _run_compare_fn(
@@ -592,7 +613,9 @@ class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
                     mismatch_prefix=f"Variable {name}: ",
                     failure_prefix=f"Cannot compare variable {name}:\n",
                 )
-                results.append({"correct": result["correct"], "variable": name, "reason": result["reason"]})
+                results.append(
+                    {"correct": result["correct"], "category": self.alias, "variable": name, "reason": result["reason"]}
+                )
 
         if any(r["correct"] == "no" for r in results):
             correct = "no"
@@ -958,3 +981,167 @@ class VisualizationValidator(Validator):
     alias: ClassVar[str] = "vis"
 
     # TODO: implement this
+
+
+class Verdict(str, Enum):
+    Correct = "CORRECT"
+    IntactViolation = "INTACT_VIOLATION"
+    PresentationError = "PRESENTATION_ERROR"
+    WrongOutput = "WRONG_OUTPUT"
+    WrongVariables = "WRONG_VARIABLES"
+    UnitTestFailure = "UNIT_TEST_FAILURE"
+    Timeout = "TIMEOUT"
+    Crash = "CRASH"
+    BadModel = "BAD_MODEL"
+    SyntaxError = "SYNTAX_ERROR"
+    Unknown = "UNKNOWN"
+
+
+class Subverdict(str, Enum):
+    Uncategorized = "UNCATEGORIZED"
+    # For presentation error
+    IndexMismatch = "INDEX_MISMATCH"
+    MissingReturn = "MISSING_RETURN"
+    PartialMatch = "PARTIAL_MATCH"
+    NonCode = "NON_CODE"
+    # For wrong output / variables / unit-test failure
+    ShapeMismatch = "SHAPE_MISMATCH"
+    DtypeMismatch = "DTYPE_MISMATCH"
+    ColumnsMismatch = "COLUMNS_MISMATCH"
+    ValueMismatch = "VALUE_MISMATCH"
+    UnexpectedType = "UNEXPECTED_TYPE"
+    # Crash
+    ModuleNotFound = "MODULE_NOT_FOUND"
+    AttributeError = "ATTRIBUTE_ERROR"
+    KeyError = "KEY_ERROR"
+    NameError = "NAME_ERROR"
+    TypeError = "TYPE_ERROR"
+    ValueError = "VALUE_ERROR"
+
+
+def categorize_comparison_failure(failure: str) -> Subverdict:
+    if "shape mismatch" in failure:
+        return Subverdict.ShapeMismatch
+    if '"dtype" are different' in failure:
+        return Subverdict.DtypeMismatch
+    if "columns are different" in failure or "Columns mismatch:" in failure:
+        return Subverdict.ColumnsMismatch
+    if (
+        "Wrong value:" in failure
+        or "values are different" in failure
+        or "Series are different" in failure
+        or "not equal:" in failure
+        or "Length mismatch:" in failure
+        or "Keys mismatch:" in failure
+    ):
+        return Subverdict.ValueMismatch
+    if "Wrong type:" in failure or "Mismatched type:" in failure:
+        return Subverdict.UnexpectedType
+    return Subverdict.Uncategorized
+
+
+def validator_comments_to_verdict(
+    comments: ValidateResult,
+) -> tuple[Verdict, Subverdict, str]:
+    def _traverse_comments(comments: ValidateResult):
+        if comments["correct"] != "yes":
+            if comments["correct"] == "no":
+                completely_problematic_categories.add(comments["category"])
+            if comments["category"] not in problematic_verdicts and comments["category"] not in ("and", "or"):
+                problematic_verdicts[comments["category"]] = comments["reason"]
+            if comments["correct"] == "partial" and isinstance(comments["reason"], str):
+                partially_problematic_verdicts.append(comments["reason"])
+        if isinstance(comments["reason"], list):
+            for sub_comments in comments["reason"]:
+                _traverse_comments(sub_comments)
+
+    # All validate results that are problematic (with correct being partial or no)
+    problematic_verdicts: dict[str, list[ValidateResult] | str] = {}
+    # Verdict categories that return no.
+    completely_problematic_categories: set[str] = set()
+    # with correct being partial
+    partially_problematic_verdicts: list[str] = []
+    _traverse_comments(comments)
+
+    if comments["correct"] == "yes":
+        return Verdict.Correct, Subverdict.Uncategorized, ""
+
+    if comments["correct"] == "no" and "crash" in completely_problematic_categories:
+        crash_reason = str(problematic_verdicts["crash"])
+        if "SyntaxError:" in problematic_verdicts["crash"]:
+            return Verdict.SyntaxError, Subverdict.Uncategorized, crash_reason
+        if "dseval.limit.TimeLimitError" in problematic_verdicts["crash"]:
+            return Verdict.Timeout, Subverdict.Uncategorized, crash_reason
+
+        verdict = Verdict.Crash
+        subverdict = Subverdict.Uncategorized
+        if "\n" in crash_reason:
+            lines = crash_reason.splitlines()
+            if any(line.startswith("ModuleNotFoundError:") for line in lines):
+                subverdict = Subverdict.ModuleNotFound
+            elif any(line.startswith("KeyError:") for line in lines):
+                subverdict = Subverdict.KeyError
+            elif any(line.startswith("TypeError:") for line in lines):
+                subverdict = Subverdict.TypeError
+            elif any(line.startswith("ValueError:") for line in lines):
+                subverdict = Subverdict.ValueError
+            elif any(line.startswith("NameError:") for line in lines):
+                subverdict = Subverdict.NameError
+            elif any(line.startswith("AttributeError:") for line in lines):
+                subverdict = Subverdict.AttributeError
+        return verdict, subverdict, crash_reason
+
+    print(completely_problematic_categories)
+    if completely_problematic_categories == {"namespace_intact"}:
+        return (
+            Verdict.IntactViolation,
+            Subverdict.Uncategorized,
+            str(problematic_verdicts["namespace_intact"]),
+        )
+
+    if comments["correct"] == "partial":
+        comment_fallback = ""
+        for comment in partially_problematic_verdicts:
+            # This will include "partial" from result, namespace_check and etc.
+            if "Partial match on" in comment:
+                return Verdict.PresentationError, Subverdict.PartialMatch, comment
+            if "Correct with inferred output:" in comment:
+                return Verdict.PresentationError, Subverdict.MissingReturn, comment
+            if "Output is directly shown in the code" in comment:
+                return Verdict.PresentationError, Subverdict.NonCode, comment
+            comment_fallback = comment
+        return Verdict.PresentationError, Subverdict.IndexMismatch, comment_fallback
+
+    if "namespace_check" in problematic_verdicts:
+        check_reason = problematic_verdicts["namespace_check"]
+        assert isinstance(check_reason, list)
+        return (
+            Verdict.WrongVariables,
+            categorize_comparison_failure(str(check_reason)),
+            "\n".join(["- " + str(line["reason"]) for line in check_reason]),
+        )
+
+    if "result" in problematic_verdicts:
+        result_reason = problematic_verdicts["result"]
+        assert isinstance(result_reason, str)
+        return (
+            Verdict.WrongOutput,
+            categorize_comparison_failure(result_reason),
+            result_reason,
+        )
+
+    if "model" in problematic_verdicts:
+        model_reason = problematic_verdicts["model"]
+        assert isinstance(model_reason, str)
+        return Verdict.BadModel, Subverdict.Uncategorized, model_reason
+
+    if "table_test" in problematic_verdicts:
+        table_reason = problematic_verdicts["table_test"]
+        assert isinstance(table_reason, str)
+        return (
+            Verdict.UnitTestFailure,
+            categorize_comparison_failure(table_reason),
+            table_reason,
+        )
+
+    return Verdict.Unknown, Subverdict.Uncategorized, json.dumps(problematic_verdicts)

@@ -16,49 +16,9 @@ from typing_extensions import NotRequired
 from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .validator  import ValidateResult
+from .validator import Verdict, Subverdict
 
 _logger = logging.getLogger(__name__)
-
-
-class Verdict(Enum):
-    CORRECT = "correct"
-    INTACT_VIOLATION = "Intact Violation"
-    PRESENTATION_ERROR = "Presentation Error"
-    WRONG_OUTPUT = "Wrong Output"
-    WRONG_VARIABLES = "Wrong Variables"
-    UNIT_TEST_FAILURE = "Unit-test Failure"
-    TIMEOUT = "Timeout"
-    CRASH = "Crash"
-    SYNTAX_ERROR = "Syntax Error"
-    CRASHED = "crashed"
-    UNKNOWN = "unknown"
-
-
-class Subverdict(Enum):
-    UNCATEGORIZED = "Uncategorized"
-    # For presentation error
-    INDEX_MISMATCH = "Index Mismatch"
-    MISSING_RETURN = "Missing Return"
-    PARTIAL_MATCH = "Partial Match"
-    NON_CODE = "Non-code"
-    # For wrong output / variables / unit-test failure
-    SHAPE_MISMATCH = "Shape Mismatch"
-    DTYPE_MISMATCH = "Dtype Mismatch"
-    COLUMNS_MISMATCH = "Columns Mismatch"
-    VALUE_MISMATCH = "Value Mismatch"
-    UNEXPECTED_TYPE = "Unexpected Type"
-    # Crash
-    MODULE_NOT_FOUND = "Module Not Found"
-    ATTRIBUTE_ERROR = "Attribute Error"
-    KEY_ERROR = "Key Error"
-    NAME_ERROR = "Name Error"
-    TYPE_ERROR = "Type Error"
-    VALUE_ERROR = "Value Error"
-
-
-def validator_comments_to_verdict(comments: ValidateResult) -> tuple[Verdict, Subverdict]:
-    ...
 
 
 class EvaluationDetail(TypedDict):
@@ -73,7 +33,9 @@ class EvaluationDetail(TypedDict):
     # ========================
     # Evaluation results
     # Correct put upfront for ease of inspection
-    verdict: 
+    verdict: Verdict
+    subverdict: Subverdict
+    extended_verdict: str
     # Question content
     question: str
     # If agent crashes
@@ -91,9 +53,7 @@ class EvaluationResult:
     num_passed: int
     details: list[EvaluationDetail]
 
-    def __init__(
-        self, num_problems: int, num_passed: int, details: list[EvaluationDetail]
-    ):
+    def __init__(self, num_problems: int, num_passed: int, details: list[EvaluationDetail]):
         self.num_problems = num_problems
         self.num_passed = num_passed
         self.details = details
@@ -154,9 +114,7 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question.strip())
             playground_env = environment.fork()
-            environment.execute(
-                problem.reference_code, **(problem.execution or {}), raise_error=True
-            )
+            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
             playground_env.execute(problem.reference_code, **(problem.execution or {}))
 
             if problem.validator is not None:
@@ -166,11 +124,7 @@ class Evaluator:
                 _logger.info(
                     "[Question %d] %s%s%s! (time elapsed: %s%.2f%s seconds)",
                     total,
-                    (
-                        colorama.Fore.GREEN
-                        if validate_result["correct"]
-                        else colorama.Fore.RED
-                    ),
+                    (colorama.Fore.GREEN if validate_result["correct"] else colorama.Fore.RED),
                     "Correct" if validate_result["correct"] else "Incorrect",
                     colorama.Fore.RESET,
                     (
@@ -184,9 +138,7 @@ class Evaluator:
                 )
                 correct += int(validate_result["correct"])
                 if not validate_result["correct"]:
-                    _logger.warning(
-                        "[Question %d] %s", total, validate_result["reason"]
-                    )
+                    _logger.warning("[Question %d] %s", total, validate_result["reason"])
             else:
                 correct += 1
 
@@ -219,9 +171,7 @@ class Evaluator:
             total += 1
 
             _logger.info("[Question %d] %s", total, problem.question.strip())
-            with solver.track_stats(), self.propagate_errors(
-                environment, code_with_errors
-            ):
+            with solver.track_stats(), self.propagate_errors(environment, code_with_errors):
                 code = solver.solve(problem.question, environment)
             _logger.info(
                 "[Question %d] Code:\n%s%s%s",
@@ -232,9 +182,7 @@ class Evaluator:
             )
 
             code_with_errors.append(code)
-            environment.execute(
-                problem.reference_code, **(problem.execution or {}), raise_error=True
-            )
+            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
 
             codes.append(
                 {
@@ -266,9 +214,7 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question)
             playground_env = environment.fork()
-            environment.execute(
-                problem.reference_code, **(problem.execution or {}), raise_error=True
-            )
+            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
             assert environment.last_cell is not None
             answer = environment.last_cell.output
 
@@ -287,9 +233,7 @@ class Evaluator:
                     # Reset the playground_env in case there is a backup
                     playground_env = playground_env_backup.fork()
 
-                with solver.track_stats(), self.propagate_errors(
-                    playground_env, code_with_errors
-                ):
+                with solver.track_stats(), self.propagate_errors(playground_env, code_with_errors):
                     try:
                         if retry_count == 0:
                             code = solver.solve(problem.question, playground_env)
@@ -302,12 +246,8 @@ class Evaluator:
                                 produced_output,
                             )
                             if self.retry_hint and not crashed:
-                                _logger.info(
-                                    "[Question %d] Retry with hint: %s", total, hint
-                                )
-                                code = solver.retry(
-                                    crashed or "", produced_output, hint
-                                )
+                                _logger.info("[Question %d] Retry with hint: %s", total, hint)
+                                code = solver.retry(crashed or "", produced_output, hint)
                             code = solver.retry(crashed or "", produced_output)
                     except SolverException:
                         if not self.ignore_agent_exception:
@@ -336,9 +276,7 @@ class Evaluator:
 
                 # Using the same playground_env throughout all retries
                 # Won't rollback even for failed attempts.
-                produced_output = playground_env.execute(
-                    code, **(problem.execution or {})
-                )
+                produced_output = playground_env.execute(code, **(problem.execution or {}))
                 code_with_errors.append(code)
                 assert playground_env.last_cell is not None
 
@@ -352,16 +290,12 @@ class Evaluator:
                     )
 
                 if problem.validator is not None:
-                    validate_result = problem.validator.validate(
-                        answer, playground_env.last_cell.output
-                    )
+                    validate_result = problem.validator.validate(answer, playground_env.last_cell.output)
                     hint = validate_result.get("reason", "")
                     current_correct = validate_result["correct"]
 
                 if problem.validator_loose is not None:
-                    validate_result_loose = problem.validator_loose.validate(
-                        answer, playground_env.last_cell.output
-                    )
+                    validate_result_loose = problem.validator_loose.validate(answer, playground_env.last_cell.output)
                     current_correct_loose = validate_result_loose["correct"]
 
                 retry_count += 1

@@ -14,9 +14,13 @@ from .validator import (
     Or,
     ResultValidator,
     StreamOutputValidator,
+    Subverdict,
     TableTestValidator,
     ValidateResult,
     Validator,
+    Verdict,
+    categorize_comparison_failure,
+    validator_comments_to_verdict,
     _DictWithError,
     _DictWithExecuteResult,
     _DictWithNamespaceDiff,
@@ -465,6 +469,7 @@ def test_namespace_checker_with_exact_match():
             {
                 "correct": "yes",
                 "variable": "foo",
+                "category": "namespace_check",
                 "reason": "Result matches the expected.",
             }
         ],
@@ -483,11 +488,13 @@ def test_namespace_checker_with_mismatch():
             {
                 "correct": "yes",
                 "variable": "foo",
+                "category": "namespace_check",
                 "reason": "Result matches the expected.",
             },
             {
                 "correct": "no",
                 "variable": "baz",
+                "category": "namespace_check",
                 "reason": "Variable baz: Wrong value: 42 vs. 43",
             },
         ],
@@ -506,11 +513,13 @@ def test_namespace_checker_with_missing_variable():
             {
                 "correct": "yes",
                 "variable": "foo",
+                "category": "namespace_check",
                 "reason": "Result matches the expected.",
             },
             {
                 "correct": "no",
                 "variable": "baz",
+                "category": "namespace_check",
                 "reason": "Variable baz not found in submission.",
             },
         ],
@@ -779,20 +788,12 @@ def test_validator_loose():
     }
     result = validator.validate(reference, submission)
     assert result == {
-        "correct": "no",
+        "correct": "partial",
         "category": "and",
         "reason": [
-            {"correct": "no", "category": "crash", "reason": "Submission crashes."},
-            {
-                "correct": "yes",
-                "category": "namespace_intact",
-                "reason": "Namespace is intact.",
-            },
-            {
-                "correct": "partial",
-                "category": "result",
-                "reason": "Output is directly shown in the code: 123",
-            },
+            {"correct": "partial", "category": "crash", "reason": "Output is directly shown in the code: 123"},
+            {"correct": "yes", "category": "namespace_intact", "reason": "Namespace is intact."},
+            {"correct": "partial", "category": "result", "reason": "Output is directly shown in the code: 123"},
         ],
     }
 
@@ -803,17 +804,9 @@ def test_validator_loose():
         "correct": "no",
         "category": "and",
         "reason": [
-            {"correct": "no", "category": "crash", "reason": "Submission crashes."},
-            {
-                "correct": "no",
-                "category": "namespace_intact",
-                "reason": "Unexpected variable updated: foo",
-            },
-            {
-                "correct": "partial",
-                "category": "result",
-                "reason": "Output is directly shown in the code: 123",
-            },
+            {"correct": "partial", "category": "crash", "reason": "Output is directly shown in the code: 123"},
+            {"correct": "no", "category": "namespace_intact", "reason": "Unexpected variable updated: foo"},
+            {"correct": "partial", "category": "result", "reason": "Output is directly shown in the code: 123"},
         ],
     }
 
@@ -825,3 +818,20 @@ def test_validator_loose():
         "category": "result",
         "reason": "Output is directly shown in the code: 123",
     }
+
+
+def test_verdict():
+    comments = ValidateResult({
+        "correct": "no",
+        "category": "and",
+        "reason": [
+            {"correct": "partial", "category": "crash", "reason": "Output is directly shown in the code: 123"},
+            {"correct": "no", "category": "namespace_intact", "reason": "Unexpected variable updated: foo"},
+            {"correct": "partial", "category": "result", "reason": "Output is directly shown in the code: 123"},
+        ],
+    })
+
+    verdict, subverdict, detail = validator_comments_to_verdict(comments)
+    assert verdict == Verdict.IntactViolation
+    assert subverdict == Subverdict.Uncategorized
+    assert detail == "Output is directly shown in the code: 123"
