@@ -791,9 +791,21 @@ def test_validator_loose():
         "correct": "partial",
         "category": "and",
         "reason": [
-            {"correct": "partial", "category": "crash", "reason": "Output is directly shown in the code: 123"},
-            {"correct": "yes", "category": "namespace_intact", "reason": "Namespace is intact."},
-            {"correct": "partial", "category": "result", "reason": "Output is directly shown in the code: 123"},
+            {
+                "correct": "partial",
+                "category": "crash",
+                "reason": "Output is directly shown in the code: 123",
+            },
+            {
+                "correct": "yes",
+                "category": "namespace_intact",
+                "reason": "Namespace is intact.",
+            },
+            {
+                "correct": "partial",
+                "category": "result",
+                "reason": "Output is directly shown in the code: 123",
+            },
         ],
     }
 
@@ -804,9 +816,21 @@ def test_validator_loose():
         "correct": "no",
         "category": "and",
         "reason": [
-            {"correct": "partial", "category": "crash", "reason": "Output is directly shown in the code: 123"},
-            {"correct": "no", "category": "namespace_intact", "reason": "Unexpected variable updated: foo"},
-            {"correct": "partial", "category": "result", "reason": "Output is directly shown in the code: 123"},
+            {
+                "correct": "partial",
+                "category": "crash",
+                "reason": "Output is directly shown in the code: 123",
+            },
+            {
+                "correct": "no",
+                "category": "namespace_intact",
+                "reason": "Unexpected variable updated: foo",
+            },
+            {
+                "correct": "partial",
+                "category": "result",
+                "reason": "Output is directly shown in the code: 123",
+            },
         ],
     }
 
@@ -821,17 +845,107 @@ def test_validator_loose():
 
 
 def test_verdict():
-    comments = ValidateResult({
-        "correct": "no",
-        "category": "and",
-        "reason": [
-            {"correct": "partial", "category": "crash", "reason": "Output is directly shown in the code: 123"},
-            {"correct": "no", "category": "namespace_intact", "reason": "Unexpected variable updated: foo"},
-            {"correct": "partial", "category": "result", "reason": "Output is directly shown in the code: 123"},
-        ],
-    })
+    comments = ValidateResult(
+        {
+            "correct": "no",
+            "category": "and",
+            "reason": [
+                {
+                    "correct": "partial",
+                    "category": "crash",
+                    "reason": "Output is directly shown in the code: 123",
+                },
+                {
+                    "correct": "no",
+                    "category": "namespace_intact",
+                    "reason": "Unexpected variable updated: foo",
+                },
+                {
+                    "correct": "partial",
+                    "category": "result",
+                    "reason": "Output is directly shown in the code: 123",
+                },
+            ],
+        }
+    )
 
     verdict, subverdict, detail = validator_comments_to_verdict(comments)
     assert verdict == Verdict.IntactViolation
     assert subverdict == Subverdict.Uncategorized
+    assert detail == "Unexpected variable updated: foo"
+
+    comments = ValidateResult(
+        {
+            "correct": "no",
+            "category": "and",
+            "reason": [
+                {
+                    "correct": "partial",
+                    "category": "result",
+                    "reason": "Output is directly shown in the code: 123",
+                },
+                {
+                    "correct": "no",
+                    "category": "crash",
+                    "reason": "Submission crashes:\nTraceback (most recent call last):\nTypeError: ...",
+                },
+            ],
+        }
+    )
+    verdict, subverdict, detail = validator_comments_to_verdict(comments)
+    assert verdict == Verdict.Crash
+    assert subverdict == Subverdict.TypeError
+    assert detail == "Submission crashes:\nTraceback (most recent call last):\nTypeError: ..."
+
+    comments = ValidateResult(
+        {  # type: ignore
+            "correct": "no",
+            "category": "namespace_check",
+            "reason": [
+                {
+                    "correct": "yes",
+                    "variable": "foo",
+                    "category": "namespace_check",
+                    "reason": "Result matches the expected.",
+                },
+                {
+                    "correct": "no",
+                    "variable": "baz",
+                    "category": "namespace_check",
+                    "reason": "Variable baz: Wrong value: 42 vs. 43",
+                },
+            ],
+        }
+    )
+    verdict, subverdict, detail = validator_comments_to_verdict(comments)
+    assert verdict == Verdict.WrongVariables
+    assert subverdict == Subverdict.ValueMismatch
+    assert detail == "- Variable baz: Wrong value: 42 vs. 43"
+
+    comments = ValidateResult(
+        {
+            "correct": "partial",
+            "category": "or",
+            "reason": [
+                {
+                    "correct": "partial",
+                    "category": "crash",
+                    "reason": "Output is directly shown in the code: 123",
+                },
+                {
+                    "correct": "no",
+                    "category": "namespace_check",
+                    "reason": "Unexpected variable updated: foo",
+                },
+                {
+                    "correct": "partial",
+                    "category": "result",
+                    "reason": "Result is problematic",
+                },
+            ],
+        }
+    )
+    verdict, subverdict, detail = validator_comments_to_verdict(comments)
+    assert verdict == Verdict.PresentationError
+    assert subverdict == Subverdict.NonCode
     assert detail == "Output is directly shown in the code: 123"

@@ -601,7 +601,12 @@ class NamespaceChecker(Validator[_DictWithNamespaceSnapshot]):
                 raise ValueError(f"Variable {name} not found in reference.")
             if name not in namespace:
                 results.append(
-                    {"correct": "no", "category": self.alias, "variable": name, "reason": f"Variable {name} not found in submission."}
+                    {
+                        "correct": "no",
+                        "category": self.alias,
+                        "variable": name,
+                        "reason": f"Variable {name} not found in submission.",
+                    }
                 )
             else:
                 result = _run_compare_fn(
@@ -1045,12 +1050,14 @@ def validator_comments_to_verdict(
 ) -> tuple[Verdict, Subverdict, str]:
     def _traverse_comments(comments: ValidateResult):
         if comments["correct"] != "yes":
-            if comments["correct"] == "no":
-                completely_problematic_categories.add(comments["category"])
-            if comments["category"] not in problematic_verdicts and comments["category"] not in ("and", "or"):
+            if comments["category"] not in problematic_verdicts:
                 problematic_verdicts[comments["category"]] = comments["reason"]
-            if comments["correct"] == "partial" and isinstance(comments["reason"], str):
-                partially_problematic_verdicts.append(comments["reason"])
+            if isinstance(comments["reason"], str):
+                # not a combination node (e.g., and, or)
+                if comments["correct"] == "no":
+                    severe_problematic_categories.add(comments["category"])
+                if comments["correct"] == "partial":
+                    partially_problematic_verdicts.append(comments["reason"])
         if isinstance(comments["reason"], list):
             for sub_comments in comments["reason"]:
                 _traverse_comments(sub_comments)
@@ -1058,7 +1065,7 @@ def validator_comments_to_verdict(
     # All validate results that are problematic (with correct being partial or no)
     problematic_verdicts: dict[str, list[ValidateResult] | str] = {}
     # Verdict categories that return no.
-    completely_problematic_categories: set[str] = set()
+    severe_problematic_categories: set[str] = set()
     # with correct being partial
     partially_problematic_verdicts: list[str] = []
     _traverse_comments(comments)
@@ -1066,7 +1073,7 @@ def validator_comments_to_verdict(
     if comments["correct"] == "yes":
         return Verdict.Correct, Subverdict.Uncategorized, ""
 
-    if comments["correct"] == "no" and "crash" in completely_problematic_categories:
+    if comments["correct"] == "no" and "crash" in severe_problematic_categories:
         crash_reason = str(problematic_verdicts["crash"])
         if "SyntaxError:" in problematic_verdicts["crash"]:
             return Verdict.SyntaxError, Subverdict.Uncategorized, crash_reason
@@ -1091,8 +1098,7 @@ def validator_comments_to_verdict(
                 subverdict = Subverdict.AttributeError
         return verdict, subverdict, crash_reason
 
-    print(completely_problematic_categories)
-    if completely_problematic_categories == {"namespace_intact"}:
+    if severe_problematic_categories == {"namespace_intact"}:
         return (
             Verdict.IntactViolation,
             Subverdict.Uncategorized,
@@ -1118,7 +1124,7 @@ def validator_comments_to_verdict(
         return (
             Verdict.WrongVariables,
             categorize_comparison_failure(str(check_reason)),
-            "\n".join(["- " + str(line["reason"]) for line in check_reason]),
+            "\n".join(["- " + str(line["reason"]) for line in check_reason if line["correct"] != "yes"]),
         )
 
     if "result" in problematic_verdicts:
