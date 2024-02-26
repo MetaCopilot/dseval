@@ -316,7 +316,7 @@ def _find_answer_in_source_code(source_code: str, expected_result: Any) -> str:
     if expected_result is not None:
         res_string = str(expected_result)
         if re.search(r"\b" + re.escape(res_string) + r"\b", source_code):
-            return f"Output is directly shown in the code: " + res_string
+            return "Output is directly shown in the code: " + res_string
     return ""
 
 

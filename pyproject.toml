@@ -16,6 +16,10 @@ dependencies = [
 include = ["dseval*"]
 
 [project.optional-dependencies]
+agent = [
+    "mlcopilot",
+    "codeinterpreterapi",
+]
 dev = [
     "pytest",
     "flake8",

@@ -2,7 +2,35 @@
 
 DSEval is a series of benchmarks aiming at evaluating LLM-powered data science agents.
 
-## Benchmark Summary
+In this repository, we provide both the toolkit to support the benchmarking, as well as the data used for benchmarks.
+
+## Benchmark Toolkit
+
+DSEval (as a Python package) provides the necessary infrastructure needed for reliable evaluation of data science agents. It has some integrations of popular data science agents inside.
+
+It **DOES NOT** contain any benchmark data or benchmarking results.
+
+### Installation Option 1
+
+Recommended. Note that in this case, the version installed might not be latest.
+
+```
+pip install dseval
+```
+
+Use `pip install dseval[agent]` to automatically install all the dependant agents.
+
+### Installation Option 2
+
+Install from source code.
+
+```
+git clone https://github.com/MetaCopilot/dseval
+cd dseval
+pip install -e .
+```
+
+## Benchmark Data
 
 This table summarizes the currently-provided benchmarks in this repository.
 
@@ -13,53 +41,32 @@ This table summarizes the currently-provided benchmarks in this repository.
 | LeetCode | v1 | 40 | 40 | 56.0 |
 | Kaggle | v1 | 31 | 396 | 35.9 |
 
-## Environment setup
+### Evaluating Existing Agent on Existing Benchmarks
 
-- Create `.env` folder and put `aiyyds.env` and `aoai.env` inside. Add extra services if necessary (requires editing `scripts/test.py`).
-- Install necessary dependencies (e.g., `numpy`, `pandas`, `xgboost`, `catboost`, `lightgbm`, `scikit-learn`).
-- Install dseval (via: `pip install -e .`).
+1. Install the **toolkit** following the guide above.
+2. Clone `dseval` repository if you haven't done so.
+3. Use `python scripts/test.py <path_to_benchmark>` to test a benchmark. You can select agent frameworks, LLMs, endpoints and evaluation configurations.
 
-## Benchmarks
+For example:
 
-- autoproblems/benchmark_v3
-- leetcode/benchmark
-- pandasexec
-- pycodegpt/benchmark
-
-Please use these paths in the following commands.
-
-## Evaluation
-
-Solving a benchmark (generating code only, with gpt-35-turbo on aiyyds as example). This will generate a folder containing the code snippets:
-
-```bash
-python scripts/test.py <benchmark_path> --model gpt-35-turbo --endpoint aiyyds --solve-only
+```
+python scripts/test.py benchmarks/leetcode --model gpt-35-turbo --endpoint aoai
 ```
 
-Evaluating the generated code snippets:
+**TODO:** Guide for properly setup reproducible environment for evaluation.
 
-```bash
-python scripts/test.py <benchmark_path> --evaluate-from <solution_folder_just_generated>
-```
+### Diagnosis
 
-Both solving and evaluating (not recommended for ease of debugging):
+TODO
 
-```bash
-python scripts/test.py <benchmark_path>
-```
+### Contributing New Problems
 
-**Attention:** Please commit all the running results in `results` folder. Note to check if there are any results overwritten before committing.
+TODO
 
-## Diagnosis
+### Developing New Benchmarks
 
-```bash
-flask --app browse run
-```
+TODO
 
-## DSEval Development
+### Integrating New Agents
 
-Unit test:
-
-```bash
-pytest dseval
-```
+TODO

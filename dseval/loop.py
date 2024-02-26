@@ -6,12 +6,10 @@ import os
 import shutil
 import traceback
 from contextlib import contextmanager
-from enum import Enum
 from pathlib import Path
 from typing import Any, List, TypedDict, cast
 
 import colorama
-from typing_extensions import NotRequired
 
 from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
@@ -310,7 +308,7 @@ class Evaluator:
                     "[Question %d]%s %s!",
                     total,
                     " (attempt #%d)" % attempt_id if attempt_id > 1 else "",
-                    "Correct" if validate_result["correct"] else "Incorrect",
+                    verdict.name,
                 )
 
                 summary: EvaluationDetail = {
@@ -354,6 +352,7 @@ def running_environment(run_directory: Path, data_source: Path | None = None):
         # Link input directory
         if data_source is not None:
             shutil.copytree(data_source.resolve(), run_directory / "inputs")
+            _logger.info("Data source found and copied: %s", data_source)
 
         os.chdir(run_directory)
 
@@ -379,13 +378,13 @@ def resumable_benchmark_evaluation_loop(
         agent.reset()
 
         # Check whether the problemset is already tested
-        if overall_result.has(benchmark.name, idx, 1):
+        if overall_result.has(problemset.name, 1, 1):
             _logger.info("[Problem set %d] %s (skipped)", idx, problemset.name)
             continue
 
         _logger.info("[Problem set %d] %s", idx, problemset.name)
 
-        with running_environment(run_directory, benchmark.data_directory):
+        with running_environment(run_directory, problemset.data_directory):
             result = evaluator.evaluate(problemset, agent, benchmark.name, benchmark.version)
             overall_result.extend(result)
             _logger.info("[Problem set %d] Score: %.2f", idx, result.score)

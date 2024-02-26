@@ -82,9 +82,10 @@ class SubProblem:
 
 
 class ProblemSet:
-    def __init__(self, problems: list[SubProblem], name: str | None = None):
+    def __init__(self, problems: list[SubProblem], name: str | None = None, data_directory: Path | None = None):
         self.problems = problems
         self.name = name
+        self.data_directory = data_directory
 
     def __iter__(self):
         return iter(self.problems)
@@ -134,7 +135,17 @@ class ProblemSet:
                 problems.append(SubProblem(reference_code=code.strip(), **setup))
             else:
                 problems.append(SubProblem(reference_code=section))
-        return cls(problems, code_path.stem)
+
+        # Find data directory
+        # 1) Look for `_inputs/<problemset_name>`
+        if (code_path.parent / "_inputs" / code_path.stem).exists():
+            data_directory = code_path.parent / "_inputs" / code_path.stem
+        # 2) Look for `_inputs`
+        elif (code_path.parent / "_inputs").exists():
+            data_directory = code_path.parent / "_inputs"
+        else:
+            data_directory = None
+        return cls(problems, code_path.stem, data_directory)
 
     def __repr__(self) -> str:
         return (
@@ -145,17 +156,14 @@ class ProblemSet:
 
 
 class Benchmark:
-    problemsets: list[ProblemSet]
 
     def __init__(
         self,
         problemsets: list[ProblemSet],
-        data_directory: Path | None = None,
         name: str | None = None,
         version: str | None = None,
     ):
         self.problemsets = problemsets
-        self.data_directory = data_directory
         self.name = name
         self.version = version
 
@@ -174,10 +182,7 @@ class Benchmark:
             benchmark_path = Path(benchmark_path)
         if benchmark_path.is_dir():
             problemsets = sorted([path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")])
-            if (benchmark_path / "_inputs").exists():
-                data_directory = benchmark_path / "_inputs"
-            else:
-                data_directory = None
+
             manifest_path = benchmark_path / "_manifest.yaml"
             if not manifest_path.exists():
                 raise FileNotFoundError(f"Manifest file not found in {benchmark_path}")
@@ -186,7 +191,6 @@ class Benchmark:
             benchmark_version = manifest["version"]
             return cls(
                 [ProblemSet.fromfile(problemset) for problemset in problemsets],
-                data_directory,
                 benchmark_name,
                 benchmark_version,
             )

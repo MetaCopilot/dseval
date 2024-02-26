@@ -19,7 +19,6 @@ from .validator import (
     ValidateResult,
     Validator,
     Verdict,
-    categorize_comparison_failure,
     validator_comments_to_verdict,
     _DictWithError,
     _DictWithExecuteResult,
