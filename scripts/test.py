@@ -1,73 +1,36 @@
 import argparse
-import json
 import logging
-import os
-import shutil
-import sys
-import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from langchain.chat_models.base import BaseChatModel
-from langchain_community.chat_models import ChatOpenAI, AzureChatOpenAI
-from langchain.embeddings import CacheBackedEmbeddings
-from langchain.storage import LocalFileStore
-from langchain_community.embeddings import AzureOpenAIEmbeddings, OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
 
 import dotenv
-from dseval import ProblemSet, Evaluator
+from dseval import Evaluator, Benchmark
 from dseval.agent import (
     CoMLAgent,
-    PreloadAgent,
     ChapyterAgent,
     JupyterAIAgent,
     CodeInterpreterAgent,
-    TentativeSolutions,
 )
+from dseval.loop import resumable_benchmark_evaluation_loop
 
 
 _logger = logging.getLogger("dseval")
 
 
-def resolve_running_environment(problemset_path: Path, run_dir: Path = Path("runs")):
-    run_dir.mkdir(exist_ok=True, parents=True)
-
-    # Delete old files
-    for file in run_dir.iterdir():
-        if file.is_file() or file.is_symlink():
-            file.unlink()
-        else:
-            shutil.rmtree(file)
-
-    # Link input directory
-    if (problemset_path.parent / "_inputs").exists():
-        shutil.copytree(
-            (problemset_path.parent / "_inputs").resolve(), run_dir / "_inputs"
-        )
-    else:
-        # No data required.
-        pass
-
-
-def glob_problemsets(problemset_path: Path) -> list[Path]:
-    problemsets = sorted(problemset_path.glob("*.py"))
-    if problemset_path.name == "pandasexec":
-        problemsets = [p for p in problemsets if p.name[0].isdigit()]
-    return problemsets
-
-
 def configure_llm(model: str, endpoint: str):
     if endpoint == "aoai":
         from msllm_extensions import AzureChatOpenAIWithTooling
+
         return AzureChatOpenAIWithTooling(
             temperature=0.0,
             azure_deployment=model,
             api_version="2023-12-01-preview",
             max_retries=30,
         )
-    elif endpoint == "aiyyds":
-        dotenv.load_dotenv(".env/aiyyds.env")
+    elif endpoint in ("openai", "aiyyds"):
         if model == "gpt-35-turbo":
             model = "gpt-3.5-turbo"
         if model == "gpt-4":
@@ -83,10 +46,11 @@ def configure_llm(model: str, endpoint: str):
         if model != "gpt-35-turbo":
             raise ValueError("Only gpt-35-turbo is supported for SubstrateChatLLM")
         from msllm_extensions import SubstrateChatLLM
+
         return SubstrateChatLLM(temperature=0.0, max_retries=10, max_tokens=1000)
     elif endpoint == "azureml":
         from msllm_extensions import AzureMLModel
-        dotenv.load_dotenv(".env/azureml.env")
+
         if model == "llama2-70b":
             model = "llama-2-70b-chat-13"
         elif model == "llama2-13b":
@@ -99,11 +63,10 @@ def configure_llm(model: str, endpoint: str):
 
         if model != "gemini-pro":
             raise ValueError("Only gemini-pro is supported for GoogleChatLLM")
-        dotenv.load_dotenv(".env/google.env")
         return ChatGoogleGenerativeAI(model=model, temperature=0.0)
     elif endpoint == "llamacpp":
         from msllm_extension import LlamaCppClient
-        dotenv.load_dotenv(".env/llamacpp.env")
+
         if model == "codellama-7b":
             model = "CodeLlama-7B-Instruct"
         elif model == "codellama-13b":
@@ -121,88 +84,23 @@ def configure_llm(model: str, endpoint: str):
         raise ValueError(f"Unknown endpoint {endpoint}")
 
 
-def configure_agent(model: str, prompt: str, llm: BaseChatModel, debug: bool):
-    if prompt.startswith("coml"):
+def configure_agent(model: str, agent: str, llm: BaseChatModel, debug: bool):
+    if agent == "coml":
         return CoMLAgent(llm)
-    elif prompt == "chapyter":
+    elif agent == "chapyter":
         return ChapyterAgent(llm)
-    elif prompt == "jupyterai":
+    elif agent == "jupyterai":
         return JupyterAIAgent(llm)
-    elif prompt == "codeinterpreterapi":
+    elif agent == "codeinterpreterapi":
         return CodeInterpreterAgent(llm)
     else:
-        raise ValueError(f"Unknown prompt {prompt}")
+        raise ValueError(f"Unknown agent: {agent}")
 
 
-def _test_problemset(args: argparse.Namespace, problemset_path: Path):
-    if problemset_path.is_dir():
-        problemsets = glob_problemsets(problemset_path)
-    else:
-        problemsets = [problemset_path]
-
-    # Resolve output directory
-
-    if args.evaluate_from:
-        # Using the specified directory as output directory
-        if args.solve_only:
-            raise ValueError(
-                "Cannot use --solve-only and --evaluate-from at the same time"
-            )
-        _logger.info(
-            "Model, endpoint and prompt will be ignored when evaluating with --evaluate-from. "
-            "Evaluating from: %s",
-            args.evaluate_from,
-        )
-        output_dir = Path(args.evaluate_from)
-        agent = PreloadAgent()
-    else:
-        # Configure th agent
-        llm = configure_llm(args.model, args.endpoint)
-        agent = configure_agent(args.model, args.prompt, llm, args.debug)
-
-        # Guessing the output directory
-        output_dir = (
-            Path("results")
-            / ("version-" + datetime.now().strftime("%m%d"))
-            / (
-                args.model
-                + "-"
-                + args.endpoint
-                + ("-" + args.prompt if args.prompt != "coml" else "")
-                + (
-                    "-r"
-                    + str(args.retry)
-                    + ("hint" if args.retry_hint else "")
-                    + ("reset" if args.retry_reset else "")
-                    if args.retry
-                    else ""
-                )
-                + ("-errorprop" if args.error_propagation else "")
-            )
-        )
-
-        if problemset_path.is_dir():
-            output_dir = output_dir / problemset_path.resolve().relative_to(
-                Path(".").resolve()
-            )
-        else:
-            output_dir = output_dir / problemset_path.parent.resolve().relative_to(
-                Path(".").resolve()
-            )
-
-        if "benchmark" in output_dir.name:
-            output_dir = output_dir.parent
-
-        if args.solve_only:
-            output_dir = output_dir / "solutions"
-
-    _logger.info("Output diretory: %s", output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    if output_dir.name == "solutions":
-        run_dir_name = output_dir.parent.parent.name + "-" + output_dir.parent.name
-    else:
-        run_dir_name = output_dir.parent.name + "-" + output_dir.name
+def _evaluate_benchmark(args: argparse.Namespace, benchmark_path: Path):
+    # Configure the agent
+    llm = configure_llm(args.model, args.endpoint)
+    agent = configure_agent(args.model, args.agent, llm, args.debug)
 
     evaluator_kwargs = {}
     if args.retry:
@@ -215,51 +113,27 @@ def _test_problemset(args: argparse.Namespace, problemset_path: Path):
         evaluator_kwargs["error_propagation"] = True
     if args.endpoint == "google":
         evaluator_kwargs["ignore_solver_failure"] = True
-    if "-dflida" in args.prompt:
-        evaluator_kwargs["ignore_solver_failure"] = True
     evaluator = Evaluator(**evaluator_kwargs)
 
-    for idx, problemset in enumerate(problemsets, start=1):
-        solver.reset()
+    benchmark = Benchmark.frompath(benchmark_path)
+    # Guessing the output file
+    output_path = (
+        (
+            Path("results")
+            / (benchmark.name if benchmark.name else "unknown")
+            / (datetime.now().strftime("%y%m%d") + "-" + args.agent + "-" + args.model + "-" + args.endpoint + ".jsonl")
+        )
+        .resolve()
+        .relative_to(Path(".").resolve())
+    )
+    _logger.info("Output path: %s", output_path)
 
-        if isinstance(solver, PreloadSolver):
-            solver.load_tentative_solutions(
-                TentativeSolutions.load(
-                    output_dir / "solutions" / f"{problemset.stem}.jsonl"
-                )
-            )
-        result_path = (output_dir / f"{problemset.stem}.jsonl").resolve()
-
-        if result_path.exists():
-            if args.overwrite:
-                _logger.warning("[Problem set %d] %s (overwritten)", idx, problemset)
-            else:
-                _logger.info("[Problem set %d] %s (skipped)", idx, problemset)
-                continue
-
-        _logger.info("[Problem set %d] %s", idx, problemset)
-        resolve_running_environment(problemset, Path("runs") / run_dir_name)
-        problems = ProblemSet.fromfile(problemset)
-
-        current_working_directory = Path.cwd().resolve()
-
-        os.chdir(Path("runs") / run_dir_name)
-
-        if args.solve_only:
-            result = evaluator.solve_only(problems, solver)
-            result.write(result_path)
-            _logger.info("[Problem set %d] Solutions written to %s", idx, result_path)
-        else:
-            result = evaluator.solve_evaluate(problems, solver)
-            result.write(result_path)
-            _logger.info("[Problem set %d] Score: %.2f", idx, result.score)
-
-        os.chdir(current_working_directory)
+    resumable_benchmark_evaluation_loop(benchmark, agent, evaluator, Path("runs") / output_path.stem, output_path)
 
 
 def _main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("problemset", type=Path, nargs="+")
+    parser.add_argument("benchmark", type=Path, nargs="+")
     parser.add_argument(
         "--model",
         default="gpt-4",
@@ -280,12 +154,9 @@ def _main():
     parser.add_argument(
         "--endpoint",
         default="aoai",
-        choices=["aoai", "aiyyds", "substrate", "azureml", "google", "llamacpp"],
+        choices=["aoai", "openai", "aiyyds", "substrate", "azureml", "google", "llamacpp"],
     )
-    parser.add_argument(
-        "--prompt",
-        default="coml",
-    )
+    parser.add_argument("--agent", default="coml", choices=["coml", "chapyter", "jupyterai", "codeinterpreterapi"])
     parser.add_argument("--overwrite", action="store_true", default=False)
     parser.add_argument("--solve-only", default=False, action="store_true")
     parser.add_argument("--evaluate-from", type=Path, default=None)
@@ -297,9 +168,11 @@ def _main():
 
     args = parser.parse_args()
 
-    for problemset in args.problemset:
-        _logger.info("Testing: %s", problemset)
-        _test_problemset(args, problemset)
+    dotenv.load_dotenv()
+
+    for benchmark in args.benchmark:
+        _logger.info("Testing: %s", benchmark)
+        _evaluate_benchmark(args, benchmark)
 
 
 if __name__ == "__main__":

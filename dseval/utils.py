@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import atexit
+import json
 import tempfile
 import uuid
 from pathlib import Path
@@ -80,3 +81,22 @@ def get_code_complexity(code: str) -> float:
             complexity += 1
 
     return complexity
+
+
+def read_jsonl(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+
+    data = []
+    with path.open() as f:
+        for line in f:
+            if not line.strip():
+                continue
+            data.append(json.loads(line))
+    return data
+
+
+def write_jsonl(path: Path, data: list[dict]) -> None:
+    with path.open("w") as f:
+        for item in data:
+            f.write(json.dumps(item) + "\n")

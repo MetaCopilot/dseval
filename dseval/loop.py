@@ -8,7 +8,7 @@ import traceback
 from contextlib import contextmanager
 from enum import Enum
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any, List, TypedDict, cast
 
 import colorama
 from typing_extensions import NotRequired
@@ -17,6 +17,7 @@ from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
 from .validator import Verdict, Subverdict, ValidateResult, validator_comments_to_verdict
+from .utils import read_jsonl, write_jsonl
 
 _logger = logging.getLogger(__name__)
 
@@ -52,14 +53,41 @@ class EvaluationResult:
     details: list[EvaluationDetail]
 
     def __init__(self, details: list[EvaluationDetail]):
-        self.details = details
+        self.details: list[EvaluationDetail] = []
+
+        # Later records will overwrite the previous ones
+        self.existing_records: set[tuple[str | None, int, int]] = set()
+        for detail in details:
+            key = (detail["problemset"], detail["index"], detail["attempt"])
+            if key in self.existing_records:
+                continue
+            self.details.append(detail)
+            self.existing_records.add(key)
+
+    def has(self, problemset: str | None, index: int, attempt: int) -> bool:
+        return (problemset, index, attempt) in self.existing_records
+
+    def extend(self, other: EvaluationResult) -> None:
+        added_problemsets = set([other["problemset"] for other in other.details])
+        self.details = [detail for detail in self.details if detail["problemset"] not in added_problemsets]
+        self.existing_records = set(
+            (detail["problemset"], detail["index"], detail["attempt"]) for detail in self.details
+        )
+        for detail in other.details:
+            self.details.append(detail)
+            self.existing_records.add((detail["problemset"], detail["index"], detail["attempt"]))
 
     def write(self, path: Path | str) -> None:
         if not isinstance(path, Path):
             path = Path(path)
-        with path.open("w") as f:
-            for detail in self.details:
-                f.write(json.dumps(detail) + "\n")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        write_jsonl(path, cast(List[dict], self.details))
+
+    @classmethod
+    def read(cls, path: Path | str) -> EvaluationResult:
+        if not isinstance(path, Path):
+            path = Path(path)
+        return cls(cast(List[EvaluationDetail], read_jsonl(path)))
 
     @property
     def score(self) -> float:
@@ -116,9 +144,7 @@ class Evaluator:
             if problem.validator is not None:
                 last_cell, last_cell_playground = environment.last_cell, playground_env.last_cell
                 assert last_cell is not None and last_cell_playground is not None
-                validate_result = problem.validator.validate(
-                    last_cell.output, last_cell_playground.output
-                )
+                validate_result = problem.validator.validate(last_cell.output, last_cell_playground.output)
                 _logger.info(
                     "[Question %d] %s%s%s! (time elapsed: %s%.2f%s seconds)",
                     total,
@@ -127,8 +153,7 @@ class Evaluator:
                     colorama.Fore.RESET,
                     (
                         colorama.Fore.GREEN
-                        if last_cell.output["execute_time"]
-                        < (problem.execution or {}).get("max_time", 1) / 3
+                        if last_cell.output["execute_time"] < (problem.execution or {}).get("max_time", 1) / 3
                         else colorama.Fore.YELLOW
                     ),
                     last_cell.output["execute_time"],
@@ -191,7 +216,9 @@ class Evaluator:
 
         return TentativeSolutions(codes)
 
-    def evaluate(self, problems: ProblemSet, agent: Agent, benchmark_name: str | None = None, version: str | None = None) -> EvaluationResult:
+    def evaluate(
+        self, problems: ProblemSet, agent: Agent, benchmark_name: str | None = None, version: str | None = None
+    ) -> EvaluationResult:
         environment = Environment()
         total = 0
         evaluation_results: list[EvaluationDetail] = []
@@ -205,7 +232,7 @@ class Evaluator:
                 environment.execute(problem.reference_code, raise_error=True)
                 code_with_errors.append(problem.reference_code)
                 continue
-            assert problem.question is not None
+            assert problem.question is not None and problem.validator is not None
 
             total += 1
             _logger.info("[Question %d] %s", total, problem.question)
@@ -313,6 +340,7 @@ class Evaluator:
 @contextmanager
 def running_environment(run_directory: Path, data_source: Path | None = None):
     current_working_directory = Path.cwd().resolve()
+    run_directory = run_directory.resolve()
     try:
         run_directory.mkdir(exist_ok=True, parents=True)
 
@@ -332,6 +360,8 @@ def running_environment(run_directory: Path, data_source: Path | None = None):
         yield
 
     finally:
+        os.chdir(current_working_directory)
+
         # Clean up
         for file in run_directory.iterdir():
             if file.is_file() or file.is_symlink():
@@ -339,4 +369,26 @@ def running_environment(run_directory: Path, data_source: Path | None = None):
             else:
                 shutil.rmtree(file)
 
-        os.chdir(current_working_directory)
+
+def resumable_benchmark_evaluation_loop(
+    benchmark: Benchmark, agent: Agent, evaluator: Evaluator, run_directory: Path, result_path: Path
+) -> None:
+    overall_result = EvaluationResult.read(result_path)
+
+    for idx, problemset in enumerate(benchmark, start=1):
+        agent.reset()
+
+        # Check whether the problemset is already tested
+        if overall_result.has(benchmark.name, idx, 1):
+            _logger.info("[Problem set %d] %s (skipped)", idx, problemset.name)
+            continue
+
+        _logger.info("[Problem set %d] %s", idx, problemset.name)
+
+        with running_environment(run_directory, benchmark.data_directory):
+            result = evaluator.evaluate(problemset, agent, benchmark.name, benchmark.version)
+            overall_result.extend(result)
+            _logger.info("[Problem set %d] Score: %.2f", idx, result.score)
+
+        overall_result.write(result_path)
+        _logger.info("[Problem set %d] Overall score so far: %.3f", idx, overall_result.score)

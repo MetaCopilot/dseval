@@ -21,7 +21,7 @@ class ExecutionConfig(TypedDict):
 class SubProblem:
     reference_code: str
     question: str | None
-    validator: Validator
+    validator: Validator | None
     data: dict | None
     execution: ExecutionConfig | None
 
@@ -40,7 +40,6 @@ class SubProblem:
         elif isinstance(validator, dict):
             template = validator.pop("template", "comparison")
             validator = Validator.load("and", Validator.augment_config(validator, template))
-        assert validator is not None
         self.validator = validator
         self.data = data
         self.execution = execution

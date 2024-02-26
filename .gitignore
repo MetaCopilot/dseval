@@ -8,6 +8,7 @@ __pycache__
 .vscode
 .cache
 .env/
+.env
 
 # Temporary results
 /runs

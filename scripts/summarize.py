@@ -65,11 +65,7 @@ def summarize():
             }
         )
 
-    print(
-        pd.DataFrame(summary).to_markdown(
-            index=False, numalign=None, stralign=None, floatfmt=".1f"
-        )
-    )
+    print(pd.DataFrame(summary).to_markdown(index=False, numalign=None, stralign=None, floatfmt=".1f"))
 
 
 if __name__ == "__main__":
