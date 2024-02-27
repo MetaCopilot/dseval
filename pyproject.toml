@@ -28,3 +28,7 @@ dev = [
     "scikit-learn",
     "tabulate",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

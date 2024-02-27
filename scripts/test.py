@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -24,10 +25,13 @@ def configure_llm(model: str, endpoint: str):
     if endpoint == "aoai":
         from msllm_extensions import AzureChatOpenAIWithTooling
 
+        if "OPENAI_API_BASE" in os.environ:
+            del os.environ["OPENAI_API_BASE"]
         return AzureChatOpenAIWithTooling(
             temperature=0.0,
             azure_deployment=model,
             api_version="2023-12-01-preview",
+            base_url=None,
             max_retries=30,
         )
     elif endpoint in ("openai", "aiyyds"):
