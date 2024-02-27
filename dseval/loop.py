@@ -10,11 +10,17 @@ from pathlib import Path
 from typing import Any, List, TypedDict, cast
 
 import colorama
+import pandas as pd
 
 from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .validator import Verdict, Subverdict, ValidateResult, validator_comments_to_verdict
+from .validator import (
+    Verdict,
+    Subverdict,
+    ValidateResult,
+    validator_comments_to_verdict,
+)
 from .utils import read_jsonl, write_jsonl
 
 _logger = logging.getLogger(__name__)
@@ -62,18 +68,52 @@ class EvaluationResult:
             self.details.append(detail)
             self.existing_records.add(key)
 
+    def as_dataframe(self) -> pd.DataFrame:
+        records = []
+        for detail in self.details:
+            records.append(
+                {
+                    "benchmark": f'{detail["benchmark"]}-v{detail["version"]}',
+                    "problemset": detail["problemset"],
+                    "index": detail["index"],
+                    "attempt": detail["attempt"],
+                    "verdict": detail["verdict"].name,
+                    "subverdict": detail["subverdict"].name,
+                    "extended_verdict": detail["extended_verdict"],
+                    "question": detail["question"],
+                    "code": detail["code"],
+                }
+            )
+        records = pd.DataFrame(records)
+
+        records_latest_attempt = (
+            records.sort_values(by=["benchmark", "problemset", "index", "attempt"])
+            .groupby(["benchmark", "problemset", "index"])
+            .last()
+            .reset_index()
+        )
+
+        return records_latest_attempt
+
     def has(self, problemset: str | None, index: int, attempt: int) -> bool:
         return (problemset, index, attempt) in self.existing_records
 
     def extend(self, other: EvaluationResult) -> None:
         added_problemsets = set([other["problemset"] for other in other.details])
-        self.details = [detail for detail in self.details if detail["problemset"] not in added_problemsets]
+        self.details = [
+            detail
+            for detail in self.details
+            if detail["problemset"] not in added_problemsets
+        ]
         self.existing_records = set(
-            (detail["problemset"], detail["index"], detail["attempt"]) for detail in self.details
+            (detail["problemset"], detail["index"], detail["attempt"])
+            for detail in self.details
         )
         for detail in other.details:
             self.details.append(detail)
-            self.existing_records.add((detail["problemset"], detail["index"], detail["attempt"]))
+            self.existing_records.add(
+                (detail["problemset"], detail["index"], detail["attempt"])
+            )
 
     def write(self, path: Path | str) -> None:
         if not isinstance(path, Path):
@@ -85,11 +125,17 @@ class EvaluationResult:
     def read(cls, path: Path | str) -> EvaluationResult:
         if not isinstance(path, Path):
             path = Path(path)
-        return cls(cast(List[EvaluationDetail], read_jsonl(path)))
+        data = read_jsonl(path)
+        for d in data:
+            d["verdict"] = Verdict[d["verdict"]]
+            d["subverdict"] = Subverdict[d["subverdict"]]
+        return cls(cast(List[EvaluationDetail], data))
 
     @property
     def score(self) -> float:
-        return len([detail for detail in self.details if detail["verdict"] == Verdict.Correct]) / len(self.details)
+        return len(
+            [detail for detail in self.details if detail["verdict"] == Verdict.Correct]
+        ) / len(self.details)
 
 
 class Evaluator:
@@ -136,22 +182,34 @@ class Evaluator:
             total += 1
             _logger.info("[Question %d] %s", total, problem.question.strip())
             playground_env = environment.fork()
-            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
+            environment.execute(
+                problem.reference_code, **(problem.execution or {}), raise_error=True
+            )
             playground_env.execute(problem.reference_code, **(problem.execution or {}))
 
             if problem.validator is not None:
-                last_cell, last_cell_playground = environment.last_cell, playground_env.last_cell
+                last_cell, last_cell_playground = (
+                    environment.last_cell,
+                    playground_env.last_cell,
+                )
                 assert last_cell is not None and last_cell_playground is not None
-                validate_result = problem.validator.validate(last_cell.output, last_cell_playground.output)
+                validate_result = problem.validator.validate(
+                    last_cell.output, last_cell_playground.output
+                )
                 _logger.info(
                     "[Question %d] %s%s%s! (time elapsed: %s%.2f%s seconds)",
                     total,
-                    (colorama.Fore.GREEN if validate_result["correct"] else colorama.Fore.RED),
+                    (
+                        colorama.Fore.GREEN
+                        if validate_result["correct"]
+                        else colorama.Fore.RED
+                    ),
                     "Correct" if validate_result["correct"] else "Incorrect",
                     colorama.Fore.RESET,
                     (
                         colorama.Fore.GREEN
-                        if last_cell.output["execute_time"] < (problem.execution or {}).get("max_time", 1) / 3
+                        if last_cell.output["execute_time"]
+                        < (problem.execution or {}).get("max_time", 1) / 3
                         else colorama.Fore.YELLOW
                     ),
                     last_cell.output["execute_time"],
@@ -159,7 +217,9 @@ class Evaluator:
                 )
                 correct += int(validate_result["correct"])
                 if not validate_result["correct"]:
-                    _logger.warning("[Question %d] %s", total, validate_result["reason"])
+                    _logger.warning(
+                        "[Question %d] %s", total, validate_result["reason"]
+                    )
             else:
                 correct += 1
 
@@ -191,7 +251,9 @@ class Evaluator:
             total += 1
 
             _logger.info("[Question %d] %s", total, problem.question.strip())
-            with agent.track_stats(), self.propagate_errors(environment, code_with_errors):
+            with agent.track_stats(), self.propagate_errors(
+                environment, code_with_errors
+            ):
                 code = agent.solve(problem.question, environment)
             _logger.info(
                 "[Question %d] Code:\n%s%s%s",
@@ -202,7 +264,9 @@ class Evaluator:
             )
 
             code_with_errors.append(code)
-            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
+            environment.execute(
+                problem.reference_code, **(problem.execution or {}), raise_error=True
+            )
 
             codes.append(
                 {
@@ -215,7 +279,11 @@ class Evaluator:
         return TentativeSolutions(codes)
 
     def evaluate(
-        self, problems: ProblemSet, agent: Agent, benchmark_name: str | None = None, version: str | None = None
+        self,
+        problems: ProblemSet,
+        agent: Agent,
+        benchmark_name: str | None = None,
+        version: str | None = None,
     ) -> EvaluationResult:
         environment = Environment()
         total = 0
@@ -237,7 +305,9 @@ class Evaluator:
             playground_env = environment.fork()
 
             # Execute ground truth code
-            environment.execute(problem.reference_code, **(problem.execution or {}), raise_error=True)
+            environment.execute(
+                problem.reference_code, **(problem.execution or {}), raise_error=True
+            )
             assert environment.last_cell is not None
             answer = environment.last_cell.output
 
@@ -255,12 +325,19 @@ class Evaluator:
                     playground_env = playground_env_backup.fork()
 
                 # Invoke agent for code generation.
-                with agent.track_stats(), self.propagate_errors(playground_env, code_with_errors):
+                with agent.track_stats(), self.propagate_errors(
+                    playground_env, code_with_errors
+                ):
                     try:
                         if attempt_id == 1:
                             code = agent.solve(problem.question, playground_env)
                         else:
-                            _logger.info("[Question %d] Attempt #%d: %s", total, attempt_id, retry_kwargs)
+                            _logger.info(
+                                "[Question %d] Attempt #%d: %s",
+                                total,
+                                attempt_id,
+                                retry_kwargs,
+                            )
                             code = agent.retry(**retry_kwargs)
                     except AgentException:
                         if not self.ignore_agent_exception:
@@ -286,8 +363,12 @@ class Evaluator:
                 assert playground_env.last_cell is not None
 
                 # Validate the generation result.
-                validate_result = problem.validator.validate(answer, playground_env.last_cell.output)
-                verdict, subverdict, extended_verdict = validator_comments_to_verdict(validate_result)
+                validate_result = problem.validator.validate(
+                    answer, playground_env.last_cell.output
+                )
+                verdict, subverdict, extended_verdict = validator_comments_to_verdict(
+                    validate_result
+                )
 
                 # Set information needed for retries
                 if playground_env.last_exception is not None:
@@ -370,7 +451,11 @@ def running_environment(run_directory: Path, data_source: Path | None = None):
 
 
 def resumable_benchmark_evaluation_loop(
-    benchmark: Benchmark, agent: Agent, evaluator: Evaluator, run_directory: Path, result_path: Path
+    benchmark: Benchmark,
+    agent: Agent,
+    evaluator: Evaluator,
+    run_directory: Path,
+    result_path: Path,
 ) -> None:
     overall_result = EvaluationResult.read(result_path)
 
@@ -385,9 +470,13 @@ def resumable_benchmark_evaluation_loop(
         _logger.info("[Problem set %d] %s", idx, problemset.name)
 
         with running_environment(run_directory, problemset.data_directory):
-            result = evaluator.evaluate(problemset, agent, benchmark.name, benchmark.version)
+            result = evaluator.evaluate(
+                problemset, agent, benchmark.name, benchmark.version
+            )
             overall_result.extend(result)
             _logger.info("[Problem set %d] Score: %.2f", idx, result.score)
 
         overall_result.write(result_path)
-        _logger.info("[Problem set %d] Overall score so far: %.3f", idx, overall_result.score)
+        _logger.info(
+            "[Problem set %d] Overall score so far: %.3f", idx, overall_result.score
+        )

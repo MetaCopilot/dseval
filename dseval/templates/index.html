@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>dseval - Browser</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css"
+    integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer" />
+  <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"
+    integrity="sha512-Xo0Jh8MsOn72LGV8kU5LsclG7SUzJsWGhXbWcYs2MAmChkQzwiW/yTQwdJ8w6UA9C6EVG18GHb/TrYpYCjyAQw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    
+  <script>
+    const current_run = "{{ run }}";
+    $(document).ready(function() {
+      hljs.highlightAll();
+      $('#select-run').dropdown({
+        onChange: function(value, text, $selectedItem) {
+          window.location.href = '?run=' + value;
+        }
+      });
+      $('#select-filter').dropdown({
+        onChange: function(value, text, $selectedItem) {
+          const href = new URL(window.location.href);
+          href.searchParams.set('filter', value);
+          href.searchParams.set('run', current_run);
+          window.location.href = href.toString();
+        }
+      });
+      $('.show-more').click(function () {
+        $(this).siblings('pre').text($(this).data('value'));
+        $(this).remove();
+      })
+    });
+  </script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+</head>
+<body>
+
+  <div class="ui fixed menu">
+    <div class="ui wide-container">
+      <a href="#" class="header item">
+        DSEval Browser
+      </a>
+    </div>
+  </div>
+
+  <div class="ui main wide-container">
+    <h2 class="ui header">Summary</h2>
+
+    <table class="ui celled table">
+      <tbody>
+        <tr>
+          <td>Run</td>
+          <td>
+            <div class="ui fluid selection dropdown" id="select-run">
+              <input type="hidden" name="user">
+              <i class="dropdown icon"></i>
+              <div class="text">{{ run }}</div>
+              <div class="menu">
+                {% for available_run in available_runs %}
+                <div class="item">
+                  {{ available_run }}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>Total problems</td>
+          <td>{{ total }}</td>
+        </tr>
+        <tr>
+          <td>Correct</td>
+          <td>{{ correct }}</td>
+        </tr>
+        <tr>
+          <td>Accuracy</td>
+          <td>{{ "%.2f" | format(correct / total * 100) }}%</td>
+        </tr>
+        <tr>
+          <td>Accuracy (w/o Intact)</td>
+          <td>{{ "%.2f" | format(correct_wo_intact / total * 100) }}%</td>
+        </tr>
+        <tr>
+          <td>Accuracy (w/o PE)</td>
+          <td>{{ "%.2f" | format(correct_wo_pe / total * 100) }}%</td>
+        </tr>
+        <tr>
+          <td>Accuracy (w/o Intact &amp; PE)</td>
+          <td>{{ "%.2f" | format(correct_wo_intact_pe / total * 100) }}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="ui header">Details</h2>
+    <table class="ui celled table" style="table-layout: fixed;">
+      <thead>
+        <tr>
+          <th class="two wide">Problemset</th>
+          <th class="one wide">Correct</th>
+          <th class="three wide">Question</th>
+          <th class="five wide">Code</th>
+          <th class="five wide">Comment</th>
+        </tr>
+      </thead>
+
+      <div class="ui fluid selection dropdown" id="select-filter">
+        <input type="hidden" name="user">
+        <i class="dropdown icon"></i>
+        <div class="text">{{ selected_filter }} ({{ available_filters[selected_filter] }})</div>
+        <div class="menu">
+          {% for available_filter_name, available_filter_count in available_filters.items() %}
+          <div class="item" data-value="{{ available_filter_name }}">
+            {{ available_filter_name }} ({{ available_filter_count }})
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <tbody>
+        {% for record in records %}
+          <tr>
+            <td class="top aligned">{{ record.problemset }} ({{ record.index }})</td>
+            <td class="top aligned">
+              {% if record.verdict == "CORRECT" %}
+                <a class="ui green label">CORRECT</a>
+              {% elif record.verdict in ["INTACT_VIOLATION", "PRESENTATION_ERROR"] %}
+                <a class="ui orange label">{{ record.verdict }} - {{ record.subverdict }}</a>
+              {% elif record.verdict in ["CRASH", "SYNTAX_ERROR"] %}
+                <a class="ui yellow label">{{ record.verdict }} - {{ record.subverdict }}</a>
+              {% else %}
+                <a class="ui red label">{{ record.verdict }} - {{ record.subverdict }}</a>
+              {% endif %}
+            </td>
+            <td class="top aligned">{{ record.question }}</td>
+            <td class="top aligned"><pre><code class="language-python">{{ record.code }}</code></pre></td>
+            <td class="top aligned">
+              <pre class="val-reason">{{ record.extended_verdict }}</pre>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</body>
+
+</html>
+
+
+

@@ -1,0 +1,18 @@
+.main {
+  margin-top: 7em;
+  padding-bottom: 5em;
+}
+
+.wide-container {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+pre code.hljs {
+  text-wrap: wrap;
+}
+
+.val-reason {
+  text-wrap: wrap;
+}
