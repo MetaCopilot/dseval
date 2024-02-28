@@ -71,11 +71,13 @@ Use `python -m dseval.browser --help` to see more options.
 
 ### Contributing New Problems
 
-TODO
+We are collecting problems via [this Google form](https://forms.gle/Wf4hkVHZzEv7xBGu7). If you have any ideas to challenge LLMs, LLM-powered data science agents, or any agents, you are welcome to submit it here.
+
+Multi-lingual version coming soon.
 
 ### Developing New Benchmarks
 
-TODO
+We will provide a tutorial soon. Currently you can refer to the examples provided in `benchmarks/examples`.
 
 ### Integrating New Agents
 
