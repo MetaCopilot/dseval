@@ -15,6 +15,9 @@ dependencies = [
 [tool.setuptools.packages.find]
 include = ["dseval*"]
 
+[tool.setuptools.package-data]
+mypkg = ["*.html", "*.js", "*.css"]
+
 [project.optional-dependencies]
 agent = [
     "mlcopilot",
@@ -30,5 +33,5 @@ dev = [
 ]
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

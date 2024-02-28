@@ -10,11 +10,17 @@ from pathlib import Path
 from typing import Any, List, TypedDict, cast
 
 import colorama
+import pandas as pd
 
 from .agent import Agent, AgentException, TentativeSolution, TentativeSolutions
 from .problem import Benchmark, ProblemSet
 from .simulation import Environment
-from .validator import Verdict, Subverdict, ValidateResult, validator_comments_to_verdict
+from .validator import (
+    Verdict,
+    Subverdict,
+    ValidateResult,
+    validator_comments_to_verdict,
+)
 from .utils import read_jsonl, write_jsonl
 
 _logger = logging.getLogger(__name__)
@@ -62,6 +68,33 @@ class EvaluationResult:
             self.details.append(detail)
             self.existing_records.add(key)
 
+    def as_dataframe(self) -> pd.DataFrame:
+        records = []
+        for detail in self.details:
+            records.append(
+                {
+                    "benchmark": f'{detail["benchmark"]}-v{detail["version"]}',
+                    "problemset": detail["problemset"],
+                    "index": detail["index"],
+                    "attempt": detail["attempt"],
+                    "verdict": detail["verdict"].name,
+                    "subverdict": detail["subverdict"].name,
+                    "extended_verdict": detail["extended_verdict"],
+                    "question": detail["question"],
+                    "code": detail["code"],
+                }
+            )
+        records = pd.DataFrame(records)
+
+        records_latest_attempt = (
+            records.sort_values(by=["benchmark", "problemset", "index", "attempt"])
+            .groupby(["benchmark", "problemset", "index"])
+            .last()
+            .reset_index()
+        )
+
+        return records_latest_attempt
+
     def has(self, problemset: str | None, index: int, attempt: int) -> bool:
         return (problemset, index, attempt) in self.existing_records
 
@@ -85,7 +118,11 @@ class EvaluationResult:
     def read(cls, path: Path | str) -> EvaluationResult:
         if not isinstance(path, Path):
             path = Path(path)
-        return cls(cast(List[EvaluationDetail], read_jsonl(path)))
+        data = read_jsonl(path)
+        for d in data:
+            d["verdict"] = Verdict(d["verdict"])
+            d["subverdict"] = Subverdict(d["subverdict"])
+        return cls(cast(List[EvaluationDetail], data))
 
     @property
     def score(self) -> float:
@@ -140,7 +177,10 @@ class Evaluator:
             playground_env.execute(problem.reference_code, **(problem.execution or {}))
 
             if problem.validator is not None:
-                last_cell, last_cell_playground = environment.last_cell, playground_env.last_cell
+                last_cell, last_cell_playground = (
+                    environment.last_cell,
+                    playground_env.last_cell,
+                )
                 assert last_cell is not None and last_cell_playground is not None
                 validate_result = problem.validator.validate(last_cell.output, last_cell_playground.output)
                 _logger.info(
@@ -215,7 +255,11 @@ class Evaluator:
         return TentativeSolutions(codes)
 
     def evaluate(
-        self, problems: ProblemSet, agent: Agent, benchmark_name: str | None = None, version: str | None = None
+        self,
+        problems: ProblemSet,
+        agent: Agent,
+        benchmark_name: str | None = None,
+        version: str | None = None,
     ) -> EvaluationResult:
         environment = Environment()
         total = 0
@@ -260,7 +304,12 @@ class Evaluator:
                         if attempt_id == 1:
                             code = agent.solve(problem.question, playground_env)
                         else:
-                            _logger.info("[Question %d] Attempt #%d: %s", total, attempt_id, retry_kwargs)
+                            _logger.info(
+                                "[Question %d] Attempt #%d: %s",
+                                total,
+                                attempt_id,
+                                retry_kwargs,
+                            )
                             code = agent.retry(**retry_kwargs)
                     except AgentException:
                         if not self.ignore_agent_exception:
@@ -370,7 +419,11 @@ def running_environment(run_directory: Path, data_source: Path | None = None):
 
 
 def resumable_benchmark_evaluation_loop(
-    benchmark: Benchmark, agent: Agent, evaluator: Evaluator, run_directory: Path, result_path: Path
+    benchmark: Benchmark,
+    agent: Agent,
+    evaluator: Evaluator,
+    run_directory: Path,
+    result_path: Path,
 ) -> None:
     overall_result = EvaluationResult.read(result_path)
 

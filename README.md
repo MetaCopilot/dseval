@@ -57,7 +57,17 @@ python scripts/test.py benchmarks/leetcode --model gpt-35-turbo --endpoint aoai
 
 ### Diagnosis
 
-TODO
+Use DSEval browser to diagnose agents' performance on benchmarks. For example,
+
+```bash
+python -m dseval.browser results
+```
+
+You will see a webpage like this:
+
+![](assets/dseval-browser.png)
+
+Use `python -m dseval.browser --help` to see more options.
 
 ### Contributing New Problems
 
@@ -70,3 +80,18 @@ TODO
 ### Integrating New Agents
 
 TODO
+
+## Citation
+
+The repository is founded upon the idea proposed in [this paper](https://arxiv.org/abs/2402.17168). If you find it useful in your research, please consider citing it:
+
+```bibtex
+@misc{zhang2024benchmarking,
+    title={Benchmarking Data Science Agents}, 
+    author={Yuge Zhang and Qiyang Jiang and Xingyu Han and Nan Chen and Yuqing Yang and Kan Ren},
+    year={2024},
+    eprint={2402.17168},
+    archivePrefix={arXiv},
+    primaryClass={cs.AI}
+}
+```
