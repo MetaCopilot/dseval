@@ -67,6 +67,8 @@ You will see a webpage like this:
 
 ![](assets/dseval-browser.png)
 
+Use `python -m dseval.browser --help` to see more options.
+
 ### Contributing New Problems
 
 TODO
