@@ -108,10 +108,6 @@
           <td>Accuracy (w/o PE)</td>
           <td>{{ "%.2f" | format(correct_wo_pe / total * 100) }}%</td>
         </tr>
-        <tr>
-          <td>Accuracy (w/o Intact &amp; PE)</td>
-          <td>{{ "%.2f" | format(correct_wo_intact_pe / total * 100) }}%</td>
-        </tr>
       </tbody>
     </table>
 
@@ -145,11 +141,11 @@
           <tr>
             <td class="top aligned">{{ record.problemset }} ({{ record.index }})</td>
             <td class="top aligned">
-              {% if record.verdict == "CORRECT" %}
-                <a class="ui green label">CORRECT</a>
-              {% elif record.verdict in ["INTACT_VIOLATION", "PRESENTATION_ERROR"] %}
+              {% if record.verdict == "Correct" %}
+                <a class="ui green label">Correct</a>
+              {% elif record.verdict in ["IntactViolation", "PresentationError"] %}
                 <a class="ui orange label">{{ record.verdict }} - {{ record.subverdict }}</a>
-              {% elif record.verdict in ["CRASH", "SYNTAX_ERROR"] %}
+              {% elif record.verdict in ["Crash", "SyntaxError"] %}
                 <a class="ui yellow label">{{ record.verdict }} - {{ record.subverdict }}</a>
               {% else %}
                 <a class="ui red label">{{ record.verdict }} - {{ record.subverdict }}</a>

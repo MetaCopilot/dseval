@@ -57,7 +57,15 @@ python scripts/test.py benchmarks/leetcode --model gpt-35-turbo --endpoint aoai
 
 ### Diagnosis
 
-TODO
+Use DSEval browser to diagnose agents' performance on benchmarks. For example,
+
+```bash
+python -m dseval.browser results
+```
+
+You will see a webpage like this:
+
+![](assets/dseval-browser.png)
 
 ### Contributing New Problems
 
