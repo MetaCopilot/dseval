@@ -12,6 +12,22 @@ from typing_extensions import NotRequired
 from .validator import Validator, add_indent
 
 
+def _str_presenter(dumper, data):
+    """
+    Configures yaml for dumping multiline strings
+
+    Ref:
+    - https://stackoverflow.com/questions/8640959/how-can-i-control-what-scalar-form-pyyaml-uses-for-my-data
+    - https://github.com/yaml/pyyaml/issues/240
+    """
+    if data.count("\n") > 0:  # check for multiline string
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+yaml.representer.SafeRepresenter.add_representer(str, _str_presenter)
+
+
 class ExecutionConfig(TypedDict):
     max_time: NotRequired[int]
     max_memory: NotRequired[int]
@@ -33,13 +49,26 @@ class SubProblem:
         data: dict | None = None,
         execution: ExecutionConfig | None = None,
     ):
+        self.setups: dict = {}
+        if question is not None:
+            self.setups["question"] = question
+        if validator is not None:
+            self.setups["validator"] = validator
+        if data is not None:
+            self.setups["data"] = data
+        if execution is not None:
+            self.setups["execution"] = execution
         self.question = question
         self.reference_code = reference_code
         if question is not None and validator is None:
-            validator = Validator.load("and", Validator.augment_config({}, "comparison"))
+            validator = Validator.load(
+                "and", Validator.augment_config({}, "comparison")
+            )
         elif isinstance(validator, dict):
             template = validator.pop("template", "comparison")
-            validator = Validator.load("and", Validator.augment_config(validator, template))
+            validator = Validator.load(
+                "and", Validator.augment_config(validator, template)
+            )
         self.validator = validator
         self.data = data
         self.execution = execution
@@ -69,7 +98,18 @@ class SubProblem:
             f"  validator: {add_indent(repr(self.validator), 2).lstrip()}\n)"
         )
 
-    def to_plain_text(self, index: int | None = None, answer_prefix: bool = True) -> str:
+    def to_dseal(self) -> tuple[str, str]:
+        setup = yaml.safe_dump(self.setups, default_flow_style=False)
+        if setup == "{}\n":
+            setup = ""
+        return (
+            setup,
+            self.reference_code
+        )
+
+    def to_plain_text(
+        self, index: int | None = None, answer_prefix: bool = True
+    ) -> str:
         index_str = str(index) if index is not None else ""
         if self.question is not None:
             ret = f"Q{index_str}: {self.question.rstrip()}\n\n"
@@ -82,7 +122,12 @@ class SubProblem:
 
 
 class ProblemSet:
-    def __init__(self, problems: list[SubProblem], name: str | None = None, data_directory: Path | None = None):
+    def __init__(
+        self,
+        problems: list[SubProblem],
+        name: str | None = None,
+        data_directory: Path | None = None,
+    ):
         self.problems = problems
         self.name = name
         self.data_directory = data_directory
@@ -150,7 +195,12 @@ class ProblemSet:
     def __repr__(self) -> str:
         return (
             "ProblemSet(\n"
-            + ",\n".join([add_indent(str(i) + ": " + repr(problem), 2) for i, problem in enumerate(self.problems)])
+            + ",\n".join(
+                [
+                    add_indent(str(i) + ": " + repr(problem), 2)
+                    for i, problem in enumerate(self.problems)
+                ]
+            )
             + "\n)"
         )
 
@@ -181,7 +231,13 @@ class Benchmark:
         if not isinstance(benchmark_path, Path):
             benchmark_path = Path(benchmark_path)
         if benchmark_path.is_dir():
-            problemsets = sorted([path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")])
+            problemsets = sorted(
+                [
+                    path
+                    for path in benchmark_path.glob("*.py")
+                    if not path.name.startswith("_")
+                ]
+            )
 
             manifest_path = benchmark_path / "_manifest.yaml"
             if not manifest_path.exists():
@@ -209,7 +265,10 @@ class Benchmark:
         return (
             "Benchmark(\n"
             + ",\n".join(
-                [add_indent(str(i) + ": " + repr(problemset), 2) for i, problemset in enumerate(self.problemsets)]
+                [
+                    add_indent(str(i) + ": " + repr(problemset), 2)
+                    for i, problemset in enumerate(self.problemsets)
+                ]
             )
             + "\n)"
         )
