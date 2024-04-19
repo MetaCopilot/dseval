@@ -10,6 +10,7 @@ __pycache__
 .env/
 .env
 /website/data
+/website/public/data
 
 # Temporary results
 /runs

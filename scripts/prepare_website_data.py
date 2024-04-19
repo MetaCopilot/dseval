@@ -20,7 +20,7 @@ def _main():
                     "code": code
                 })
 
-    Path("website/data/benchmarks.json").write_text(json.dumps(benchmark_data))
+    Path("website/public/data/benchmarks.json").write_text(json.dumps(benchmark_data))
 
     result_data = {}
     for result_dir in Path("results").iterdir():
@@ -28,7 +28,7 @@ def _main():
         for result_path in result_dir.iterdir():
             result_data[result_dir.name] += read_jsonl(result_path)
 
-    Path("website/data/results.json").write_text(json.dumps(result_data))
+    Path("website/public/data/results.json").write_text(json.dumps(result_data))
 
 
 if __name__ == "__main__":
