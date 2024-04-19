@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from dseval import Benchmark
-from dseval.utils import read_jsonl
+from dseval.utils import read_jsonl, get_code_complexity
 
 
 def _main():
@@ -16,8 +16,10 @@ def _main():
                 benchmark_data[benchmark.name].append({
                     "problemset": problemset.name,
                     "index": index,
+                    "question": problem.question,
                     "setup": setup,
-                    "code": code
+                    "code": code,
+                    "difficulty": get_code_complexity(code),
                 })
 
     Path("website/public/data/benchmarks.json").write_text(json.dumps(benchmark_data))
@@ -26,7 +28,10 @@ def _main():
     for result_dir in Path("results").iterdir():
         result_data[result_dir.name] = []
         for result_path in result_dir.iterdir():
-            result_data[result_dir.name] += read_jsonl(result_path)
+            added_result = read_jsonl(result_path)
+            for result in added_result:
+                result["agent"] = result_path.stem
+            result_data[result_dir.name] += added_result
 
     Path("website/public/data/results.json").write_text(json.dumps(result_data))
 

@@ -3,36 +3,7 @@ import ast
 import pandas as pd
 
 from dseval import Benchmark
-
-
-def get_code_complexity(code: str) -> float:
-    module = ast.parse(code)
-
-    complexity = 0.0
-    for node in ast.walk(module):
-        # Conditions
-        if isinstance(node, (ast.For, ast.While, ast.If, ast.With)):
-            complexity += 3
-        # Other statements
-        elif isinstance(node, ast.stmt):
-            complexity += 1
-        # Constant, variable
-        elif isinstance(node, (ast.Constant, ast.Name)):
-            complexity += 0
-        # Call other methods
-        elif isinstance(node, ast.Call):
-            complexity += 3
-        # Calling an attribute or a subscript
-        elif isinstance(node, (ast.Attribute, ast.Subscript)):
-            complexity += 4
-        # Other expressions
-        elif isinstance(node, ast.expr):
-            complexity += 1
-        # Function arguments
-        elif isinstance(node, ast.arg):
-            complexity += 1
-
-    return complexity
+from dseval.utils import get_code_complexity
 
 
 def compute_benchmark_difficulty(benchmark: Benchmark) -> float:
