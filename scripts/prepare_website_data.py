@@ -5,7 +5,10 @@ from dseval import Benchmark
 from dseval.utils import read_jsonl, get_code_complexity
 
 
-def _main():
+def _main(root_dir: str | Path):
+    root_dir = Path(root_dir)
+    root_dir.mkdir(exist_ok=True, parents=True)
+
     benchmark_data = {}
     for benchmark_path in Path("benchmarks").iterdir():
         benchmark = Benchmark.frompath(benchmark_path)
@@ -22,7 +25,7 @@ def _main():
                     "difficulty": get_code_complexity(code),
                 })
 
-    Path("website/public/data/benchmarks.json").write_text(json.dumps(benchmark_data))
+    (root_dir / "benchmarks.json").write_text(json.dumps(benchmark_data))
 
     result_data = {}
     for result_dir in Path("results").iterdir():
@@ -33,8 +36,8 @@ def _main():
                 result["agent"] = result_path.stem
             result_data[result_dir.name] += added_result
 
-    Path("website/public/data/results.json").write_text(json.dumps(result_data))
+    (root_dir / "results.json").write_text(json.dumps(result_data))
 
 
 if __name__ == "__main__":
-    _main()
+    _main("website/public/data")
