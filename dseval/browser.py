@@ -53,7 +53,7 @@ def home():
         result = result[result["verdict"] == selected_filter]
 
     return render_template(
-        "index.html",
+        "local_browser.html",
         records=result.to_dict(orient="records"),
         run=Path(selected_run).as_posix(),
         available_runs=available_runs,
