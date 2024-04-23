@@ -107,7 +107,7 @@ export default function Home() {
   const SEPARATOR = '---';
 
   useEffect(() => {
-    Promise.all([fetch('/data/benchmarks.json'), fetch('/data/results.json')])
+    Promise.all([fetch('data/benchmarks.json'), fetch('data/results.json')])
       .then(([res1, res2]) => {
         return Promise.all([res1.json(), res2.json()]);
       })

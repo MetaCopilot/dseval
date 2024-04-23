@@ -27,19 +27,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Prepare Website Data
+        run: |
+          python scripts/prepare_website_data.py
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           static_site_generator: next
           generator_config_file: website/next.config.mjs
+
       - name: Install Dependencies
         run: |
           cd website
           npm install
+
       - name: Build with Next
         run: |
           cd website
           npm run build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
