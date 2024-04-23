@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import CssBaseline from '@mui/material/CssBaseline';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import IconButton from '@mui/material/IconButton';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
@@ -282,6 +284,25 @@ export default function Home() {
           <Typography variant='h6' component='div' noWrap sx={{ flexGrow: 1 }}>
             DSEval Online Browser
           </Typography>
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton
+              size='large'
+              href='https://github.com/MetaCopilot/dseval'
+              target='_blank'
+              color='inherit'
+            >
+              <GitHubIcon />
+            </IconButton>
+            <IconButton
+              size='large'
+              edge='end'
+              href='https://arxiv.org/abs/2402.17168'
+              color='inherit'
+              target='_blank'
+            >
+              <ReadMoreIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
 
