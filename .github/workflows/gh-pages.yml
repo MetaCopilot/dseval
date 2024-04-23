@@ -32,6 +32,10 @@ jobs:
         with:
           static_site_generator: next
           generator_config_file: website/next.config.mjs
+      - name: Install Dependencies
+        run: |
+          cd website
+          npm install
       - name: Build with Next
         run: |
           cd website
