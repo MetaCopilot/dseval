@@ -102,10 +102,7 @@ class SubProblem:
         setup = yaml.safe_dump(self.setups, default_flow_style=False)
         if setup == "{}\n":
             setup = ""
-        return (
-            setup,
-            self.reference_code
-        )
+        return (setup, self.reference_code)
 
     def to_plain_text(
         self, index: int | None = None, answer_prefix: bool = True

@@ -1,5 +1,3 @@
-import ast
-
 import pandas as pd
 
 from dseval import Benchmark
