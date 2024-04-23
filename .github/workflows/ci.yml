@@ -47,10 +47,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd website
           npm install
 
       - name: Lint with ESLint
-        run: npm run lint
+        run: |
+          cd website
+          npm run lint
 
   build:
 
