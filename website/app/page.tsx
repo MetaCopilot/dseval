@@ -213,12 +213,20 @@ export default function Home() {
             .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
           return (
             <Box sx={{ marginBottom: 2, p: 2 }}>
-              <Typography variant="h6">
-                {result.agent}
-                <Chip label={displayName} color={color} />
-              </Typography>
+              <Box display="flex">
+                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                  {result.agent}
+                </Typography>
+                <Chip label={displayName} color={color} sx={{ fontWeight: 'bold' }} />
+              </Box>
               <SyntaxHighlighter language="python" wrapLongLines={true}>
                 {result.code}
+              </SyntaxHighlighter>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                Validator Summary
+              </Typography>
+              <SyntaxHighlighter language="text" wrapLongLines={true}>
+                {result.extended_verdict}
               </SyntaxHighlighter>
             </Box>
           );
