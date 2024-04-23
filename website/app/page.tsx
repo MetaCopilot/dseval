@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Drawer from '@mui/material/Drawer';
 import Toolbar from "@mui/material/Toolbar";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -54,6 +55,10 @@ interface SiteData {
   results: Map<string, Result[]>;
 }
 
+function ResultDrawer() {
+  return <div/>;
+}
+
 export default function Home() {
   const [data, setData] = useState<SiteData>({
     benchmarks: new Map(),
@@ -61,7 +66,7 @@ export default function Home() {
     results: new Map(),
   });
   const [visibleProblems, setVisibleProblems] = useState<Problem[]>([]);
-  const [visibleResults, setVisibleResults] = useState<Result[]>([]);
+  const [resultSet, setResultSet] = useState<Result[] | undefined>(undefined);
 
   const SEPARATOR = "---";
 
@@ -127,6 +132,11 @@ export default function Home() {
       const problems = data.problems.get(`${benchmark}${SEPARATOR}${problemset}`)!;
       setVisibleProblems(problems);
     };
+
+  const drawer = (
+    <Drawer open={resultSet !== undefined} onClose={() => setResultSet(undefined)}>
+    </Drawer>
+  )
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -217,6 +227,9 @@ export default function Home() {
           })}
         </Grid>
       </Grid>
+
+      {drawer}
+
     </Box>
   );
 }
