@@ -14,6 +14,7 @@ def _main():
             for index, problem in problemset.enumerate(False):
                 setup, code = problem.to_dseal()
                 benchmark_data[benchmark.name].append({
+                    "benchmark": benchmark.name,
                     "problemset": problemset.name,
                     "index": index,
                     "question": problem.question,

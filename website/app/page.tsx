@@ -9,6 +9,8 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Divider from "@mui/material/Divider";
+import Modal from "@mui/material/Modal";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
@@ -20,6 +22,7 @@ interface ProblemSet {
 }
 
 interface Problem {
+  benchmark: string;
   problemset: string;
   index: number;
   setup: string;
@@ -58,6 +61,7 @@ export default function Home() {
     results: new Map(),
   });
   const [visibleProblems, setVisibleProblems] = useState<Problem[]>([]);
+  const [visibleResults, setVisibleResults] = useState<Result[]>([]);
 
   const SEPARATOR = "---";
 
@@ -110,8 +114,6 @@ export default function Home() {
           });
         });
 
-        console.log(benchmarks, problems, results);
-
         setData({
           benchmarks,
           problems,
@@ -122,14 +124,13 @@ export default function Home() {
 
   const handleProblemSetClick =
     (benchmark: string, problemset: string) => (event: React.MouseEvent) => {
-      console.log(benchmark, problemset);
       const problems = data.problems.get(`${benchmark}${SEPARATOR}${problemset}`)!;
       setVisibleProblems(problems);
     };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="sticky">
+      <AppBar position="fixed">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             DSEval Online Browser
@@ -137,8 +138,8 @@ export default function Home() {
         </Toolbar>
       </AppBar>
 
-      <Grid container spacing={2}>
-        <Grid item xs={5}>
+      <Grid container spacing={2} sx={{ marginTop: "80px" }}>
+        <Grid item xs={5} sx={{ maxHeight: "calc(100vh - 80px)", overflow: "auto" }}>
           <SimpleTreeView>
             {Array.from(data.benchmarks.entries()).map(
               ([benchmarkName, benchmarkContents], index) => {
@@ -156,7 +157,9 @@ export default function Home() {
                 return (
                   <TreeItem
                     itemId={`benchmark-${index}`}
-                    label={`${benchmarkName} (${numProblemsets} problemsets, ${numProblems} problems, difficulty ${averageDifficulty.toFixed(1)})`}
+                    label={`${benchmarkName} (${numProblemsets} problemsets, ${numProblems} problems, difficulty ${averageDifficulty.toFixed(
+                      1
+                    )})`}
                   >
                     {benchmarkContents.map((problemset, localIndex) => (
                       <TreeItem
@@ -173,21 +176,45 @@ export default function Home() {
             )}
           </SimpleTreeView>
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={7} sx={{ maxHeight: "calc(100vh - 80px)", overflow: "auto" }}>
           <Typography variant="h4">
             ProblemSet:{" "}
             {visibleProblems.length > 0 ? visibleProblems[0].problemset : "not selected"}
           </Typography>
-          {visibleProblems.map((problem) => (
-            <React.Fragment>
-              <Typography variant="h6" component="div">
-                Problem #{problem.index}
-              </Typography>
-              <pre>{problem.setup}</pre>
-              <pre>{problem.code}</pre>
-              <Divider />
-            </React.Fragment>
-          ))}
+          {visibleProblems.map((problem) => {
+            const results =
+              data.results.get(
+                `${problem.benchmark}${SEPARATOR}${problem.problemset}${SEPARATOR}${problem.index}`
+              ) || [];
+            const acceptRate =
+              results.length > 0
+                ? (results.filter((result) => result.verdict === "CORRECT").length /
+                    results.length) *
+                  100
+                : 0;
+
+            return (
+              <React.Fragment>
+                <Typography variant="h6" component="div">
+                  {problem.setup
+                    ? `Problem #${problem.index} (difficulty ${problem.difficulty.toFixed(
+                        1
+                      )}, accept rate: ${acceptRate.toFixed(1)}%)`
+                    : `Preparation Code #${problem.index}`}
+                </Typography>
+
+                {problem.setup ? (
+                  <SyntaxHighlighter language="yaml" wrapLongLines={true}>
+                    {problem.setup}
+                  </SyntaxHighlighter>
+                ) : null}
+                <SyntaxHighlighter language="python" wrapLongLines={true}>
+                  {problem.code}
+                </SyntaxHighlighter>
+                <Divider />
+              </React.Fragment>
+            );
+          })}
         </Grid>
       </Grid>
     </Box>

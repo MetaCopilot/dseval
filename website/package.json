@@ -17,12 +17,14 @@
     "@mui/x-tree-view": "^7.3.0",
     "next": "14.2.2",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-syntax-highlighter": "^15.5.11",
     "eslint": "^8",
     "eslint-config-next": "14.2.2",
     "postcss": "^8",
