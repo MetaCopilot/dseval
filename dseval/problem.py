@@ -61,14 +61,10 @@ class SubProblem:
         self.question = question
         self.reference_code = reference_code
         if question is not None and validator is None:
-            validator = Validator.load(
-                "and", Validator.augment_config({}, "comparison")
-            )
+            validator = Validator.load("and", Validator.augment_config({}, "comparison"))
         elif isinstance(validator, dict):
             template = validator.pop("template", "comparison")
-            validator = Validator.load(
-                "and", Validator.augment_config(validator, template)
-            )
+            validator = Validator.load("and", Validator.augment_config(validator, template))
         self.validator = validator
         self.data = data
         self.execution = execution
@@ -104,9 +100,7 @@ class SubProblem:
             setup = ""
         return (setup, self.reference_code)
 
-    def to_plain_text(
-        self, index: int | None = None, answer_prefix: bool = True
-    ) -> str:
+    def to_plain_text(self, index: int | None = None, answer_prefix: bool = True) -> str:
         index_str = str(index) if index is not None else ""
         if self.question is not None:
             ret = f"Q{index_str}: {self.question.rstrip()}\n\n"
@@ -192,12 +186,7 @@ class ProblemSet:
     def __repr__(self) -> str:
         return (
             "ProblemSet(\n"
-            + ",\n".join(
-                [
-                    add_indent(str(i) + ": " + repr(problem), 2)
-                    for i, problem in enumerate(self.problems)
-                ]
-            )
+            + ",\n".join([add_indent(str(i) + ": " + repr(problem), 2) for i, problem in enumerate(self.problems)])
             + "\n)"
         )
 
@@ -228,13 +217,7 @@ class Benchmark:
         if not isinstance(benchmark_path, Path):
             benchmark_path = Path(benchmark_path)
         if benchmark_path.is_dir():
-            problemsets = sorted(
-                [
-                    path
-                    for path in benchmark_path.glob("*.py")
-                    if not path.name.startswith("_")
-                ]
-            )
+            problemsets = sorted([path for path in benchmark_path.glob("*.py") if not path.name.startswith("_")])
 
             manifest_path = benchmark_path / "_manifest.yaml"
             if not manifest_path.exists():
@@ -262,10 +245,7 @@ class Benchmark:
         return (
             "Benchmark(\n"
             + ",\n".join(
-                [
-                    add_indent(str(i) + ": " + repr(problemset), 2)
-                    for i, problemset in enumerate(self.problemsets)
-                ]
+                [add_indent(str(i) + ": " + repr(problemset), 2) for i, problemset in enumerate(self.problemsets)]
             )
             + "\n)"
         )
