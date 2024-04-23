@@ -196,19 +196,19 @@ export default function Home() {
             (acc, problemset) => acc + problemset.averageDifficulty * problemset.problemCount,
             0
           ) / numProblems;
+        const itemLabel =
+          `${benchmarkName} (${numProblemsets} problemsets, ` +
+          `${numProblems} problems, ` +
+          `difficulty ${averageDifficulty.toFixed(1)}`;
         return (
-          <TreeItem
-            itemId={`benchmark-${index}`}
-            label={`${benchmarkName} (${numProblemsets} problemsets, ${numProblems} problems, difficulty ${averageDifficulty.toFixed(
-              1
-            )})`}
-          >
+          <TreeItem itemId={`benchmark-${index}`} label={itemLabel} key={`benchmark-${index}`}>
             {benchmarkContents.map((problemset, localIndex) => (
               <TreeItem
                 itemId={`benchmark-${index}-${localIndex}`}
                 label={`${problemset.name} (${
                   problemset.problemCount
                 } problems, difficulty ${problemset.averageDifficulty.toFixed(1)})`}
+                key={`benchmark-${index}-${localIndex}`}
                 onClick={handleProblemSetClick(benchmarkName, problemset.name)}
               />
             ))}
@@ -248,7 +248,10 @@ export default function Home() {
               .toLowerCase()
               .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
             return (
-              <Box sx={{ marginBottom: 2, p: 2 }}>
+              <Box
+                sx={{ marginBottom: 2, p: 2 }}
+                key={`${result.benchmark}-${result.problemset}-${result.index}-${result.agent}`}
+              >
                 <Box display='flex'>
                   <Typography variant='h6' sx={{ flexGrow: 1 }}>
                     {result.agent}
@@ -352,7 +355,10 @@ export default function Home() {
               : 0;
 
           return (
-            <Box sx={{ marginBottom: 3 }}>
+            <Box
+              sx={{ marginBottom: 3 }}
+              key={`${problem.benchmark}-${problem.problemset}-${problem.index}`}
+            >
               <Box sx={{ display: 'flex' }}>
                 <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
                   {problem.setup
