@@ -3,7 +3,7 @@ name: Deploy Next Website to GitHub Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["master"]
+    branches: ["master", "github-pages"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -40,6 +40,8 @@ jobs:
         run: |
           cd website
           npm run build
+          ls -al ../_site
+          ls -al ../_site/data
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
