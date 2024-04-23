@@ -1,24 +1,19 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { styled } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import Toolbar from "@mui/material/Toolbar";
-import Grid from "@mui/material/Grid";
-import Chip from "@mui/material/Chip";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Divider from "@mui/material/Divider";
-import Modal from "@mui/material/Modal";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import CssBaseline from "@mui/material/CssBaseline";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
-import IconButton from "@mui/material/IconButton";
-
-import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
-import { TreeItem } from "@mui/x-tree-view/TreeItem";
+import React, { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Toolbar from '@mui/material/Toolbar';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import CssBaseline from '@mui/material/CssBaseline';
+import LeaderboardIcon from '@mui/icons-material/Leaderboard';
+import IconButton from '@mui/material/IconButton';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 
 interface ProblemSet {
   name: string;
@@ -60,6 +55,44 @@ interface SiteData {
   results: Map<string, Result[]>;
 }
 
+interface CodeBlockProps {
+  language: string;
+  code: string;
+  title?: string;
+  className?: string;
+}
+
+function CodeBlock(props: CodeBlockProps) {
+  console.log(props);
+  return (
+    <Box className={props.className}>
+      {props.title && <Typography variant='body1'>{props.title}</Typography>}
+      <SyntaxHighlighter
+        language={props.language}
+        wrapLongLines={true}
+        className={props.className}
+        customStyle={props.title ? { marginTop: 0 } : undefined}
+      >
+        {props.code}
+      </SyntaxHighlighter>
+    </Box>
+  );
+}
+
+const StyledCodeBlock = styled(CodeBlock)(({ theme }) => ({
+  '& .MuiTypography-root': {
+    fontWeight: 500,
+    color: theme.palette.grey[50],
+    backgroundColor: theme.palette.grey[600],
+    padding: `${theme.spacing(0.5)} ${theme.spacing(2)}`,
+  },
+  '& pre': {
+    padding: `${theme.spacing(1)} ${theme.spacing(2)} !important`,
+    lineHeight: `${theme.typography.body2.lineHeight} !important`,
+    fontSize: `${theme.typography.body2.fontSize} !important`,
+  },
+}));
+
 export default function Home() {
   const [data, setData] = useState<SiteData>({
     benchmarks: new Map(),
@@ -69,10 +102,10 @@ export default function Home() {
   const [visibleProblems, setVisibleProblems] = useState<Problem[]>([]);
   const [resultSet, setResultSet] = useState<Result[] | undefined>(undefined);
 
-  const SEPARATOR = "---";
+  const SEPARATOR = '---';
 
   useEffect(() => {
-    Promise.all([fetch("/data/benchmarks.json"), fetch("/data/results.json")])
+    Promise.all([fetch('/data/benchmarks.json'), fetch('/data/results.json')])
       .then(([res1, res2]) => {
         return Promise.all([res1.json(), res2.json()]);
       })
@@ -145,11 +178,11 @@ export default function Home() {
     }
   };
 
-  const fileBrowserWidth = "35vw";
-  const resultWidth = "40vw";
+  const fileBrowserWidth = '35vw';
+  const resultWidth = '40vw';
 
   const fileBrowser = (
-    <SimpleTreeView>
+    <SimpleTreeView sx={{ mt: 2 }}>
       {Array.from(data.benchmarks.entries()).map(([benchmarkName, benchmarkContents], index) => {
         const numProblemsets = benchmarkContents.length;
         const numProblems = benchmarkContents.reduce(
@@ -189,77 +222,103 @@ export default function Home() {
       onClose={() => setResultSet(undefined)}
       sx={{
         width: resultWidth,
-        [`& .MuiDrawer-paper`]: { width: resultWidth, boxSizing: "border-box" },
+        [`& .MuiDrawer-paper`]: { width: resultWidth, boxSizing: 'border-box' },
       }}
     >
       <Toolbar />
-      {resultSet &&
-        resultSet.map((result) => {
-          let color: "error" | "success" | "warning" = "error";
-          if (result.verdict == "CORRECT") {
-            color = "success";
-          } else if (
-            result.verdict == "INTACT_VIOLATION" ||
-            result.verdict == "PRESENTATION_ERROR"
-          ) {
-            color = "warning";
-          }
-          const displayName = (
-            result.verdict +
-            (result.subverdict === "UNCATEGORIZED" ? "" : " - " + result.subverdict)
-          )
-            .replace(/_/g, " ")
-            .toLowerCase()
-            .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
-          return (
-            <Box sx={{ marginBottom: 2, p: 2 }}>
-              <Box display="flex">
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                  {result.agent}
+      <Box sx={{ mt: 1 }}>
+        {resultSet &&
+          resultSet.map((result) => {
+            let color: 'error' | 'success' | 'warning' = 'error';
+            if (result.verdict == 'CORRECT') {
+              color = 'success';
+            } else if (
+              result.verdict == 'INTACT_VIOLATION' ||
+              result.verdict == 'PRESENTATION_ERROR'
+            ) {
+              color = 'warning';
+            }
+            const displayName = (
+              result.verdict +
+              (result.subverdict === 'UNCATEGORIZED' ? '' : ' - ' + result.subverdict)
+            )
+              .replace(/_/g, ' ')
+              .toLowerCase()
+              .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
+            return (
+              <Box sx={{ marginBottom: 2, p: 2 }}>
+                <Box display='flex'>
+                  <Typography variant='h6' sx={{ flexGrow: 1 }}>
+                    {result.agent}
+                  </Typography>
+                  <Chip label={displayName} color={color} sx={{ fontWeight: 'bold' }} />
+                </Box>
+                <Typography variant='body1' sx={{ fontWeight: 'bold' }}>
+                  Generated Code
                 </Typography>
-                <Chip label={displayName} color={color} sx={{ fontWeight: 'bold' }} />
+                <SyntaxHighlighter language='python' wrapLongLines={true}>
+                  {result.code}
+                </SyntaxHighlighter>
+                {result.extended_verdict && (
+                  <Box>
+                    <Typography variant='body1' sx={{ fontWeight: 'bold' }}>
+                      Validator Summary
+                    </Typography>
+                    <StyledCodeBlock language='text' code={result.extended_verdict} />
+                  </Box>
+                )}
               </Box>
-              <SyntaxHighlighter language="python" wrapLongLines={true}>
-                {result.code}
-              </SyntaxHighlighter>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                Validator Summary
-              </Typography>
-              <SyntaxHighlighter language="text" wrapLongLines={true}>
-                {result.extended_verdict}
-              </SyntaxHighlighter>
-            </Box>
-          );
-        })}
+            );
+          })}
+      </Box>
     </Drawer>
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar position='fixed' sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          <Typography variant="h6" component="div" noWrap sx={{ flexGrow: 1 }}>
+          <Typography variant='h6' component='div' noWrap sx={{ flexGrow: 1 }}>
             DSEval Online Browser
           </Typography>
         </Toolbar>
       </AppBar>
 
       <Drawer
-        variant="permanent"
+        variant='permanent'
         sx={{
           width: fileBrowserWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: fileBrowserWidth, boxSizing: "border-box" },
+          [`& .MuiDrawer-paper`]: { width: fileBrowserWidth, boxSizing: 'border-box' },
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: "auto" }}>{fileBrowser}</Box>
+        <Box sx={{ overflow: 'auto' }}>{fileBrowser}</Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h4">
-          ProblemSet: {visibleProblems.length > 0 ? visibleProblems[0].problemset : "not selected"}
-        </Typography>
+      <Box component='main' sx={{ flexGrow: 1, p: 3 }}>
+        <Toolbar />
+        {visibleProblems.length > 0 ? (
+          <Typography variant='h4' sx={{ mt: 0, mb: 2 }}>
+            Problem Set: {visibleProblems[0].problemset}
+          </Typography>
+        ) : (
+          <Typography
+            variant='h6'
+            sx={{
+              fontWeight: 'bold',
+              margin: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              minHeight: 'calc(100vh - 200px)',
+              textAlign: 'center',
+              color: 'gray',
+            }}
+          >
+            Problem set not selected
+          </Typography>
+        )}
         {visibleProblems.map((problem) => {
           const results =
             data.results.get(
@@ -267,14 +326,14 @@ export default function Home() {
             ) || [];
           const acceptRate =
             results.length > 0
-              ? (results.filter((result) => result.verdict === "CORRECT").length / results.length) *
+              ? (results.filter((result) => result.verdict === 'CORRECT').length / results.length) *
                 100
               : 0;
 
           return (
             <Box sx={{ marginBottom: 3 }}>
-              <Box sx={{ display: "flex" }}>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
                   {problem.setup
                     ? `Problem #${problem.index} (difficulty ${problem.difficulty.toFixed(
                         1
@@ -282,21 +341,19 @@ export default function Home() {
                     : `Preparation Code #${problem.index}`}
                 </Typography>
                 {problem.setup && (
-                  <IconButton aria-label="Leaderboard" onClick={handleResultButtonClick(problem)}>
+                  <IconButton aria-label='Leaderboard' onClick={handleResultButtonClick(problem)}>
                     <LeaderboardIcon />
                   </IconButton>
                 )}
               </Box>
 
-              {problem.setup ? (
-                <SyntaxHighlighter language="yaml" wrapLongLines={true}>
-                  {problem.setup}
-                </SyntaxHighlighter>
-              ) : null}
-              <SyntaxHighlighter language="python" wrapLongLines={true}>
-                {problem.code}
-              </SyntaxHighlighter>
-              <Divider />
+              {problem.setup ? <StyledCodeBlock code={problem.setup} language='yaml' /> : null}
+
+              <StyledCodeBlock
+                language='python'
+                code={problem.code}
+                title={problem.setup ? 'Answer' : undefined}
+              />
             </Box>
           );
         })}
