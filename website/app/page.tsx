@@ -199,7 +199,7 @@ export default function Home() {
         const itemLabel =
           `${benchmarkName} (${numProblemsets} problemsets, ` +
           `${numProblems} problems, ` +
-          `difficulty ${averageDifficulty.toFixed(1)}`;
+          `difficulty ${averageDifficulty.toFixed(1)})`;
         return (
           <TreeItem itemId={`benchmark-${index}`} label={itemLabel} key={`benchmark-${index}`}>
             {benchmarkContents.map((problemset, localIndex) => (
@@ -261,9 +261,7 @@ export default function Home() {
                 <Typography variant='body1' sx={{ fontWeight: 'bold' }}>
                   Generated Code
                 </Typography>
-                <SyntaxHighlighter language='python' wrapLongLines={true}>
-                  {result.code}
-                </SyntaxHighlighter>
+                <StyledCodeBlock language='python' code={result.code} />
                 {result.extended_verdict && (
                   <Box>
                     <Typography variant='body1' sx={{ fontWeight: 'bold' }}>
