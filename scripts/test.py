@@ -14,6 +14,7 @@ from dseval.agent import (
     ChapyterAgent,
     JupyterAIAgent,
     CodeInterpreterAgent,
+    DataInterpreterAgent,
 )
 from dseval.loop import resumable_benchmark_evaluation_loop
 
@@ -97,6 +98,8 @@ def configure_agent(model: str, agent: str, llm: BaseChatModel, debug: bool):
         return JupyterAIAgent(llm)
     elif agent == "codeinterpreterapi":
         return CodeInterpreterAgent(llm)
+    elif agent == "datainterpreter":
+        return DataInterpreterAgent()
     else:
         raise ValueError(f"Unknown agent: {agent}")
 
@@ -160,7 +163,7 @@ def _main():
         default="aoai",
         choices=["aoai", "openai", "aiyyds", "substrate", "azureml", "google", "llamacpp"],
     )
-    parser.add_argument("--agent", default="coml", choices=["coml", "chapyter", "jupyterai", "codeinterpreterapi"])
+    parser.add_argument("--agent", default="coml", choices=["coml", "chapyter", "jupyterai", "codeinterpreterapi", "datainterpreter"])
     parser.add_argument("--overwrite", action="store_true", default=False)
     parser.add_argument("--solve-only", default=False, action="store_true")
     parser.add_argument("--evaluate-from", type=Path, default=None)

@@ -691,3 +691,29 @@ class CodeInterpreterAgent(Agent):
             return agent_action.tool_input["code"]
         else:
             return "Invalid code"
+
+
+class DataInterpreterAgent(Agent):
+    def __init__(self):
+        self.memory: List[str] = []
+        
+    def reset(self):
+        self.memory.clear()
+
+    def solve(self, question: str, environment: Environment) -> str:
+        import asyncio
+        from metagpt.roles.di.data_interpreter import DataInterpreter
+        from .dataInterpreter_dseval import DataInterpreterForDSEval
+
+        if environment.last_cell:
+            self.memory.append(environment.last_cell.source)
+
+        prompt = (
+            "{prompt}\n\nProduce output as source code only, " "with no text or explanation before or after it."
+        ).format(prompt=question.strip())
+        self.memory.append(prompt)
+        # di = DataInterpreter()
+        environment_backup = environment.fork()
+        di = DataInterpreterForDSEval(environment_backup)
+        rsp = asyncio.run(di.run(self.memory))
+        return di.execute_code.nb.cells[-1].source
