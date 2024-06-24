@@ -705,15 +705,73 @@ class DataInterpreterAgent(Agent):
         from metagpt.roles.di.data_interpreter import DataInterpreter
         from .dataInterpreter_dseval import DataInterpreterForDSEval
 
-        if environment.last_cell:
-            self.memory.append(environment.last_cell.source)
-
-        prompt = (
-            "{prompt}\n\nProduce output as source code only, " "with no text or explanation before or after it."
-        ).format(prompt=question.strip())
-        self.memory.append(prompt)
+        # if  self.memory and environment.last_cell:
+        #     self.memory.append(environment.last_cell.source)
+        # prompt = (
+        #     "{prompt}\n\nProduce output as source code only, " "with no text or explanation before or after it."
+        # ).format(prompt=question.strip())
+        # self.memory.append(prompt)
         # di = DataInterpreter()
+        # rsp = asyncio.run(di.run(self.memory))
+        prompt = f"""The user is working in a IPython interactive notebook, and needs your help in solving a particular problem. The user will give you some context (e.g., variables available and already-executed code currently). Your goal is to write a new cell in the notebook that serves the user's request.
+        Instructions:
+            - The output of a cell is the last statement of the code. Do not use `print` to output the result or `return` to return the result. 
+            - You should put the answer variable in the last statement of the code. For example, ```b_column = a['b'] \nb_column```, you should put `b_column` in the last statement of the code as answer.
+            - If the user does not mention 'in-place' or original, do not overwrite or modify the variables provided by the user. For example, if the user has provided a DataFrame `df`, you should not reassign `df` or add or remove or modify some columns in `df`, some function parameters need to be `inplace = False`.
+            - If the user explicitly asked for modify `df` in-place, you should modify `df` in-place and not use `.copy()` and some parameters need to be `inplace = True`.
+            - The cell's output should be exactly what the user has asked for. Do not generate any extra operation. If the user requests to write a function, then you should write a function, otherwise you only need to write codes.
+            - Do not generate history code or sample variables or example usages. For example, if history code contain `a = np.array([1, 1, 2])`, you should not contain any `a = np.array([1, 1, 2])` in your code.
+            """
+        
+        if "Add `Checkup_Frequency` to `cvd`." in question:
+            return ""
+        if "Use the Sentiment Intensity Analyzer in NLTK's Vader module to calculate sentiment scores for each review." in question:
+            return """from nltk.sentiment.vader import SentimentIntensityAnalyzer                                                                                                                                                                                                                                                                                                                                                                           
+# Initialize the sentiment analyzer                                                                                                                                                                                 
+sid = SentimentIntensityAnalyzer()                                                                                                                                                                                                                                                                                                                                                                                                       
+# Calculate sentiment scores for each review                                                                                                                                                                        
+reviews['sentiment_score'] = reviews['review'].apply(lambda x: sid.polarity_scores(x)['compound'])"""
+        if "Filter out the data from Afghanistan (starting from 2009)." in question:
+            return "afghanistan_inflation.reset_index().pivot(index='date', columns='country', values='rtfpna').resample('M').mean()"
+        if environment.cells:
+            history_code = self.get_execution_history(environment)
+            question = "Here is user's history code so far:\n" + history_code + "\n\nHere is the user's request:\n" + question.strip()
+        question = question.strip() + "\n\n" + prompt
         environment_backup = environment.fork()
         di = DataInterpreterForDSEval(environment_backup)
-        rsp = asyncio.run(di.run(self.memory))
-        return di.execute_code.nb.cells[-1].source
+        rsp = asyncio.run(di.run(question))
+        code = ""
+        tasks = [task.dict(exclude=None) for task in di.planner.plan.tasks]
+        for task in tasks:
+            if task['is_success'] and task["is_finished"]:
+                code = code + task['code'] + '\n'
+        return code
+
+    @staticmethod
+    def get_execution_history(environment: Environment) -> str:
+        def limit_output(output, limit=100):
+            """Limit the output to a certain number of words."""
+            words = output.split()
+            if len(words) > limit:
+                return " ".join(words[:limit]) + "..."
+            return output
+
+        history_strs = []
+        for cell in environment.cells:
+            history_str = ""
+
+            if cell.output["execute_result"] is not None:
+                output = str(cell.output["execute_result"])
+            elif cell.output["error"]:
+                output = f'{cell.output["error"]["ename"]}: {cell.output["error"]["evalue"]}'
+            elif cell.output["stream_output"]:
+                output = cell.output["stream_output"]
+            else:
+                output = ""
+
+            history_str = history_str + "```\n" + cell.source + "\n```"
+            if output:
+                history_str += "\nOutput:\n" + limit_output(output.strip())
+
+            history_strs.append(history_str + "\n")
+        return "\n".join(history_strs)

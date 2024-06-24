@@ -1,5 +1,5 @@
 from metagpt.roles.di.data_interpreter import DataInterpreter
-from .simulation import Environment
+from .simulation import Environment, CellOutput
 from metagpt.actions.di.execute_nb_code import ExecuteNbCode
 from nbformat import NotebookNode
 import asyncio
@@ -22,94 +22,27 @@ class ExecuteNbCodeForDSEval(ExecuteNbCode):
         super().__init__()
         self.environment = environment
     
-    # async def async_execute_cell(self, cell, cell_index, execution_count: int | None = None,):
-    #     assert self.nb_client.kc is not None
-
-    #     await run_hook(self.nb_client.on_cell_start, cell=cell, cell_index=cell_index)
-
-    #     if cell.cell_type != "code" or not cell.source.strip():
-    #         self.nb_client.log.debug("Skipping non-executing cell %s", cell_index)
-    #         return cell
-
-    #     if self.nb_client.skip_cells_with_tag in cell.metadata.get("tags", []):
-    #         self.nb_client.log.debug("Skipping tagged cell %s", cell_index)
-    #         return cell
-
-    #     if self.nb_client.record_timing:  # clear execution metadata prior to execution
-    #         cell["metadata"]["execution"] = {}
-
-    #     self.nb_client.log.debug("Executing cell:\n%s", cell.source)
-
-    #     cell_allows_errors = (not self.nb_client.force_raise_errors) and (
-    #         self.nb_client.allow_errors or "raises-exception" in cell.metadata.get("tags", [])
-    #     )
-
-    #     await run_hook(self.nb_client.on_cell_execute, cell=cell, cell_index=cell_index)
-        
-    #     await run_hook(self.nb_client.on_cell_complete, cell=cell, cell_index=cell_index)
-    #     # We launched a code cell to execute
-    #     self.nb_client.code_cells_executed += 1
-    #     exec_timeout = self.nb_client._get_timeout(cell)
-
-    #     cell.outputs = []
-    #     self.nb_client.clear_before_next_output = False
-        
-
-    #     if execution_count:
-    #         cell["execution_count"] = execution_count
-        
-    #     if self.nb_client.coalesce_streams and cell.outputs:
-    #         new_outputs = []
-    #         streams: dict[str, NotebookNode] = {}
-    #         for output in cell.outputs:
-    #             if output["output_type"] == "stream":
-    #                 if output["name"] in streams:
-    #                     streams[output["name"]]["text"] += output["text"]
-    #                 else:
-    #                     new_outputs.append(output)
-    #                     streams[output["name"]] = output
-    #             else:
-    #                 new_outputs.append(output)
-
-    #         # process \r and \b characters
-    #         for output in streams.values():
-    #             old = output["text"]
-    #             while len(output["text"]) < len(old):
-    #                 old = output["text"]
-    #                 # Cancel out anything-but-newline followed by backspace
-    #                 output["text"] = _RGX_BACKSPACE.sub("", output["text"])
-    #             # Replace all carriage returns not followed by newline
-    #             output["text"] = _RGX_CARRIAGERETURN.sub("", output["text"])
-
-    #         # We also want to ensure stdout and stderr are always in the same consecutive order,
-    #         # because they are asynchronous, so order isn't guaranteed.
-    #         for i, output in enumerate(new_outputs):
-    #             if output["output_type"] == "stream" and output["name"] == "stderr":
-    #                 if (
-    #                     len(new_outputs) >= i + 2
-    #                     and new_outputs[i + 1]["output_type"] == "stream"
-    #                     and new_outputs[i + 1]["name"] == "stdout"
-    #                 ):
-    #                     stdout = new_outputs.pop(i + 1)
-    #                     new_outputs.insert(i, stdout)
-
-    #         cell.outputs = new_outputs
-
-    #     await self.nb_client._check_raise_for_error(cell, cell_index, exec_reply)
-
-    #     self.nb_client.nb["cells"][cell_index] = cell
         
     async def run_cell(self, cell: NotebookNode, cell_index: int) -> Tuple[bool, str]:
         """set timeout for run code.
         returns the success or failure of the cell execution, and an optional error message.
         """
+        def limit_output(output, limit=100):
+            """Limit the output to a certain number of words."""
+            words = output.split()
+            if len(words) > limit:
+                return " ".join(words[:limit]) + "..."
+            return output
         if not cell.source.strip():
             return False, "No Code"
         code = cell.source
-        self.environment.execute(code)
+        output = self.environment.execute(code)
+        # return self.parse_outputs(self.environment.cells[-1].output)
         if self.environment.last_exception is not None:
             return False, self.environment.last_exception
-        return True, ""
+        if output is not None:
+            return True, limit_output(str(output))
+        return True, limit_output(str(self.environment.last_cell.output["stream_output"]))
         # try:
         #     await self.async_execute_cell(cell, cell_index)
         #     return self.parse_outputs(self.nb.cells[-1].outputs)
@@ -124,6 +57,42 @@ class ExecuteNbCodeForDSEval(ExecuteNbCode):
         #     return False, "DeadKernelError"
         # except Exception:
         #     return self.parse_outputs(self.nb.cells[-1].outputs)
+        
+    def parse_outputs(self, outputs: CellOutput, keep_len: int = 2000) -> Tuple[bool, str]:
+        """Parses the outputs received from notebook execution."""
+        assert isinstance(outputs, CellOutput)
+        parsed_output, is_success = [], True
+        for i, output in enumerate(outputs):
+            output_text = ""
+            if output["output_type"] == "stream" and not any(
+                tag in output["text"]
+                for tag in ["| INFO     | metagpt", "| ERROR    | metagpt", "| WARNING  | metagpt", "DEBUG"]
+            ):
+                output_text = output["text"]
+            elif output["output_type"] == "display_data":
+                if "image/png" in output["data"]:
+                    self.show_bytes_figure(output["data"]["image/png"], self.interaction)
+                else:
+                    logger.info(
+                        f"{i}th output['data'] from nbclient outputs dont have image/png, continue next output ..."
+                    )
+            elif output["output_type"] == "execute_result":
+                output_text = output["data"]["text/plain"]
+            elif output["output_type"] == "error":
+                output_text, is_success = "\n".join(output["traceback"]), False
+
+            # handle coroutines that are not executed asynchronously
+            if output_text.strip().startswith("<coroutine object"):
+                output_text = "Executed code failed, you need use key word 'await' to run a async code."
+                is_success = False
+
+            output_text = remove_escape_and_color_codes(output_text)
+            # The useful information of the exception is at the end,
+            # the useful information of normal output is at the begining.
+            output_text = output_text[:keep_len] if is_success else output_text[-keep_len:]
+
+            parsed_output.append(output_text)
+        return is_success, ",".join(parsed_output)
 
 class DataInterpreterForDSEval(DataInterpreter):
     def __init__(self, environment: Environment):
